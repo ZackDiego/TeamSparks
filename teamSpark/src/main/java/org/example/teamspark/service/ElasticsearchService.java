@@ -1,8 +1,10 @@
 package org.example.teamspark.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.example.teamspark.model.OutMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,7 @@ public class ElasticsearchService {
         this.restTemplate = new RestTemplate();
     }
 
-    public void createIndex(String indexName) throws JsonProcessingException {
+    public void createIndexIfNotExists(String indexName) throws JsonProcessingException {
         String indexEndpoint = ESUrl + "/" + indexName;
 
         // Create HttpHeaders with authentication
@@ -54,6 +56,36 @@ public class ElasticsearchService {
             log.error("Failed to create index: " + indexName);
         }
     }
+
+    public void addMessageToIndex(String indexName, OutMessage message) {
+        String indexEndpoint = ESUrl + "/" + indexName + "/_doc";
+
+        // Create HttpHeaders with authentication
+        HttpHeaders headers = createHeaders(ESUserName, ESPassword);
+
+        // convert message to JSON
+        ObjectMapper objectMapper = new ObjectMapper();
+        String messageJson = null;
+        try {
+            messageJson = objectMapper.writeValueAsString(message);
+        } catch (Exception e) {
+            // Handle JSON serialization exception
+            log.error("Error when converting message to json");
+            return;
+        }
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(messageJson, headers);
+
+        // Send POST request to add message to index
+        ResponseEntity<String> response = restTemplate.exchange(indexEndpoint, HttpMethod.POST, requestEntity, String.class);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            log.info("Message added to index: " + indexName);
+        } else {
+            log.error("Failed to add message to index: " + indexName);
+        }
+    }
+
 
     private HttpHeaders createHeaders(String username, String password) {
         String auth = username + ":" + password;
