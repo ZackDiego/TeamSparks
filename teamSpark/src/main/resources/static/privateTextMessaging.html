@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Messenger</title>
+    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" rel="stylesheet">
+    <script
+            crossorigin="anonymous"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <script src="/privateTextMessagingStomp.js"></script>
+</head>
+<body>
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+    enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+<div class="container" id="main-content">
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="from">Message Sender Name:</label>
+                    <input class="form-control" id="from" placeholder="Name" type="text" value="Alice">
+                </div>
+                <div class="form-group">
+                    <label for="from">Message Receiver Name:</label>
+                    <input class="form-control" id="to" placeholder="Receiver" type="text" value="Bob">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6 mb-3">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="connect">WebSocket connection:</label>
+                    <button class="btn btn-default" id="connect" type="submit">Connect</button>
+                    <button class="btn btn-default" disabled="disabled" id="disconnect" type="submit">Disconnect
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6 mb-3">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="content">Message:</label>
+                    <input class="form-control" id="content" placeholder="Message" type="text">
+                </div>
+                <button class="btn btn-default" id="send" type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped" id="conversation-container">
+                <thead>
+                <tr>
+                    <th>Conversation</th>
+                </tr>
+                </thead>
+                <tbody id="conversation">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,7 +1,6 @@
 package org.example.teamspark.controller;
 
 import lombok.extern.apachecommons.CommonsLog;
-
 import org.example.teamspark.model.InGroupMessage;
 import org.example.teamspark.model.InMessage;
 import org.example.teamspark.model.OutMessage;
@@ -21,21 +20,19 @@ public class TextMessageController {
     public void handleGroupMessage(InGroupMessage message) throws Exception {
         messageTemplate.convertAndSend(
                 "/textChatGroup/" + message.getChatGroup(),
-                new OutMessage(message.getFrom()+" send: " + message.getContent()));
+                new OutMessage(message.getFrom() + " send: " + message.getContent()));
     }
 
     @MessageMapping("/privateTextChat")
     public void handlePrivateMessage(InMessage message) {
-        log.info("receive message");
         // Send to Message Receiver
         messageTemplate.convertAndSend(
-                "/privateTextChat/"+ message.getTo(),
-                new OutMessage(message.getFrom()+" send: "+ message.getContent()));
+                "/privateTextChat/" + message.getTo(),
+                new OutMessage(message.getFrom() + " send: " + message.getContent()));
 
-        log.info(message.getFrom());
         // Send to Message Sender
         messageTemplate.convertAndSend(
-                "/privateTextChat/"+ message.getFrom(),
-                new OutMessage(message.getFrom()+" send: "+ message.getContent()));
+                "/privateTextChat/" + message.getFrom(),
+                new OutMessage(message.getFrom() + " send: " + message.getContent()));
     }
 }
