@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spring Boot Chat Room</title>
+    <meta charset="utf-8"/>
+    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" rel="stylesheet">
+    <script
+            crossorigin="anonymous"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <script src="/groupTextMessagingStomp.js"></script>
+</head>
+<body>
+
+<div class="container" id="main-content">
+    <div class="row">
+        <div class="col-md-6">
+            <form class="form-inline">
+
+                <div class="form-group">
+                    <label for="from">Enter Your Name: </label>
+                    <input class="form-control" id="from" placeholder="Enter your name" type="text">
+                </div>
+                <div>
+                    <label for="chat-group">Enter Group Name: </label>
+                    <input class="form-control" id="chat-group" placeholder="Enter group name" type="text">
+                </div>
+                <div class="form-group">
+                    <label for="connect">WebSocket Connection:</label>
+                    <button class="btn btn-default" id="connect" type="submit">Connect</button>
+                    <button class="btn btn-default" disabled="disabled" id="disconnect" type="submit">Disconnect
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="content">Send Message</label>
+                    <input class="form-control" id="content" placeholder="Enter Message" type="text">
+                </div>
+                <button class="btn btn-default" id="send" type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped" id="conversation-container">
+                <thead>
+                <tr>
+                    <th>Conversation</th>
+                </tr>
+                </thead>
+                <tbody id="conversation">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

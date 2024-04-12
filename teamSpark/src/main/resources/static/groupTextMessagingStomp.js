@@ -3,11 +3,11 @@ const stompClient = new StompJs.Client({
 });
 
 stompClient.onConnect = (frame) => {
-    const from = $("#from").val();
+    const group = $("#chat-group").val();
 
     setConnected(true);
     console.log('Connected: ' + frame);
-    stompClient.subscribe('/privateTextChat/' + from, function (result) {
+    stompClient.subscribe('/textChatGroup/' + group, (result) => {
         showContent(JSON.parse(result.body));
     });
 };
@@ -44,14 +44,13 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-
 function sendMessage() {
     stompClient.publish({
-        destination: "/websocket/privateTextChat",
+        destination: "/websocket/groupTextChat",
         body: JSON.stringify({
             'content': $("#content").val(),
-            'to': $("#to").val(),
-            'from': $("#from").val()
+            'from': $("#from").val(),
+            'chatGroup': $("#chat-group").val()
         })
     });
 }
