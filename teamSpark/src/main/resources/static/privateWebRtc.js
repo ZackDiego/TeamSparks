@@ -2,9 +2,10 @@
 const LOCAL_IP_ADDRESS = "localhost:8000";
 
 const getElement = id => document.getElementById(id);
-const [btnConnect, btnToggleVideo, btnToggleAudio, divRoomConfig, roomDiv, roomNameInput, localVideo, remoteVideo] = ["btnConnect",
-    "toggleVideo", "toggleAudio", "roomConfig", "roomDiv", "roomName",
-    "localVideo", "remoteVideo"].map(getElement);
+const [btnConnect, btnToggleVideo, btnToggleAudio, divRoomConfig,
+    roomDiv, roomNameInput, localVideo, remoteVideo] =
+    ["btnConnect", "toggleVideo", "toggleAudio", "roomConfig", "roomDiv", "roomName",
+        "localVideo", "remoteVideo"].map(getElement);
 let remoteDescriptionPromise, roomName, localStream, remoteStream,
     rtcPeerConnection, isCaller;
 
@@ -12,11 +13,15 @@ let remoteDescriptionPromise, roomName, localStream, remoteStream,
 // but we don't need for local development
 const iceServers = {
     iceServers: [
-        {urls: `stun:${LOCAL_IP_ADDRESS}:3478`},
+        {urls: 'stun:stun.l.google.com:19302'},
+        {urls: 'stun:stun1.l.google.com:19302'},
+        {urls: 'stun:stun2.l.google.com:19302'},
+        {urls: 'stun:stun3.l.google.com:19302'},
+        {urls: 'stun:stun4.l.google.com:19302'},
         {
-            urls: `turn:${LOCAL_IP_ADDRESS}:3478`,
-            username: "username",
-            credential: "password"
+            urls: `turn:13.250.13.83:3478`,
+            username: "YzYNCouZM1mhqhmseWk6",
+            credential: "YzYNCouZM1mhqhmseWk6"
         }
     ]
 };
@@ -28,6 +33,12 @@ let socket = io.connect("http://" + LOCAL_IP_ADDRESS);
 
 btnToggleVideo.addEventListener("click", () => toggleTrack("video"));
 btnToggleAudio.addEventListener("click", () => toggleTrack("audio"));
+
+$('#btnLeave').click(() => {
+    console.log("leave room")
+    socket.emit("leaveRoom", roomName)
+    socket.disconnect();
+});
 
 function toggleTrack(trackType) {
     if (!localStream) {

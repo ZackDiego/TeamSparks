@@ -67,7 +67,7 @@ public class SocketHandler {
             users.put(client.getSessionId().toString(), room);
             rooms.put(room, client.getSessionId().toString());
         } else if (connectedClients == 1) {
-            //
+            // room created
             client.joinRoom(room);
             client.sendEvent("joined", room);
             users.put(client.getSessionId().toString(), room);
@@ -75,7 +75,7 @@ public class SocketHandler {
         } else {
             client.sendEvent("full", room);
         }
-        printLog("onReady", client, room);
+        printLog("onJoinRoom", client, room);
     }
 
     @OnEvent("ready")
