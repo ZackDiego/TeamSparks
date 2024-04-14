@@ -40,6 +40,8 @@ $('#btnLeave').click(() => {
     console.log("leave room")
     socket.emit("leaveRoom", roomName)
     socket.disconnect();
+    // refresh the page when leave room
+    window.location.reload();
 });
 
 function toggleTrack(trackType) {
@@ -197,8 +199,9 @@ handleSocketEvent("answer", e => {
     }
 });
 
-handleSocketEvent("userDisconnected", (e) => {
-    remoteVideo.srcObject = null;
+handleSocketEvent("userDisconnected", (clientId) => {
+    $(`#remoteVideo_${clientId}`).remove();
+    rtcPeerConnectionsMap.delete(clientId);
 });
 
 handleSocketEvent("setCaller", callerId => {
@@ -232,15 +235,21 @@ function createRemoteVideoScreen(stream, clientId) {
 
     const clientIdVideoElement = $(`#remoteVideo_${clientId}`)
     if (clientIdVideoElement.length === 0) {
+
         const $videoElement = $('<video autoplay ></video>')
-            .attr('id', `remoteVideo_${clientId}`)
             .addClass('img-responsive center-block')
             .prop('srcObject', stream);
 
         const $remoteStreamsDiv = $('#remoteStreams');
+        const $participantDiv = $('<div></div>')
+            .attr('id', `remoteVideo_${clientId}`);
+
         const $remoteParticipantHeader = $('<h3 class="text-center"></h3>').text(`Participant: ${clientId}`);
 
-        $remoteStreamsDiv.append($remoteParticipantHeader);
-        $remoteStreamsDiv.append($videoElement);
+        $participantDiv.append($remoteParticipantHeader);
+        $participantDiv.append($videoElement);
+        $remoteStreamsDiv.append($participantDiv);
     }
+
+
 }

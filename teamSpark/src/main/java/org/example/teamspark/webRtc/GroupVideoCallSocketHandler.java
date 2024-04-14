@@ -116,6 +116,11 @@ public class GroupVideoCallSocketHandler {
     @OnEvent("leaveRoom")
     public void onLeaveRoom(SocketIOClient client, String room) {
         client.leaveRoom(room);
+        String leaveCliendId = client.getSessionId().toString();
+        roomManager.removeClientFromRoom(room, leaveCliendId);
+        // send userDisconnected to rest of users in the same room
+        client.getNamespace().getRoomOperations(room).sendEvent("userDisconnected", leaveCliendId);
+
         printLog("onLeaveRoom", client, room);
     }
 
