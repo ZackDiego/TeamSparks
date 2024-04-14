@@ -79,23 +79,44 @@ btnConnect.onclick = () => {
 const handleSocketEvent = (eventName, callback) => socket.on(eventName,
     callback);
 
-handleSocketEvent("created", e => {
+handleSocketEvent("created", async function () {
     console.log("receive created event")
-    navigator.mediaDevices.getUserMedia(streamConstraints).then(stream => {
-        localStream = stream;
-        localVideo.srcObject = stream;
-        isCaller = true;
-    }).catch(console.error);
+    const stream = await navigator.mediaDevices.getUserMedia(streamConstraints)
+    localStream = stream;
+    localVideo.srcObject = stream;
+    isCaller = true;
 });
 
-handleSocketEvent("joined", e => {
+handleSocketEvent("joined", async function (e) {
     console.log("receive joined event")
 
-    navigator.mediaDevices.getUserMedia(streamConstraints).then(stream => {
-        localStream = stream;
-        localVideo.srcObject = stream;
-        socket.emit("ready", roomName);
-    }).catch(console.error);
+    // get local stream
+    const stream = await navigator.mediaDevices.getUserMedia(streamConstraints)
+    localStream = stream;
+    localVideo.srcObject = stream;
+
+    // loop through existing clients to send offer
+    for (let existingClientId of e) {
+        rtcPeerConnection = new RTCPeerConnection(iceServers);
+        rtcPeerConnection.onicecandidate = event => onIceCandidate(event, existingClientId);
+        rtcPeerConnection.ontrack = event => onAddStream(event, existingClientId);
+        rtcPeerConnection.addTrack(localStream.getTracks()[0], localStream);
+        rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
+        const sessionDescription = await rtcPeerConnection.createOffer();
+        await rtcPeerConnection.setLocalDescription(sessionDescription);
+
+        console.log("send offer to existing client: " + existingClientId)
+
+        // send offer event to new client through signal server
+        socket.emit("offer", {
+            type: "offer", sdp: sessionDescription, room: roomName,
+            targetClientId: existingClientId,
+        });
+
+        // save connection into map for management
+        rtcPeerConnectionsMap.set(existingClientId, rtcPeerConnection);
+    }
+    console.log(rtcPeerConnectionsMap);
 });
 
 
@@ -127,30 +148,6 @@ handleSocketEvent("candidate", e => {
     }
 });
 
-handleSocketEvent("ready", async function (joinedClientId) {
-    console.log("receive ready event");
-
-    if (socket.id !== joinedClientId) {
-        rtcPeerConnection = new RTCPeerConnection(iceServers);
-        rtcPeerConnection.onicecandidate = event => onIceCandidate(event, joinedClientId);
-        rtcPeerConnection.ontrack = onAddStream;
-        rtcPeerConnection.addTrack(localStream.getTracks()[0], localStream);
-        rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
-        const offer = await rtcPeerConnection.createOffer();
-        await rtcPeerConnection.setLocalDescription(offer);
-
-        // send offer event to new client through signal server
-        socket.emit("offer", {
-            type: "offer", sdp: sessionDescription, room: roomName,
-            joinedClientId: joinedClientId,
-        });
-
-        // save connection into map for management
-        rtcPeerConnectionsMap.set(joinedClientId, rtcPeerConnection);
-        console.log(rtcPeerConnectionsMap);
-    }
-});
-
 handleSocketEvent("offer", e => {
     console.log("receive offer event");
 
@@ -158,7 +155,7 @@ handleSocketEvent("offer", e => {
 
     rtcPeerConnection = new RTCPeerConnection(iceServers);
     rtcPeerConnection.onicecandidate = event => onIceCandidate(event, offerClientId);
-    rtcPeerConnection.ontrack = onAddStream;
+    rtcPeerConnection.ontrack = event => onAddStream(event, offerClientId);
     rtcPeerConnection.addTrack(localStream.getTracks()[0], localStream);
     rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
 
@@ -175,7 +172,6 @@ handleSocketEvent("offer", e => {
                     type: "answer", sdp: sessionDescription, room: roomName, offerClientId: offerClientId
                 });
 
-                rtcPeerConnectionStatus = "WAITING_FOR_ANSWER";
                 console.log("add offerClientId: " + offerClientId + "sdp, and return answer");
             })
             .catch(error => console.log(error));
@@ -210,7 +206,7 @@ handleSocketEvent("setCaller", callerId => {
 });
 
 const onIceCandidate = (e, clientId) => {
-    console.log("onIceCandidate" + clientId)
+    console.log("onIceCandidate " + clientId)
     if (e.candidate) {
         console.log("sending ice candidate");
         socket.emit("candidate", {
@@ -224,22 +220,22 @@ const onIceCandidate = (e, clientId) => {
     }
 }
 
-const onAddStream = e => {
+const onAddStream = (e, clientId) => {
     console.log("Create new video screen");
-    createRemoteVideoScreen(e.streams[0]);
+    createRemoteVideoScreen(e.streams[0], clientId);
     remoteStream = e.stream;
 }
 
 
-function createRemoteVideoScreen(stream) {
+function createRemoteVideoScreen(stream, clientId) {
     const $videoElement = $('<video autoplay ></video>')
-        // .attr('id', `remoteVideo_${clientId}`)
+        .attr('id', `remoteVideo_${clientId}`)
         .addClass('img-responsive center-block')
         .prop('srcObject', stream);
 
     const $remoteStreamsDiv = $('#remoteStreams');
-    // const $remoteParticipantHeader = $('<h3></h3>').text(`Participant ${clientId}`);
+    const $remoteParticipantHeader = $('<h3></h3>').text(`Participant ${clientId}`);
 
-    // $remoteStreamsDiv.append($remoteParticipantHeader);
+    $remoteStreamsDiv.append($remoteParticipantHeader);
     $remoteStreamsDiv.append($videoElement);
 }

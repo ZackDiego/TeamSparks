@@ -54,22 +54,18 @@ public class GroupVideoCallSocketHandler {
     public void onJoinRoom(SocketIOClient client, String room) {
         int connectedClients = server.getRoomOperations(room).getClients().size();
         client.joinRoom(room);
-        roomManager.addClientToRoom(client.getSessionId().toString(), room);
 
         if (connectedClients == 0) {
-            client.sendEvent("created", room);
+            client.sendEvent("created");
             roomManager.setRoomCaller(client.getSessionId().toString(), room);
         } else {
-            client.sendEvent("joined", room);
-            client.sendEvent("setCaller", roomManager.getRoomCaller(room));
+            // return existing users in room
+            client.sendEvent("joined", roomManager.getClientsInRoom(room));
         }
-        printLog("onJoinRoom", client, room);
-    }
 
-    @OnEvent("ready")
-    public void onReady(SocketIOClient client, String room) {
-        client.getNamespace().getBroadcastOperations().sendEvent("ready", client.getSessionId().toString());
-        printLog("onReady", client, room);
+        roomManager.addClientToRoom(client.getSessionId().toString(), room);
+
+        printLog("onJoinRoom", client, room);
     }
 
     @OnEvent("candidate")
@@ -86,10 +82,10 @@ public class GroupVideoCallSocketHandler {
     @OnEvent("offer")
     public void onOffer(SocketIOClient client, Map<String, Object> payload) {
         // parse payload
-        String joinedClientId = (String) payload.get("joinedClientId");
+        String targetClientId = (String) payload.get("targetClientId");
         String room = (String) payload.get("room");
 
-        SocketIOClient targetClient = server.getClient(UUID.fromString(joinedClientId));
+        SocketIOClient targetClient = server.getClient(UUID.fromString(targetClientId));
         Map<String, Object> offerPayload = new HashMap<>();
         offerPayload.put("offerClientId", client.getSessionId().toString());
         offerPayload.put("sdp", payload.get("sdp"));
