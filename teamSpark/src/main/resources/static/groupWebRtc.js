@@ -7,22 +7,24 @@ const [btnConnect, btnToggleVideo, btnToggleAudio, divRoomConfig,
     ["btnConnect", "toggleVideo", "toggleAudio", "roomConfig", "roomDiv", "roomName",
         "localVideo", "remoteVideo"].map(getElement);
 let remoteDescriptionPromise, roomName, localStream, remoteStream,
-    rtcPeerConnection, isCaller, rtcPeerConnectionStatus;
+    rtcPeerConnection, isCaller;
+
+let rtcPeerConnectionsMap = new Map();
 
 // you can use public stun and turn servers,
 // but we don't need for local development
 const iceServers = {
     iceServers: [
         {urls: 'stun:stun.l.google.com:19302'},
-        {urls: 'stun:stun1.l.google.com:19302'},
-        {urls: 'stun:stun2.l.google.com:19302'},
-        {urls: 'stun:stun3.l.google.com:19302'},
-        {urls: 'stun:stun4.l.google.com:19302'},
-        {
-            urls: `turn:13.250.13.83:3478`,
-            username: "YzYNCouZM1mhqhmseWk6",
-            credential: "YzYNCouZM1mhqhmseWk6"
-        }
+        // {urls: 'stun:stun1.l.google.com:19302'},
+        // {urls: 'stun:stun2.l.google.com:19302'},
+        // {urls: 'stun:stun3.l.google.com:19302'},
+        // {urls: 'stun:stun4.l.google.com:19302'},
+        // {
+        //     urls: `turn:13.250.13.83:3478`,
+        //     username: "YzYNCouZM1mhqhmseWk6",
+        //     credential: "YzYNCouZM1mhqhmseWk6"
+        // }
     ]
 };
 
@@ -96,9 +98,11 @@ handleSocketEvent("joined", e => {
     }).catch(console.error);
 });
 
+
 handleSocketEvent("candidate", e => {
     console.log("receive candidate event");
 
+    rtcPeerConnection = rtcPeerConnectionsMap.get(e.candidateClientId);
     if (rtcPeerConnection) {
         const candidate = new RTCIceCandidate({
             sdpMLineIndex: e.label, candidate: e.candidate,
@@ -128,7 +132,7 @@ handleSocketEvent("ready", joinedClientId => {
 
     if (socket.id !== joinedClientId) {
         rtcPeerConnection = new RTCPeerConnection(iceServers);
-        rtcPeerConnection.onicecandidate = onIceCandidate;
+        rtcPeerConnection.onicecandidate = event => onIceCandidate(event, joinedClientId);
         rtcPeerConnection.ontrack = onAddStream;
         rtcPeerConnection.addTrack(localStream.getTracks()[0], localStream);
         rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
@@ -142,6 +146,9 @@ handleSocketEvent("ready", joinedClientId => {
                 });
             })
             .catch(error => console.log(error));
+        // save connection into map for management
+        rtcPeerConnectionsMap.set(joinedClientId, rtcPeerConnection);
+        console.log(rtcPeerConnectionsMap);
     }
 });
 
@@ -151,7 +158,7 @@ handleSocketEvent("offer", e => {
     const {offerClientId, sdp} = e;
 
     rtcPeerConnection = new RTCPeerConnection(iceServers);
-    rtcPeerConnection.onicecandidate = onIceCandidate;
+    rtcPeerConnection.onicecandidate = event => onIceCandidate(event, offerClientId);
     rtcPeerConnection.ontrack = onAddStream;
     rtcPeerConnection.addTrack(localStream.getTracks()[0], localStream);
     rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
@@ -174,12 +181,18 @@ handleSocketEvent("offer", e => {
             })
             .catch(error => console.log(error));
     }
+    // save connection into map for management
+    rtcPeerConnectionsMap.set(offerClientId, rtcPeerConnection);
+    console.log(rtcPeerConnectionsMap);
 });
 
 handleSocketEvent("answer", e => {
+    console.log("receive answer event");
+
     const {answerClientId, sdp} = e;
 
-    console.log("receive answer event");
+    // find the matching rtcPeerConnection by answerClientId
+    rtcPeerConnection = rtcPeerConnectionsMap.get(answerClientId);
 
     if (rtcPeerConnection.signalingState === "have-local-offer") {
         remoteDescriptionPromise = rtcPeerConnection.setRemoteDescription(
@@ -197,7 +210,8 @@ handleSocketEvent("setCaller", callerId => {
     isCaller = socket.id === callerId;
 });
 
-const onIceCandidate = e => {
+const onIceCandidate = (e, clientId) => {
+    console.log("onIceCandidate " + clientId)
     if (e.candidate) {
         console.log("sending ice candidate");
         socket.emit("candidate", {
@@ -206,6 +220,7 @@ const onIceCandidate = e => {
             id: e.candidate.sdpMid,
             candidate: e.candidate.candidate,
             room: roomName,
+            targetClientId: clientId
         });
     }
 }

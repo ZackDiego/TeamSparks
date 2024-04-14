@@ -75,7 +75,11 @@ public class GroupVideoCallSocketHandler {
     @OnEvent("candidate")
     public void onCandidate(SocketIOClient client, Map<String, Object> payload) {
         String room = (String) payload.get("room");
-        client.getNamespace().getRoomOperations(room).sendEvent("candidate", payload);
+        String targetClientId = (String) payload.get("targetClientId");
+
+        SocketIOClient targetClient = server.getClient(UUID.fromString(targetClientId));
+        payload.put("candidateClientId", client.getSessionId().toString());
+        targetClient.sendEvent("candidate", payload);
         printLog("onCandidate", client, room);
     }
 
