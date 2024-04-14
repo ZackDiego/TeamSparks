@@ -223,19 +223,24 @@ const onIceCandidate = (e, clientId) => {
 const onAddStream = (e, clientId) => {
     console.log("Create new video screen");
     createRemoteVideoScreen(e.streams[0], clientId);
+
     remoteStream = e.stream;
 }
 
 
 function createRemoteVideoScreen(stream, clientId) {
-    const $videoElement = $('<video autoplay ></video>')
-        .attr('id', `remoteVideo_${clientId}`)
-        .addClass('img-responsive center-block')
-        .prop('srcObject', stream);
 
-    const $remoteStreamsDiv = $('#remoteStreams');
-    const $remoteParticipantHeader = $('<h3></h3>').text(`Participant ${clientId}`);
+    const clientIdVideoElement = $(`#remoteVideo_${clientId}`)
+    if (clientIdVideoElement.length === 0) {
+        const $videoElement = $('<video autoplay ></video>')
+            .attr('id', `remoteVideo_${clientId}`)
+            .addClass('img-responsive center-block')
+            .prop('srcObject', stream);
 
-    $remoteStreamsDiv.append($remoteParticipantHeader);
-    $remoteStreamsDiv.append($videoElement);
+        const $remoteStreamsDiv = $('#remoteStreams');
+        const $remoteParticipantHeader = $('<h3 class="text-center"></h3>').text(`Participant: ${clientId}`);
+
+        $remoteStreamsDiv.append($remoteParticipantHeader);
+        $remoteStreamsDiv.append($videoElement);
+    }
 }
