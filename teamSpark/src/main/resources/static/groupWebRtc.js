@@ -7,7 +7,7 @@ const [btnConnect, btnToggleVideo, btnToggleAudio, divRoomConfig,
     ["btnConnect", "toggleVideo", "toggleAudio", "roomConfig", "roomDiv", "roomName",
         "localVideo", "remoteVideo"].map(getElement);
 let remoteDescriptionPromise, roomName, localStream, remoteStream,
-    rtcPeerConnection, isCaller;
+    rtcPeerConnection, isCaller, rtcPeerConnectionStatus;
 
 // you can use public stun and turn servers,
 // but we don't need for local development
@@ -168,17 +168,23 @@ handleSocketEvent("offer", e => {
                 socket.emit("answer", {
                     type: "answer", sdp: sessionDescription, room: roomName, offerClientId: offerClientId
                 });
+
+                rtcPeerConnectionStatus = "WAITING_FOR_ANSWER";
+                console.log("add offerClientId: " + offerClientId + "sdp, and return answer");
             })
             .catch(error => console.log(error));
     }
 });
 
 handleSocketEvent("answer", e => {
+    const {answerClientId, sdp} = e;
+
     console.log("receive answer event");
 
     if (rtcPeerConnection.signalingState === "have-local-offer") {
         remoteDescriptionPromise = rtcPeerConnection.setRemoteDescription(
-            new RTCSessionDescription(e));
+            new RTCSessionDescription(sdp));
+        console.log("receive and add answer from " + answerClientId)
         remoteDescriptionPromise.catch(error => console.log(error));
     }
 });

@@ -105,7 +105,11 @@ public class GroupVideoCallSocketHandler {
 
         log.info("sent answer event " + targetClient);
 
-        targetClient.sendEvent("answer", payload.get("sdp"));
+        Map<String, Object> answerPayload = new HashMap<>();
+        answerPayload.put("answerClientId", client.getSessionId().toString());
+        answerPayload.put("sdp", payload.get("sdp"));
+
+        targetClient.sendEvent("answer", answerPayload);
         printLog("onAnswer", client, room);
     }
 
