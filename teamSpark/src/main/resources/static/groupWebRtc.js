@@ -14,8 +14,8 @@ let rtcPeerConnectionsMap = new Map();
 // you can use public stun and turn servers,
 // but we don't need for local development
 const iceServers = {
-    iceServers: [
-        {urls: 'stun:stun.l.google.com:19302'},
+    'iceServers': [
+        {'urls': 'stun:stun.l.google.com:19302'},
         // {urls: 'stun:stun1.l.google.com:19302'},
         // {urls: 'stun:stun2.l.google.com:19302'},
         // {urls: 'stun:stun3.l.google.com:19302'},
@@ -101,7 +101,7 @@ handleSocketEvent("joined", e => {
 
 handleSocketEvent("candidate", e => {
     console.log("receive candidate event");
-
+    console.log("test: " + e.candidateClientId);
     rtcPeerConnection = rtcPeerConnectionsMap.get(e.candidateClientId);
     if (rtcPeerConnection) {
         const candidate = new RTCIceCandidate({
@@ -127,7 +127,7 @@ handleSocketEvent("candidate", e => {
     }
 });
 
-handleSocketEvent("ready", joinedClientId => {
+handleSocketEvent("ready", async function (joinedClientId) {
     console.log("receive ready event");
 
     if (socket.id !== joinedClientId) {
@@ -136,16 +136,15 @@ handleSocketEvent("ready", joinedClientId => {
         rtcPeerConnection.ontrack = onAddStream;
         rtcPeerConnection.addTrack(localStream.getTracks()[0], localStream);
         rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
-        rtcPeerConnection
-            .createOffer()
-            .then(sessionDescription => {
-                rtcPeerConnection.setLocalDescription(sessionDescription);
-                socket.emit("offer", {
-                    type: "offer", sdp: sessionDescription, room: roomName,
-                    joinedClientId: joinedClientId,
-                });
-            })
-            .catch(error => console.log(error));
+        const offer = await rtcPeerConnection.createOffer();
+        await rtcPeerConnection.setLocalDescription(offer);
+
+        // send offer event to new client through signal server
+        socket.emit("offer", {
+            type: "offer", sdp: sessionDescription, room: roomName,
+            joinedClientId: joinedClientId,
+        });
+
         // save connection into map for management
         rtcPeerConnectionsMap.set(joinedClientId, rtcPeerConnection);
         console.log(rtcPeerConnectionsMap);
@@ -211,7 +210,7 @@ handleSocketEvent("setCaller", callerId => {
 });
 
 const onIceCandidate = (e, clientId) => {
-    console.log("onIceCandidate " + clientId)
+    console.log("onIceCandidate" + clientId)
     if (e.candidate) {
         console.log("sending ice candidate");
         socket.emit("candidate", {
