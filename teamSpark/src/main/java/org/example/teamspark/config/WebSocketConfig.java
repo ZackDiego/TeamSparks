@@ -16,6 +16,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private String host;
     @Value("${socket.port}")
     private int port;
+    @Value("${group.call.socket.port}")
+    private int groupCallPort;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -34,6 +36,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 new com.corundumstudio.socketio.Configuration();
         config.setHostname(host);
         config.setPort(port);
+        return new SocketIOServer(config);
+    }
+
+    @Bean
+    public SocketIOServer groupVideoCallSocketIOServer() {
+        com.corundumstudio.socketio.Configuration config =
+                new com.corundumstudio.socketio.Configuration();
+        config.setHostname(host);
+        config.setPort(groupCallPort);
         return new SocketIOServer(config);
     }
 }

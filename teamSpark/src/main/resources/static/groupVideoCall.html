@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>WebRTC Video Conferencing Application</title>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Group Video Chat</title>
     <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet"/>
@@ -13,9 +15,8 @@
 <body>
 <!-- Title & header of demo application. -->
 <div class="container">
-    <h3 class="text-center">WebRTC Video Conferencing Application</h3>
+    <h3 class="text-center">Group Video Call with Mesh WebRTC</h3>
 </div>
-
 
 <!-- Conference room ID input and connect button -->
 <div class="container" id="roomConfig">
@@ -32,17 +33,14 @@
     </div>
 </div>
 
-<!-- Video containers -->
 <div class="container" id="roomDiv" style="margin-top: 20px;">
-    <div class="row">
-        <div class="col-md-6">
-            <h3 class="text-center" id="localStream">You</h3>
-            <video autoplay class="img-responsive center-block" id="localVideo" muted></video>
-        </div>
-        <div class="col-md-6" id="remoteVideoContainer">
-            <h3 class="text-center" id="remoteStream">Other Person</h3>
-            <video autoplay class="img-responsive center-block" id="remoteVideo"></video>
-        </div>
+    <div id="localStream">
+        <h3 class="text-center">You</h3>
+        <video autoplay class="img-responsive center-block" id="localVideo" muted></video>
+    </div>
+    <div id="remoteStreams">
+        <h3 class="text-center">Other Person</h3>
+        <!-- Remote streams will be added dynamically -->
     </div>
 </div>
 
@@ -66,8 +64,10 @@
         </div>
     </div>
 </div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
-<script src="privateWebRtc.js"></script>
+<script src="groupWebRtc.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 // const LOCAL_IP_ADDRESS = "zackawesome.net";
-const LOCAL_IP_ADDRESS = "localhost:8000";
+const LOCAL_IP_ADDRESS = "localhost:8001";
 
 const getElement = id => document.getElementById(id);
 const [btnConnect, btnToggleVideo, btnToggleAudio, divRoomConfig,
@@ -79,13 +79,11 @@ const handleSocketEvent = (eventName, callback) => socket.on(eventName,
 
 handleSocketEvent("created", e => {
     console.log("receive created event")
-
     navigator.mediaDevices.getUserMedia(streamConstraints).then(stream => {
         localStream = stream;
         localVideo.srcObject = stream;
         isCaller = true;
     }).catch(console.error);
-    console.log(socket.id)
 });
 
 handleSocketEvent("joined", e => {
@@ -107,7 +105,7 @@ handleSocketEvent("candidate", e => {
         });
 
         rtcPeerConnection.onicecandidateerror = (error) => {
-            console.error("Error adding ICE candidate: ", error);
+            // console.error("Error adding ICE candidate: ", error);
         };
 
         if (remoteDescriptionPromise) {
@@ -117,16 +115,18 @@ handleSocketEvent("candidate", e => {
                         return rtcPeerConnection.addIceCandidate(candidate);
                     }
                 })
-                .catch(error => console.log(
-                    "Error adding ICE candidate after remote description: ", error));
+                .catch(error =>
+                        console.log()
+                    // console.log("Error adding ICE candidate after remote description: ", error)
+                );
         }
     }
 });
 
-handleSocketEvent("ready", joinedClient => {
+handleSocketEvent("ready", joinedClientId => {
     console.log("receive ready event");
 
-    if (isCaller) {
+    if (socket.id !== joinedClientId) {
         rtcPeerConnection = new RTCPeerConnection(iceServers);
         rtcPeerConnection.onicecandidate = onIceCandidate;
         rtcPeerConnection.ontrack = onAddStream;
@@ -138,6 +138,7 @@ handleSocketEvent("ready", joinedClient => {
                 rtcPeerConnection.setLocalDescription(sessionDescription);
                 socket.emit("offer", {
                     type: "offer", sdp: sessionDescription, room: roomName,
+                    joinedClientId: joinedClientId,
                 });
             })
             .catch(error => console.log(error));
@@ -147,35 +148,35 @@ handleSocketEvent("ready", joinedClient => {
 handleSocketEvent("offer", e => {
     console.log("receive offer event");
 
-    if (!isCaller) {
-        rtcPeerConnection = new RTCPeerConnection(iceServers);
-        rtcPeerConnection.onicecandidate = onIceCandidate;
-        rtcPeerConnection.ontrack = onAddStream;
-        rtcPeerConnection.addTrack(localStream.getTracks()[0], localStream);
-        rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
+    const {offerClientId, sdp} = e;
 
-        if (rtcPeerConnection.signalingState === "stable") {
-            remoteDescriptionPromise = rtcPeerConnection.setRemoteDescription(
-                new RTCSessionDescription(e));
-            remoteDescriptionPromise
-                .then(() => {
-                    return rtcPeerConnection.createAnswer();
-                })
-                .then(sessionDescription => {
-                    rtcPeerConnection.setLocalDescription(sessionDescription);
-                    socket.emit("answer", {
-                        type: "answer", sdp: sessionDescription, room: roomName,
-                    });
-                })
-                .catch(error => console.log(error));
-        }
+    rtcPeerConnection = new RTCPeerConnection(iceServers);
+    rtcPeerConnection.onicecandidate = onIceCandidate;
+    rtcPeerConnection.ontrack = onAddStream;
+    rtcPeerConnection.addTrack(localStream.getTracks()[0], localStream);
+    rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
+
+    if (rtcPeerConnection.signalingState === "stable") {
+        remoteDescriptionPromise = rtcPeerConnection.setRemoteDescription(
+            new RTCSessionDescription(sdp));
+        remoteDescriptionPromise
+            .then(() => {
+                return rtcPeerConnection.createAnswer();
+            })
+            .then(sessionDescription => {
+                rtcPeerConnection.setLocalDescription(sessionDescription);
+                socket.emit("answer", {
+                    type: "answer", sdp: sessionDescription, room: roomName, offerClientId: offerClientId
+                });
+            })
+            .catch(error => console.log(error));
     }
 });
 
 handleSocketEvent("answer", e => {
     console.log("receive answer event");
 
-    if (isCaller && rtcPeerConnection.signalingState === "have-local-offer") {
+    if (rtcPeerConnection.signalingState === "have-local-offer") {
         remoteDescriptionPromise = rtcPeerConnection.setRemoteDescription(
             new RTCSessionDescription(e));
         remoteDescriptionPromise.catch(error => console.log(error));
@@ -184,16 +185,10 @@ handleSocketEvent("answer", e => {
 
 handleSocketEvent("userDisconnected", (e) => {
     remoteVideo.srcObject = null;
-    isCaller = true;
 });
 
 handleSocketEvent("setCaller", callerId => {
     isCaller = socket.id === callerId;
-});
-
-handleSocketEvent("full", e => {
-    alert("room is full!");
-    window.location.reload();
 });
 
 const onIceCandidate = e => {
@@ -210,7 +205,21 @@ const onIceCandidate = e => {
 }
 
 const onAddStream = e => {
-    console.log("Remote stream added")
-    remoteVideo.srcObject = e.streams[0];
+    console.log("Create new video screen");
+    createRemoteVideoScreen(e.streams[0]);
     remoteStream = e.stream;
+}
+
+
+function createRemoteVideoScreen(stream) {
+    const $videoElement = $('<video autoplay ></video>')
+        // .attr('id', `remoteVideo_${clientId}`)
+        .addClass('img-responsive center-block')
+        .prop('srcObject', stream);
+
+    const $remoteStreamsDiv = $('#remoteStreams');
+    // const $remoteParticipantHeader = $('<h3></h3>').text(`Participant ${clientId}`);
+
+    // $remoteStreamsDiv.append($remoteParticipantHeader);
+    $remoteStreamsDiv.append($videoElement);
 }
