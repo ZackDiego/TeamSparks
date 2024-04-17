@@ -1,4 +1,4 @@
-package org.example.teamspark.model;
+package org.example.teamspark.model.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

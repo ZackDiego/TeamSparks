@@ -1,9 +1,9 @@
 package org.example.teamspark.controller;
 
 import lombok.extern.apachecommons.CommonsLog;
-import org.example.teamspark.model.InGroupMessage;
-import org.example.teamspark.model.InMessage;
-import org.example.teamspark.model.OutMessage;
+import org.example.teamspark.model.message.InGroupMessage;
+import org.example.teamspark.model.message.InMessage;
+import org.example.teamspark.model.message.OutMessage;
 import org.example.teamspark.service.ElasticsearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
