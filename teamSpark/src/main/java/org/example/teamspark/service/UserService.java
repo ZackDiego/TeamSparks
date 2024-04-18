@@ -53,7 +53,7 @@ public class UserService {
         // build response object
         SignInAndUpDto signUpDto = new SignInAndUpDto();
         UserDto userDto = UserDto.from(savedUser);
-        signUpDto.setAccessToken(jwtService.generateToken(savedUser.getName(), userDto.toMap()));
+        signUpDto.setAccessToken(jwtService.generateToken(savedUser.getEmail(), userDto.toMap()));
         signUpDto.setAccessExpired(jwtExpireTimeAsSec);
         signUpDto.setUser(userDto);
 
@@ -74,7 +74,7 @@ public class UserService {
             // build response object
             SignInAndUpDto signInDto = new SignInAndUpDto();
             UserDto userDto = UserDto.from(userFound);
-            signInDto.setAccessToken(jwtService.generateToken(userFound.getName(), userDto.toMap()));
+            signInDto.setAccessToken(jwtService.generateToken(userFound.getEmail(), userDto.toMap()));
             signInDto.setAccessExpired(jwtExpireTimeAsSec);
             signInDto.setUser(userDto);
 
