@@ -25,4 +25,7 @@ public class Workspace {
 
     @Column(name = "created_at")
     private Date createdAt;
+
+    @Column(name = "avatar")
+    private String avatar;
 }
