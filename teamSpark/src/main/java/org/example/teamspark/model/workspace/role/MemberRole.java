@@ -24,9 +24,6 @@ public class MemberRole implements Serializable {
     @JoinColumn(name = "member_id", nullable = false)
     private WorkspaceMember workspaceMember;
 
-    @Column(name = "group_by_role")
-    private Boolean groupByRole;
-
     @NoArgsConstructor
     @Data
     public static class MemberRoleId implements Serializable {

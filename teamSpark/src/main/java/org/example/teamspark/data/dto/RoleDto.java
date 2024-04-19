@@ -11,10 +11,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoleDto {
+    @JsonProperty("id")
+    private Long id;
 
     @JsonProperty("name")
     private String name;
 
-    @JsonProperty("group_by_type")
-    private boolean groupByType;
+    @JsonProperty("group_by_role")
+    private boolean groupByRole;
 }
