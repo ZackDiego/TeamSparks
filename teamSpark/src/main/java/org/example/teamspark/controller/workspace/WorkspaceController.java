@@ -1,4 +1,4 @@
-package org.example.teamspark.controller;
+package org.example.teamspark.controller.workspace;
 
 import org.example.teamspark.data.DataResponse;
 import org.example.teamspark.data.dto.WorkspaceDto;

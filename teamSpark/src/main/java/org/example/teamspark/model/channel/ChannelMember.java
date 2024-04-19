@@ -3,7 +3,7 @@ package org.example.teamspark.model.channel;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.teamspark.model.user.User;
+import org.example.teamspark.model.workspace.WorkspaceMember;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -18,7 +18,7 @@ public class ChannelMember implements Serializable {
     @Id
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
-    private User user;
+    private WorkspaceMember member;
 
     @Id
     @ManyToOne
@@ -31,7 +31,7 @@ public class ChannelMember implements Serializable {
     @NoArgsConstructor
     @Data
     public static class ChannelMemberId implements Serializable {
-        private Long user;
+        private Long member;
         private Long channel;
     }
 }

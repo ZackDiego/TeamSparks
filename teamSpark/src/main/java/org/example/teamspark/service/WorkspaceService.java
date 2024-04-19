@@ -46,8 +46,10 @@ public class WorkspaceService {
 
         Workspace savedWorkspace = workspaceRepository.save(workspace);
 
-        WorkspaceMember workspaceMember = WorkspaceMember.create(workspace, creator);
-        workspaceMemberRepository.save(workspaceMember);
+        WorkspaceMember newMember = new WorkspaceMember();
+        newMember.setWorkspace(workspace);
+        newMember.setUser(creator);
+        workspaceMemberRepository.save(newMember);
 
         // Map the members to UserDto objects
         List<UserDto> memberDtos = workspaceMemberRepository.findUsersByWorkspace(workspace).stream()
@@ -132,7 +134,9 @@ public class WorkspaceService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
 
-            WorkspaceMember newMember = WorkspaceMember.create(workspace, user);
+            WorkspaceMember newMember = new WorkspaceMember();
+            newMember.setWorkspace(workspace);
+            newMember.setUser(user);
             workspaceMemberRepository.save(newMember);
         }
 

@@ -2,8 +2,8 @@ package org.example.teamspark.model.channel;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.example.teamspark.model.user.User;
 import org.example.teamspark.model.workspace.Workspace;
+import org.example.teamspark.model.workspace.WorkspaceMember;
 
 import java.util.Date;
 
@@ -24,7 +24,7 @@ public class Channel {
 
     @ManyToOne
     @JoinColumn(name = "creator_id")
-    private User creator;
+    private WorkspaceMember creator;
 
     @Column(name = "created_at")
     private Date createdAt;

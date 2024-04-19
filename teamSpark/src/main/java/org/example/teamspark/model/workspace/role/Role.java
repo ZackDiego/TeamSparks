@@ -1,4 +1,4 @@
-package org.example.teamspark.model.role;
+package org.example.teamspark.model.workspace.role;
 
 import jakarta.persistence.*;
 import lombok.Data;

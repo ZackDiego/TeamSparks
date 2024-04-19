@@ -16,45 +16,33 @@ import java.util.Date;
 @AllArgsConstructor
 public class WorkspaceMember implements Serializable {
 
-    @EmbeddedId
-    private WorkspaceMemberId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @MapsId("workspaceId")
     @JoinColumn(name = "workspace_id", nullable = false)
     private Workspace workspace;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @MapsId("userId")
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(name = "joined_at")
     private Date joinedAt = new Date();
 
-    public static WorkspaceMember create(Workspace workspace, User user) {
-        WorkspaceMember.WorkspaceMemberId workspaceMemberId = new WorkspaceMember.WorkspaceMemberId();
-        workspaceMemberId.setWorkspaceId(workspace.getId());
-        workspaceMemberId.setUserId(user.getId());
-
-        WorkspaceMember newMember = new WorkspaceMember();
-        newMember.setId(workspaceMemberId);
-        newMember.setWorkspace(workspace);
-        newMember.setUser(user);
-
-        return newMember;
-    }
-
-    @NoArgsConstructor
-    @Data
-    @Embeddable
-    public static class WorkspaceMemberId implements Serializable {
-
-        @Column(name = "workspace_id")
-        private Long workspaceId;
-
-        @Column(name = "user_id")
-        private Long userId;
-    }
+//    public static WorkspaceMember create(Workspace workspace, User user) {
+//        WorkspaceMember.WorkspaceMemberId workspaceMemberId = new WorkspaceMember.WorkspaceMemberId();
+//        workspaceMemberId.setWorkspaceId(workspace.getId());
+//        workspaceMemberId.setUserId(user.getId());
+//
+//        WorkspaceMember newMember = new WorkspaceMember();
+//        newMember.setId(workspaceMemberId);
+//        newMember.setWorkspace(workspace);
+//        newMember.setUser(user);
+//
+//        return newMember;
+//    }
 
 }
