@@ -21,28 +21,15 @@ public class WorkspaceMember implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "workspace_id", nullable = false)
     private Workspace workspace;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(name = "joined_at")
     private Date joinedAt = new Date();
-
-//    public static WorkspaceMember create(Workspace workspace, User user) {
-//        WorkspaceMember.WorkspaceMemberId workspaceMemberId = new WorkspaceMember.WorkspaceMemberId();
-//        workspaceMemberId.setWorkspaceId(workspace.getId());
-//        workspaceMemberId.setUserId(user.getId());
-//
-//        WorkspaceMember newMember = new WorkspaceMember();
-//        newMember.setId(workspaceMemberId);
-//        newMember.setWorkspace(workspace);
-//        newMember.setUser(user);
-//
-//        return newMember;
-//    }
 
 }

@@ -31,7 +31,7 @@ public class User implements UserDetails {
     private String password;
 
     @Column(name = "avatar")
-    private String avatar;
+    private String avatar = "default_avatar.jpg";
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;

@@ -20,7 +20,7 @@ public class WorkspaceDto {
     private String name;
 
     @JsonProperty("creator")
-    private UserDto creator;
+    private WorkspaceMemberDto creator;
 
     @JsonProperty("created_at")
     private Date createdAt;
@@ -29,5 +29,5 @@ public class WorkspaceDto {
     private String avatar;
 
     @JsonProperty("members")
-    private List<UserDto> members;
+    private List<WorkspaceMemberDto> members;
 }

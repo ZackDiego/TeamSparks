@@ -1,8 +1,8 @@
 package org.example.teamspark.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.example.teamspark.data.dto.UserDto;
 import org.example.teamspark.data.dto.WorkspaceDto;
+import org.example.teamspark.data.dto.WorkspaceMemberDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.model.workspace.Workspace;
@@ -46,14 +46,15 @@ public class WorkspaceService {
 
         Workspace savedWorkspace = workspaceRepository.save(workspace);
 
+        // Create new workspace member to save
         WorkspaceMember newMember = new WorkspaceMember();
         newMember.setWorkspace(workspace);
         newMember.setUser(creator);
         workspaceMemberRepository.save(newMember);
 
         // Map the members to UserDto objects
-        List<UserDto> memberDtos = workspaceMemberRepository.findUsersByWorkspace(workspace).stream()
-                .map(member -> modelMapper.map(member, UserDto.class))
+        List<WorkspaceMemberDto> memberDtos = workspaceMemberRepository.findUsersByWorkspace(workspace).stream()
+                .map(member -> modelMapper.map(member, WorkspaceMemberDto.class))
                 .collect(Collectors.toList());
 
         // Map the savedWorkspace to WorkspaceDto
@@ -73,8 +74,8 @@ public class WorkspaceService {
                 .map(workspace -> {
                     WorkspaceDto workspaceDto = modelMapper.map(workspace, WorkspaceDto.class);
                     // Retrieve the members of the workspace
-                    List<UserDto> memberDtos = workspaceMemberRepository.findUsersByWorkspace(workspace).stream()
-                            .map(member -> modelMapper.map(member, UserDto.class))
+                    List<WorkspaceMemberDto> memberDtos = workspaceMemberRepository.findUsersByWorkspace(workspace).stream()
+                            .map(member -> modelMapper.map(member, WorkspaceMemberDto.class))
                             .collect(Collectors.toList());
                     // Set the members in the workspaceDto
                     workspaceDto.setMembers(memberDtos);
@@ -96,7 +97,7 @@ public class WorkspaceService {
 
         // convert members to memberId
         Set<Long> updatedUserIdsSet = dto.getMembers().stream()
-                .map(UserDto::getId)
+                .map(WorkspaceMemberDto::getId)
                 .collect(Collectors.toSet());
 
         // Update members
@@ -107,7 +108,7 @@ public class WorkspaceService {
         workspace.setAvatar(dto.getAvatar());
 
         // Save the updated workspace entity back to the repository
-        Workspace savedWorkspace = workspaceRepository.save(workspace);
+        workspaceRepository.save(workspace);
     }
 
     public void updateWorkspaceMembers(Workspace workspace, Set<Long> updatedUserIds) {
