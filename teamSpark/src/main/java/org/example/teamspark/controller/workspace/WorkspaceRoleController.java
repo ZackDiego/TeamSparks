@@ -49,19 +49,6 @@ public class WorkspaceRoleController {
                 .body(new DataResponse<>(roleDtos));
     }
 
-
-//    // update role (assign role to member)
-//    @PostMapping(value = "/", consumes = {"application/json"})
-//    public ResponseEntity<?> createWorkspace(@RequestBody WorkspaceDto workspaceDto) {
-//
-//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//
-//        WorkspaceDto createdWorkspace = workspaceService.createWorkspace(user, workspaceDto);
-//
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(new DataResponse<>(createdWorkspace));
-//    }
-
     // update role
     @PutMapping(value = "/{roleId}", consumes = {"application/json"})
     public ResponseEntity<?> updateWorkspace(@PathVariable Long workspaceId, @PathVariable Long roleId,

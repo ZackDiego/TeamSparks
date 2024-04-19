@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.teamspark.model.user.User;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,8 +24,8 @@ public class WorkspaceMemberDto {
     @JsonProperty("avatar")
     private String avatar;
 
-    @JsonProperty("role")
-    private RoleDto roleDto;
+    @JsonProperty("roles")
+    private List<RoleDto> roles;
 
     public static WorkspaceMemberDto from(User user) {
         WorkspaceMemberDto dto = new WorkspaceMemberDto();
