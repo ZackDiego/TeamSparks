@@ -12,4 +12,6 @@ public interface ChannelMemberRepository extends JpaRepository<ChannelMember, Lo
     List<ChannelMember> findByChannelIn(List<Channel> channels);
 
     List<ChannelMember> findByChannel(Channel channel);
+
+    void deleteByMemberId(Long memberId);
 }

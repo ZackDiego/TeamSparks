@@ -72,27 +72,27 @@ public class ChannelService {
     }
 
     public ChannelDto createChannel(User user, Long creatorId, ChannelDto channelDto) throws ResourceAccessDeniedException {
-        // Find the WorkspaceMember by memberId
-        WorkspaceMember workspaceMember = workspaceMemberRepository.findById(creatorId)
+        // Find the creator by creatorId
+        WorkspaceMember creator = workspaceMemberRepository.findById(creatorId)
                 .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + creatorId));
 
         // Check if the WorkspaceMember belongs to the provided user
-        if (!workspaceMember.getUser().equals(user)) {
+        if (!creator.getUser().equals(user)) {
             throw new ResourceAccessDeniedException("User is unauthorized to access channels for workspace member with ID " + creatorId);
         }
 
         // Create a new Channel instance
         Channel channel = new Channel();
-        channel.setWorkspace(workspaceMember.getWorkspace());
+        channel.setWorkspace(creator.getWorkspace());
         channel.setName(channelDto.getName());
-        channel.setCreator(workspaceMember);
+        channel.setCreator(creator);
         channel.setIsPrivate(channelDto.isPrivate());
 
         Channel createdChannel = channelRepository.save(channel);
 
         // add the creator as channel member
         ChannelMember newMember = new ChannelMember();
-        newMember.setMember(workspaceMember);
+        newMember.setMember(creator);
         newMember.setChannel(createdChannel);
         ChannelMember savedMember = channelMemberRepository.save(newMember);
 
@@ -104,12 +104,12 @@ public class ChannelService {
 
     public List<ChannelDto> getChannelsByMemberId(User user, Long memberId) throws ResourceAccessDeniedException {
 
-        // Find the WorkspaceMember by memberId
-        WorkspaceMember workspaceMember = workspaceMemberRepository.findById(memberId)
+        // Find the member by memberId
+        WorkspaceMember member = workspaceMemberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + memberId));
 
         // Check if the WorkspaceMember belongs to the provided user
-        if (!workspaceMember.getUser().equals(user)) {
+        if (!member.getUser().equals(user)) {
             throw new ResourceAccessDeniedException("User is unauthorized to access channels for workspace member with ID " + memberId);
         }
 
@@ -120,12 +120,12 @@ public class ChannelService {
 
     public ChannelDto updateChannel(User user, Long creatorId, Long channelId, ChannelDto channelDto) throws ResourceAccessDeniedException {
 
-        // Find the WorkspaceMember by memberId
-        WorkspaceMember workspaceMember = workspaceMemberRepository.findById(creatorId)
+        // Find the creator by creatorId
+        WorkspaceMember creator = workspaceMemberRepository.findById(creatorId)
                 .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + creatorId));
 
         // Check if the WorkspaceMember belongs to the provided user
-        if (!workspaceMember.getUser().equals(user)) {
+        if (!creator.getUser().equals(user)) {
             throw new ResourceAccessDeniedException("User is unauthorized to access channels for workspace member with ID " + creatorId);
         }
 
@@ -153,12 +153,12 @@ public class ChannelService {
 
     public void deleteChannel(User user, Long creatorId, Long channelId) throws ResourceAccessDeniedException {
 
-        // Find the WorkspaceMember by memberId
-        WorkspaceMember workspaceMember = workspaceMemberRepository.findById(creatorId)
+        // Find the creator by creatorId
+        WorkspaceMember creator = workspaceMemberRepository.findById(creatorId)
                 .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + creatorId));
 
         // Check if the WorkspaceMember belongs to the provided user
-        if (!workspaceMember.getUser().equals(user)) {
+        if (!creator.getUser().equals(user)) {
             throw new ResourceAccessDeniedException("User is unauthorized to access channels for workspace member with ID " + creatorId);
         }
 

@@ -25,9 +25,9 @@ public class ChannelController {
     }
 
     // get channel by workspace member id
-    @GetMapping(value = "/member/{memberId}/channel")
+    @GetMapping(value = "/member/{member_id}/channel")
     public ResponseEntity<?> handleGetChannelsByMemberId(
-            @PathVariable Long memberId) throws ResourceAccessDeniedException {
+            @PathVariable("member_id") Long memberId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -38,9 +38,9 @@ public class ChannelController {
     }
 
     // create channel
-    @PostMapping(value = "/creator/{creatorId}/channel", consumes = {"application/json"})
+    @PostMapping(value = "/creator/{creator_id}/channel", consumes = {"application/json"})
     public ResponseEntity<?> handleCreateChannel(
-            @PathVariable Long creatorId,
+            @PathVariable("creator_id") Long creatorId,
             @RequestBody ChannelDto channelDto) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -52,10 +52,10 @@ public class ChannelController {
     }
 
     // update channel
-    @PutMapping(value = "/creator/{creatorId}/channel/{channelId}", consumes = {"application/json"})
+    @PutMapping(value = "/creator/{creator_id}/channel/{channel_id}", consumes = {"application/json"})
     public ResponseEntity<?> handleUpdateChannel(
-            @PathVariable Long creatorId,
-            @PathVariable Long channelId,
+            @PathVariable("creator_id") Long creatorId,
+            @PathVariable("channel_id") Long channelId,
             @RequestBody ChannelDto channelDto) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -67,10 +67,10 @@ public class ChannelController {
     }
 
     // delete channel
-    @DeleteMapping("/creator/{creatorId}/channel/{channelId}")
+    @DeleteMapping("/creator/{creator_id}/channel/{channel_id}")
     public ResponseEntity<?> handleDeleteChannel(
-            @PathVariable Long creatorId,
-            @PathVariable Long channelId) throws ResourceAccessDeniedException {
+            @PathVariable("creator_id") Long creatorId,
+            @PathVariable("channel_id") Long channelId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
