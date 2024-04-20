@@ -27,7 +27,7 @@ public class Channel {
     private WorkspaceMember creator;
 
     @Column(name = "created_at")
-    private Date createdAt;
+    private Date createdAt = new Date();
 
     @Column(name = "is_private")
     private Boolean isPrivate;

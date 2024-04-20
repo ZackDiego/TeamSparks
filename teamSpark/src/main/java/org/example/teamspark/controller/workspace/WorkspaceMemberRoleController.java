@@ -27,30 +27,30 @@ public class WorkspaceMemberRoleController {
     }
 
     // assign workspace member roles
-    @PostMapping(value = "/member/{memberId}/role/{roleId}", consumes = {"application/json"})
+    @PostMapping(value = "/creator/{creatorId}/role/{roleId}", consumes = {"application/json"})
     public ResponseEntity<?> assignWorkspaceMemberRoles(
             @PathVariable Long workspaceId,
-            @PathVariable Long memberId,
+            @PathVariable Long creatorId,
             @PathVariable Long roleId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        WorkspaceMemberDto assignedMemberDto = workspaceMemberRoleService.assignWorkspaceMemberRole(workspaceId, user, memberId, roleId);
+        WorkspaceMemberDto assignedMemberDto = workspaceMemberRoleService.assignWorkspaceMemberRole(workspaceId, user, creatorId, roleId);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new DataResponse<>(assignedMemberDto));
     }
 
     // remove workspace member role
-    @DeleteMapping("/member/{memberId}/role/{roleId}")
+    @DeleteMapping("/creator/{creatorId}/role/{roleId}")
     public ResponseEntity<?> removeWorkspaceMembersRole(
             @PathVariable Long workspaceId,
-            @PathVariable Long memberId,
+            @PathVariable Long creatorId,
             @PathVariable Long roleId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        workspaceMemberRoleService.removeWorkspaceMemberRole(workspaceId, user, memberId, roleId);
+        workspaceMemberRoleService.removeWorkspaceMemberRole(workspaceId, user, creatorId, roleId);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

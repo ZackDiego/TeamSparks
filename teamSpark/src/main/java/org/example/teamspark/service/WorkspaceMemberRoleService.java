@@ -38,7 +38,7 @@ public class WorkspaceMemberRoleService {
     }
 
     @Transactional
-    public WorkspaceMemberDto assignWorkspaceMemberRole(Long workspaceId, User user, Long memberId, Long roleId)
+    public WorkspaceMemberDto assignWorkspaceMemberRole(Long workspaceId, User user, Long creatorId, Long roleId)
             throws ResourceAccessDeniedException {
 
         Workspace workspace = workspaceRepository.findById(workspaceId)
@@ -54,8 +54,8 @@ public class WorkspaceMemberRoleService {
                 .orElseThrow(() -> new EntityNotFoundException("Role with id " + roleId + " not found"));
 
         // Retrieve the WorkspaceMember entity
-        WorkspaceMember workspaceMember = workspaceMemberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace member with id " + memberId + " not found"));
+        WorkspaceMember workspaceMember = workspaceMemberRepository.findById(creatorId)
+                .orElseThrow(() -> new EntityNotFoundException("Workspace member with id " + creatorId + " not found"));
 
         MemberRole memberRole = new MemberRole();
         memberRole.setRole(role);
@@ -64,7 +64,7 @@ public class WorkspaceMemberRoleService {
         // Save the new MemberRole entity
         memberRoleRepository.save(memberRole);
 
-        List<Object[]> result = workspaceMemberRepository.findWorkspaceMemberDtoById(memberId);
+        List<Object[]> result = workspaceMemberRepository.findWorkspaceMemberDtoById(creatorId);
 
         WorkspaceMemberDto assignedMemberDto = null;
         for (Object[] row : result) {
