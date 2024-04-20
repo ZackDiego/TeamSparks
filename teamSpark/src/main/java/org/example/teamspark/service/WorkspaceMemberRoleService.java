@@ -1,8 +1,6 @@
 package org.example.teamspark.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.example.teamspark.data.dto.RoleDto;
-import org.example.teamspark.data.dto.WorkspaceMemberDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.model.workspace.Workspace;
@@ -16,9 +14,6 @@ import org.example.teamspark.repository.WorkspaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class WorkspaceMemberRoleService {
@@ -38,7 +33,7 @@ public class WorkspaceMemberRoleService {
     }
 
     @Transactional
-    public WorkspaceMemberDto assignWorkspaceMemberRole(Long workspaceId, User user, Long creatorId, Long roleId)
+    public void assignWorkspaceMemberRole(Long workspaceId, User user, Long memberId, Long roleId)
             throws ResourceAccessDeniedException {
 
         Workspace workspace = workspaceRepository.findById(workspaceId)
@@ -54,8 +49,8 @@ public class WorkspaceMemberRoleService {
                 .orElseThrow(() -> new EntityNotFoundException("Role with id " + roleId + " not found"));
 
         // Retrieve the WorkspaceMember entity
-        WorkspaceMember workspaceMember = workspaceMemberRepository.findById(creatorId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace member with id " + creatorId + " not found"));
+        WorkspaceMember workspaceMember = workspaceMemberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException("Workspace member with id " + memberId + " not found"));
 
         MemberRole memberRole = new MemberRole();
         memberRole.setRole(role);
@@ -63,28 +58,6 @@ public class WorkspaceMemberRoleService {
 
         // Save the new MemberRole entity
         memberRoleRepository.save(memberRole);
-
-        List<Object[]> result = workspaceMemberRepository.findWorkspaceMemberDtoById(creatorId);
-
-        WorkspaceMemberDto assignedMemberDto = null;
-        for (Object[] row : result) {
-
-            if (assignedMemberDto == null) {
-                assignedMemberDto = new WorkspaceMemberDto();
-                assignedMemberDto.setId((Long) row[0]);
-                assignedMemberDto.setName((String) row[1]);
-                assignedMemberDto.setAvatar((String) row[2]);
-                assignedMemberDto.setRoles(new ArrayList<>()); // Initialize roles list
-            }
-
-            RoleDto roleDto = new RoleDto();
-            roleDto.setId((Long) row[3]);
-            roleDto.setName((String) row[4]);
-            roleDto.setGroupByRole((Boolean) row[5]);
-
-            assignedMemberDto.getRoles().add(roleDto);
-        }
-        return assignedMemberDto;
     }
 
     public void removeWorkspaceMemberRole(Long workspaceId, User user, Long memberId, Long roleId)

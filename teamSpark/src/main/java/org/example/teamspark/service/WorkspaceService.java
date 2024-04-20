@@ -1,6 +1,7 @@
 package org.example.teamspark.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.example.teamspark.data.dto.UserDto;
 import org.example.teamspark.data.dto.WorkspaceDto;
 import org.example.teamspark.data.dto.WorkspaceMemberDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,8 +38,54 @@ public class WorkspaceService {
         this.modelMapper = modelMapper;
     }
 
+    private static List<WorkspaceDto> mapResultSetToWorkspaceDtos(List<Object[]> rs) {
+        // Group the results by workspace ID
+        Map<Long, List<Object[]>> groupedResults = rs.stream()
+                .collect(Collectors.groupingBy(row -> (Long) row[0]));
+
+        // Map the grouped results to WorkspaceDto objects
+        List<WorkspaceDto> workspaceDtos = groupedResults.entrySet().stream()
+                .map(entry -> {
+                    WorkspaceDto workspaceDto = new WorkspaceDto();
+                    workspaceDto.setId(entry.getKey());
+                    workspaceDto.setName((String) entry.getValue().get(0)[1]);
+                    workspaceDto.setCreatedAt((Date) entry.getValue().get(0)[2]);
+                    workspaceDto.setAvatar((String) entry.getValue().get(0)[3]);
+
+                    // workspace creator
+                    WorkspaceMemberDto creatorDto = new WorkspaceMemberDto();
+                    creatorDto.setId((Long) entry.getValue().get(0)[4]);
+                    UserDto creatorUserDto = new UserDto();
+                    creatorUserDto.setId((Long) entry.getValue().get(0)[5]);
+                    creatorUserDto.setName((String) entry.getValue().get(0)[6]);
+                    creatorUserDto.setAvatar((String) entry.getValue().get(0)[7]);
+                    creatorDto.setUserDto(creatorUserDto);
+                    workspaceDto.setCreator(creatorDto);
+
+                    List<WorkspaceMemberDto> members = entry.getValue().stream()
+                            .map(row -> {
+                                WorkspaceMemberDto memberDto = new WorkspaceMemberDto();
+                                memberDto.setId((Long) row[8]);
+
+                                // Map user details to UserDto
+                                UserDto userDto = new UserDto();
+                                userDto.setId((Long) row[9]);
+                                userDto.setName((String) row[10]);
+                                userDto.setAvatar((String) row[11]);
+
+                                memberDto.setUserDto(userDto);
+
+                                return memberDto;
+                            }).collect(Collectors.toList());
+
+                    workspaceDto.setMembers(members);
+                    return workspaceDto;
+                }).collect(Collectors.toList());
+        return workspaceDtos;
+    }
+
     @Transactional
-    public WorkspaceDto createWorkspace(User creator, WorkspaceDto dto) {
+    public void createWorkspace(User creator, WorkspaceDto dto) {
 
         Workspace workspace = modelMapper.map(dto, Workspace.class);
 
@@ -51,37 +99,31 @@ public class WorkspaceService {
         newMember.setWorkspace(workspace);
         newMember.setUser(creator);
         workspaceMemberRepository.save(newMember);
-
-        // Map the members to UserDto objects
-        List<WorkspaceMemberDto> memberDtos = workspaceMemberRepository.findUsersByWorkspace(workspace).stream()
-                .map(member -> modelMapper.map(member, WorkspaceMemberDto.class))
-                .collect(Collectors.toList());
-
-        // Map the savedWorkspace to WorkspaceDto
-        WorkspaceDto workspaceDto = modelMapper.map(savedWorkspace, WorkspaceDto.class);
-
-        // Set the members in the workspaceDto
-        workspaceDto.setMembers(memberDtos);
-
-        return workspaceDto;
     }
 
-    public List<WorkspaceDto> getUserWorkspacesByUser(User user) {
+    public List<WorkspaceDto> getWorkspacesWithMembersByUser(User user) {
 
-        List<Workspace> workspaces = workspaceRepository.findByCreator(user);
+        List<Object[]> rs = workspaceRepository.findWorkspaceWithMembersByUserId(user.getId());
 
-        return workspaces.stream()
-                .map(workspace -> {
-                    WorkspaceDto workspaceDto = modelMapper.map(workspace, WorkspaceDto.class);
-                    // Retrieve the members of the workspace
-                    List<WorkspaceMemberDto> memberDtos = workspaceMemberRepository.findUsersByWorkspace(workspace).stream()
-                            .map(member -> modelMapper.map(member, WorkspaceMemberDto.class))
-                            .collect(Collectors.toList());
-                    // Set the members in the workspaceDto
-                    workspaceDto.setMembers(memberDtos);
-                    return workspaceDto;
-                })
-                .collect(Collectors.toList());
+        List<WorkspaceDto> workspaceDtos = mapResultSetToWorkspaceDtos(rs);
+
+        return workspaceDtos;
+    }
+
+    public WorkspaceDto getWorkspaceById(User user, Long id) throws ResourceAccessDeniedException {
+
+        Workspace workspace = workspaceRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Workspace not found"));
+
+        // check if user owns the workspace
+        if (!workspace.getCreator().getId().equals(user.getId())) {
+            throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
+        }
+
+
+        List<Object[]> rs = workspaceRepository.findWorkspaceWithMembersById(id);
+
+        return mapResultSetToWorkspaceDtos(rs).get(0);
     }
 
     @Transactional

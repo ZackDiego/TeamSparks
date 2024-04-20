@@ -2,6 +2,7 @@ package org.example.teamspark.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.example.teamspark.data.dto.ChannelDto;
+import org.example.teamspark.data.dto.UserDto;
 import org.example.teamspark.data.dto.WorkspaceMemberDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.channel.Channel;
@@ -45,8 +46,14 @@ public class ChannelService {
                 // creator
                 WorkspaceMemberDto creatorDto = new WorkspaceMemberDto();
                 creatorDto.setId((Long) row[3]);
-                creatorDto.setName((String) row[4]);
-                creatorDto.setAvatar((String) row[5]);
+
+                UserDto userDto = new UserDto();
+                // TODO: set id in userDto
+                userDto.setName((String) row[4]);
+                userDto.setAvatar((String) row[5]);
+
+                creatorDto.setUserDto(userDto);
+
                 newChannelDto.setCreator(creatorDto);
 
                 newChannelDto.setCreatedAt((Date) row[9]);
@@ -58,8 +65,13 @@ public class ChannelService {
             // Create a WorkspaceMemberDto for the member
             WorkspaceMemberDto memberDto = new WorkspaceMemberDto();
             memberDto.setId((Long) row[6]);
-            memberDto.setName((String) row[7]);
-            memberDto.setAvatar((String) row[8]);
+
+            UserDto userDto = new UserDto();
+            // TODO: set id in userDto
+            userDto.setName((String) row[7]);
+            userDto.setAvatar((String) row[8]);
+
+            memberDto.setUserDto(userDto);
 
             // Add the member to the channelDto
             channelDto.getMembers().add(memberDto);

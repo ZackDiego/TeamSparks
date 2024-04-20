@@ -30,10 +30,21 @@ public class WorkspaceController {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        List<WorkspaceDto> workspaceDtoList = workspaceService.getUserWorkspacesByUser(user);
+        List<WorkspaceDto> workspaceDtoList = workspaceService.getWorkspacesWithMembersByUser(user);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new DataResponse<>(workspaceDtoList));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getWorkspaceById(@PathVariable Long id) throws ResourceAccessDeniedException {
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        WorkspaceDto workspaceDto = workspaceService.getWorkspaceById(user, id);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new DataResponse<>(workspaceDto));
     }
 
     @PostMapping(value = "/", consumes = {"application/json"})
@@ -41,10 +52,9 @@ public class WorkspaceController {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        WorkspaceDto createdWorkspace = workspaceService.createWorkspace(user, workspaceDto);
+        workspaceService.createWorkspace(user, workspaceDto);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new DataResponse<>(createdWorkspace));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping(value = "/{id}", consumes = {"application/json"})

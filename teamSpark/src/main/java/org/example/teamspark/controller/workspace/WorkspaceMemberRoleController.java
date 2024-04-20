@@ -1,7 +1,5 @@
 package org.example.teamspark.controller.workspace;
 
-import org.example.teamspark.data.DataResponse;
-import org.example.teamspark.data.dto.WorkspaceMemberDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.service.WorkspaceMemberRoleService;
@@ -27,30 +25,29 @@ public class WorkspaceMemberRoleController {
     }
 
     // assign workspace member roles
-    @PostMapping(value = "/creator/{creatorId}/role/{roleId}", consumes = {"application/json"})
+    @PostMapping(value = "/member/{memberId}/role/{roleId}", consumes = {"application/json"})
     public ResponseEntity<?> assignWorkspaceMemberRoles(
             @PathVariable Long workspaceId,
-            @PathVariable Long creatorId,
+            @PathVariable Long memberId,
             @PathVariable Long roleId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        WorkspaceMemberDto assignedMemberDto = workspaceMemberRoleService.assignWorkspaceMemberRole(workspaceId, user, creatorId, roleId);
+        workspaceMemberRoleService.assignWorkspaceMemberRole(workspaceId, user, memberId, roleId);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new DataResponse<>(assignedMemberDto));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // remove workspace member role
-    @DeleteMapping("/creator/{creatorId}/role/{roleId}")
+    @DeleteMapping("/member/{memberId}/role/{roleId}")
     public ResponseEntity<?> removeWorkspaceMembersRole(
             @PathVariable Long workspaceId,
-            @PathVariable Long creatorId,
+            @PathVariable Long memberId,
             @PathVariable Long roleId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        workspaceMemberRoleService.removeWorkspaceMemberRole(workspaceId, user, creatorId, roleId);
+        workspaceMemberRoleService.removeWorkspaceMemberRole(workspaceId, user, memberId, roleId);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
