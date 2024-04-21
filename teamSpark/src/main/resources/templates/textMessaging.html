@@ -10,7 +10,6 @@
             integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
             src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
-    <script src="/textMessagingStomp.js"></script>
 </head>
 <body>
 
@@ -18,6 +17,8 @@
     <div class="row">
         <div class="col-md-6">
             <form class="form-inline">
+
+                <div th:attr="data-channel-id=${channelId}">Channel name: [[${channelName}]]</div>
 
                 <div class="form-group">
                     <label for="from">Enter Your Name: </label>
@@ -59,5 +60,7 @@
         </div>
     </div>
 </div>
+<script src="/userBasic.js"></script>
+<script src="/textMessagingStomp.js"></script>
 </body>
 </html>

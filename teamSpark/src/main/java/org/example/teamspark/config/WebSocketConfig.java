@@ -21,12 +21,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/textChatWebsocket");
+        registry.addEndpoint("/textMessagingWebsocket");
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/privateTextChat/", "/textChatGroup/");
+        config.enableSimpleBroker("/textMessaging/");
         config.setApplicationDestinationPrefixes("/websocket");
     }
 

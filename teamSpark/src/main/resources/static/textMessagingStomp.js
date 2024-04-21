@@ -1,13 +1,11 @@
 const stompClient = new StompJs.Client({
-    brokerURL: 'ws://localhost:8080/textChatWebsocket'
+    brokerURL: 'ws://localhost:8080/textMessagingWebsocket'
 });
 
 stompClient.onConnect = (frame) => {
-    const group = $("#chat-group").val();
-
     setConnected(true);
     console.log('Connected: ' + frame);
-    stompClient.subscribe('/textChatGroup/' + group, (result) => {
+    stompClient.subscribe('/textMessagingChannel/' + $("#channel_id").val(), (result) => {
         showContent(JSON.parse(result.body));
     });
 };
@@ -45,12 +43,28 @@ function disconnect() {
 }
 
 function sendMessage() {
+
+
+    // get User inf from localStorage
+    const userInf = JSON.parse(localStorage.getItem('user_inf'));
+
+    const channelInf = JSON.parse(localStorage.getItem('channel_inf'));
+
+
+    const content = $("#content").val();
+    const containsLink = /(?:http|https):\/\/\S+/i.test(content);
+
+    // send message to websocket endpoint
     stompClient.publish({
-        destination: "/websocket/groupTextChat",
+        destination: "/websocket/textMessagingEndpoint",
         body: JSON.stringify({
-            'content': $("#content").val(),
-            'from': $("#from").val(),
-            'chatGroup': $("#chat-group").val()
+            channel_id: channelInf.channel_id,
+            from_id: userInf.member_id,
+            from_name: userInf.name,
+            content: content,
+            contain_link: containsLink,
+            file_url: null,
+            image_url: null
         })
     });
 }

@@ -2,26 +2,21 @@ package org.example.teamspark.model.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
-public class ChatMessage {
-    private String indexName;
+public class MessageDocument {
     private Long messageId;
-    private Long workspaceId;
-    private Long channelId;
-    private Long fromUserId;
-    private String fromUserName;
+    private Long fromId;
+    private String fromName;
     private String content;
-    private Date createdAt;
+    private Date createdAt = new Date();
     private Date updatedAt;
     private Boolean containLink;
     private String fileUrl;
     private String imageUrl;
-
-    public ChatMessage() {
-        this.indexName = "channel_" + this.channelId;
-    }
 }
