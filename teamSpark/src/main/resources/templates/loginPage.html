@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TeamSpark</title>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/styles/Commons.css}" type="text/css"/>
+    <!--    <link rel="stylesheet" th:href="@{/styles/Header.css}" type="text/css"/>-->
+    <!--    <link rel="stylesheet" th:href="@{/styles/Footer.css}" type="text/css"/>-->
+</head>
+<body>
+
+<header></header>
+<main>
+    <div id="login" style="display: none">
+        <h2 class="sign-in">Welcome to TeamSpark, please log in.</h2>
+
+        <form class="sign-in" id="signInForm">
+            <h3>Sign In</h3>
+            <label for="email">Email:</label><br>
+            <input id="signInEmail" name="email" required type="email"><br>
+            <label for="password">Password:</label><br>
+            <input id="signInPassword" name="password" required type="password"><br>
+            <button style="margin-top: 10px" type="submit">Sign In</button>
+        </form>
+
+        <div>
+            <a class="sign-in" href="#" id="signUpLink">Sign Up</a>
+        </div>
+
+        <!-- Sign-up form -->
+        <h2 class="sign-up">Welcome to TeamSpark, please sign up.</h2>
+
+        <form class="sign-up" id="signUpForm">
+            <h3>Sign Up</h3>
+            <label for="name">Name:</label><br>
+            <input id="signUpName" name="name" required type="text"><br>
+            <label for="email">Email:</label><br>
+            <input id="signUpEmail" name="email" required type="email"><br>
+            <label for="password">Password:</label><br>
+            <input id="signUpPassword" name="password" required type="password"><br>
+            <button style="margin-top: 10px" type="submit">Sign Up</button>
+        </form>
+
+        <div>
+            <a class="sign-up" href="#" id="signInLink">Sign In</a>
+        </div>
+    </div>
+</main>
+<footer></footer>
+<!--<script th:src="@{/js/headerFooterRender.js}"></script>-->
+<script th:src="@{/js/LoginPageRender.js}"></script>
+<script th:src="@{/js/signInSignUpForm.js}"></script>
+</body>
+</html>
