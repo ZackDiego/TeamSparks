@@ -1,4 +1,4 @@
-package org.example.teamspark.controller;
+package org.example.teamspark.controller.frontEnd;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

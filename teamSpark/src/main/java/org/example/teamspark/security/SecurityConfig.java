@@ -26,8 +26,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req ->
                         req
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                                .requestMatchers("/api/v1/user/signup", "/api/v1/user/signin", "/").permitAll()
-                                .anyRequest().authenticated())
+                                .requestMatchers("/api/**").authenticated()
+                                .requestMatchers("/api/v1/user/signup", "/api/v1/user/signin").permitAll()
+                                .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->

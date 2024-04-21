@@ -1,10 +1,12 @@
 package org.example.teamspark.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.teamspark.data.dto.MessageHistoryDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.channel.Channel;
 import org.example.teamspark.model.channel.ChannelMember;
+import org.example.teamspark.model.message.MessageHistoryIndex;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.repository.ChannelMemberRepository;
 import org.example.teamspark.repository.ChannelRepository;
@@ -24,7 +26,7 @@ public class MessageHistoryService {
         this.channelMemberRepository = channelMemberRepository;
     }
 
-    public MessageHistoryDto getMessageHistoryByChannelId(User user, Long channelId) throws ResourceAccessDeniedException {
+    public MessageHistoryDto getMessagesByChannelId(Long channelId, User user) throws ResourceAccessDeniedException, JsonProcessingException {
 
         if (!isUserMemberOfChannel(user.getId(), channelId)) {
             throw new ResourceAccessDeniedException("User Id " + user.getId() + " does not belong to the channel Id " + channelId);
@@ -34,9 +36,9 @@ public class MessageHistoryService {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new EntityNotFoundException("Channel not found with ID: " + channelId));
 
-
         // Find the message history in elasticsearch
-//        elasticsearchService.
+        MessageHistoryIndex index = elasticsearchService.getMessageHistoryByIndexName("channel-" + channelId);
+
 
         return null;
     }

@@ -1,4 +1,4 @@
-package org.example.teamspark.controller;
+package org.example.teamspark.controller.textMessage;
 
 import lombok.extern.apachecommons.CommonsLog;
 import org.example.teamspark.data.dto.message.InMessage;
