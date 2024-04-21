@@ -17,16 +17,12 @@
     <div class="row">
         <div class="col-md-6">
             <form class="form-inline">
-
-                <div th:attr="data-channel-id=${channelId}">Channel name: <span id="channel-name"></span></div>
-
+                <div>
+                    <div th:attr="data-channel-id=${channelId}">Channel name: <span id="channel-name"></span></div>
+                </div>
                 <div class="form-group">
                     <label for="from">Enter Your Name: </label>
                     <input class="form-control" id="from" placeholder="Enter your name" type="text">
-                </div>
-                <div>
-                    <label for="chat-group">Enter Channel Name: </label>
-                    <input class="form-control" id="chat-group" placeholder="Enter group name" type="text">
                 </div>
                 <div class="form-group">
                     <label for="connect">WebSocket Connection:</label>
@@ -60,7 +56,8 @@
         </div>
     </div>
 </div>
-<script src="/userBasic.js"></script>
-<script src="/textMessagingStomp.js"></script>
+<script src="/js/userBasic.js"></script>
+<script src="/js/textMessagingPageRender.js"></script>
+<script src="/js/textMessagingStomp.js"></script>
 </body>
 </html>

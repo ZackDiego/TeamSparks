@@ -5,7 +5,8 @@ const userInf = {
 }
 
 const channelInf = {
-    "channel_id": 1
+    "channel_id": 1,
+    "channel_name": "Back-End"
 }
 
 localStorage.setItem('user_inf', JSON.stringify(userInf));

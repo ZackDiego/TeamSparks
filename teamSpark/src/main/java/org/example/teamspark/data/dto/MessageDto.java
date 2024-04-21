@@ -1,14 +1,41 @@
 package org.example.teamspark.data.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class MessageDto {
+    @JsonProperty("message_id")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String messageId;
+
+    @NotBlank
+    @JsonProperty("from_id")
     private Long fromId;
+
+    @NotBlank
+    @JsonProperty("from_name")
     private String fromName;
+
     private String content;
-    private Date createAt;
-    private Date updatedAt;
-    private Boolean containLink;
+
+    @JsonProperty("created_at")
+    private Date createdAt = new Date();
+
+    @JsonProperty("contain_link")
+    private boolean containLink;
+
+    @JsonProperty("file_url")
     private String fileUrl;
-    private String imgUrl;
+
+    @JsonProperty("image_url")
+    private String imageUrl;
 }

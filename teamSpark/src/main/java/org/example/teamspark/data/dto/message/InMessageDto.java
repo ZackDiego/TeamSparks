@@ -1,20 +1,20 @@
-package org.example.teamspark.data.dto;
+package org.example.teamspark.data.dto.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.teamspark.data.dto.MessageDto;
 
-import java.util.List;
-
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class MessageHistoryDto {
+public class InMessageDto {
+
+    @NotBlank
     @JsonProperty("channel_id")
     private Long channelId;
-    @JsonProperty("is_private")
-    private Boolean isPrivate;
-    @JsonProperty("messages")
-    private List<MessageDto> messages;
+
+    private MessageDto message;
 }

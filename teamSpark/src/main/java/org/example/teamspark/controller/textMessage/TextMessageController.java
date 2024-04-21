@@ -1,9 +1,9 @@
 package org.example.teamspark.controller.textMessage;
 
 import lombok.extern.apachecommons.CommonsLog;
-import org.example.teamspark.data.dto.message.InMessage;
-import org.example.teamspark.data.dto.message.OutMessage;
-import org.example.teamspark.service.ElasticsearchService;
+import org.example.teamspark.data.dto.MessageDto;
+import org.example.teamspark.data.dto.message.InMessageDto;
+import org.example.teamspark.service.MessageHistoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -15,27 +15,28 @@ import org.springframework.stereotype.Controller;
 public class TextMessageController {
 
     private final SimpMessagingTemplate messageTemplate;
-    private final ElasticsearchService elasticsearchService;
+    private final MessageHistoryService messageHistoryService;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public TextMessageController(SimpMessagingTemplate messageTemplate, ElasticsearchService elasticsearchService, ModelMapper modelMapper) {
+    public TextMessageController(SimpMessagingTemplate messageTemplate, MessageHistoryService messageHistoryService, ModelMapper modelMapper) {
         this.messageTemplate = messageTemplate;
-        this.elasticsearchService = elasticsearchService;
+        this.messageHistoryService = messageHistoryService;
+
         this.modelMapper = modelMapper;
     }
 
     @MessageMapping("/textMessagingEndpoint")
-    public void handleTextMessage(InMessage message) {
+    public void handleTextMessage(InMessageDto inMessageDto) {
 
-        OutMessage outMessage = modelMapper.map(message, OutMessage.class);
+        MessageDto messageDto = modelMapper.map(inMessageDto.getMessage(), MessageDto.class);
 
         // store message to elasticsearch
-        elasticsearchService.addMessageToIndex(message);
+        messageHistoryService.addMessageHistoryByChannelId(inMessageDto.getChannelId(), messageDto);
 
         // Send to Message to channel
         messageTemplate.convertAndSend(
-                "/textMessagingChannel/" + message.getChannelId(),
-                outMessage);
+                "/textMessagingChannel/" + inMessageDto.getChannelId(),
+                messageDto);
     }
 }

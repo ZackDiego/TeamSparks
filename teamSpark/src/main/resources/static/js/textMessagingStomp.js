@@ -5,7 +5,8 @@ const stompClient = new StompJs.Client({
 stompClient.onConnect = (frame) => {
     setConnected(true);
     console.log('Connected: ' + frame);
-    stompClient.subscribe('/textMessagingChannel/' + $("#channel_id").val(), (result) => {
+    stompClient.subscribe('/textMessagingChannel/' + channelInf.channel_id, (result) => {
+        console.log("receive message");
         showContent(JSON.parse(result.body));
     });
 };
@@ -44,13 +45,6 @@ function disconnect() {
 
 function sendMessage() {
 
-
-    // get User inf from localStorage
-    const userInf = JSON.parse(localStorage.getItem('user_inf'));
-
-    const channelInf = JSON.parse(localStorage.getItem('channel_inf'));
-
-
     const content = $("#content").val();
     const containsLink = /(?:http|https):\/\/\S+/i.test(content);
 
@@ -59,18 +53,20 @@ function sendMessage() {
         destination: "/websocket/textMessagingEndpoint",
         body: JSON.stringify({
             channel_id: channelInf.channel_id,
-            from_id: userInf.member_id,
-            from_name: userInf.name,
-            content: content,
-            contain_link: containsLink,
-            file_url: null,
-            image_url: null
+            message: {
+                from_id: userInf.member_id,
+                from_name: $('#from').val(),
+                content: content,
+                contain_link: containsLink,
+                file_url: null,
+                image_url: null
+            }
         })
     });
 }
 
 function showContent(body) {
-    $("#conversation").append("<tr><td>" + body.content + "</td> <td>" + new Date(body.time).toLocaleString() + "</td> </tr>");
+    $("#conversation").append("<tr><td>" + body.from_name + ": " + body.content + "</td> <td>" + new Date(body.created_at).toLocaleString() + "</td> </tr>");
 }
 
 $(function () {

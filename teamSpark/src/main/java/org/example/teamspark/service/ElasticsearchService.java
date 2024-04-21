@@ -1,22 +1,13 @@
 package org.example.teamspark.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.example.teamspark.data.dto.message.InMessage;
-import org.example.teamspark.model.message.MessageDocument;
-import org.example.teamspark.model.message.MessageHistoryIndex;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Service
 @CommonsLog
@@ -65,27 +56,14 @@ public class ElasticsearchService {
         }
     }
 
-    public void addMessageToIndex(InMessage message) {
-
-        String indexName = String.valueOf(message.getChannelId());
+    public void addDocumentToIndex(String indexName, String json) {
 
         String indexEndpoint = ESUrl + "/" + indexName + "/_doc";
 
         // Create HttpHeaders with authentication
         HttpHeaders headers = createHeaders(ESUserName, ESPassword);
 
-        // convert message to JSON
-        ObjectMapper objectMapper = new ObjectMapper();
-        String messageJson = null;
-        try {
-            messageJson = objectMapper.writeValueAsString(message);
-        } catch (Exception e) {
-            // Handle JSON serialization exception
-            log.error("Error when converting message to json");
-            return;
-        }
-
-        HttpEntity<String> requestEntity = new HttpEntity<>(messageJson, headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(json, headers);
 
         // Send POST request to add message to index
         ResponseEntity<String> response = restTemplate.exchange(indexEndpoint, HttpMethod.POST, requestEntity, String.class);
@@ -97,14 +75,14 @@ public class ElasticsearchService {
         }
     }
 
-    public MessageHistoryIndex getMessageHistoryByIndexName(String indexName) throws JsonProcessingException {
-        String indexEndpoint = ESUrl + "/" + indexName;
+    public String getDocumentsByIndexName(String indexName) throws JsonProcessingException {
+        String checkExistsUrl = ESUrl + "/" + indexName;
 
         // Create HttpHeaders with authentication
         HttpHeaders headers = createHeaders(ESUserName, ESPassword);
 
         // Perform a HEAD request to check if the index exists
-        ResponseEntity<String> headResponse = restTemplate.exchange(indexEndpoint, HttpMethod.HEAD, new HttpEntity<>(headers), String.class);
+        ResponseEntity<String> headResponse = restTemplate.exchange(checkExistsUrl, HttpMethod.HEAD, new HttpEntity<>(headers), String.class);
 
         // Check if the index exists
         if (headResponse.getStatusCode() != HttpStatus.OK) {
@@ -113,34 +91,14 @@ public class ElasticsearchService {
         }
 
         // Get the index
-        String requestBody = "{}";
+        String searchUrl = ESUrl + "/" + indexName + "/_search";
+
+        String requestBody = "{\"query\": {\"match_all\": {}}}"; // all documents
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<String> response = restTemplate.exchange(indexEndpoint, HttpMethod.GET, requestEntity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(searchUrl, HttpMethod.GET, requestEntity, String.class);
 
         if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            // Deserialize the Elasticsearch response body to a JsonNode
-            JsonNode responseBody = objectMapper.readTree(response.getBody());
-
-            // Extract the hits from the responseBody
-            JsonNode hits = responseBody.get("hits").get("hits");
-
-            Stream<JsonNode> hitsStream = StreamSupport.stream(hits.spliterator(), false);
-
-            // Map each hit to your model class using ObjectMapper and collect them into a List
-            List<MessageDocument> documents = hitsStream
-                    .map(hit -> {
-                        try {
-                            return objectMapper.treeToValue(hit.get("_source"), MessageDocument.class);
-                        } catch (JsonProcessingException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .toList();
-
-            return new MessageHistoryIndex(indexName, documents);
-
+            return response.getBody();
         } else {
             throw new RuntimeException("Failed to get data from index: " + indexName);
         }
