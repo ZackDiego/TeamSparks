@@ -3,18 +3,23 @@ package org.example.teamspark.service;
 import lombok.extern.apachecommons.CommonsLog;
 import org.example.teamspark.data.dto.SignInAndUpDto;
 import org.example.teamspark.data.dto.UserDto;
+import org.example.teamspark.data.dto.UserWorkspaceMemberDto;
 import org.example.teamspark.data.form.SignInForm;
 import org.example.teamspark.data.form.SignUpForm;
 import org.example.teamspark.exception.EmailAlreadyExistsException;
 import org.example.teamspark.exception.UserAuthenticationException;
 import org.example.teamspark.model.user.User;
+import org.example.teamspark.model.workspace.WorkspaceMember;
 import org.example.teamspark.repository.UserRepository;
+import org.example.teamspark.repository.WorkspaceMemberRepository;
 import org.example.teamspark.util.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @CommonsLog
@@ -27,6 +32,9 @@ public class UserService {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private WorkspaceMemberRepository workspaceMemberRepository;
 
     @Value("${jwt.expireTimeAsSec}")
     private long jwtExpireTimeAsSec;
@@ -82,5 +90,21 @@ public class UserService {
         } else {
             throw new UserAuthenticationException("Invalid credentials. Please check your email and password and try again.");
         }
+    }
+
+    public List<UserWorkspaceMemberDto> getUserWorkspaceMembers(User user) {
+        List<WorkspaceMember> workspaceMembers = workspaceMemberRepository.findByUser(user);
+
+        return workspaceMembers.stream().
+                map(workspaceMember -> {
+                    UserWorkspaceMemberDto dto = new UserWorkspaceMemberDto();
+
+                    dto.setWorkspaceId(workspaceMember.getWorkspace().getId());
+                    dto.setWorkspaceName(workspaceMember.getWorkspace().getName());
+
+                    dto.setMemberId(workspaceMember.getId());
+                    dto.setJoinedAt(workspaceMember.getJoinedAt());
+                    return dto;
+                }).toList();
     }
 }

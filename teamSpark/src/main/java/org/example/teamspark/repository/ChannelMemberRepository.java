@@ -9,6 +9,8 @@ import java.util.List;
 public interface ChannelMemberRepository extends JpaRepository<ChannelMember, Long> {
     List<ChannelMember> findByMemberId(Long memberId);
 
+    List<ChannelMember> findByChannelId(Long channelId);
+
     List<ChannelMember> findByChannelIn(List<Channel> channels);
 
     List<ChannelMember> findByChannel(Channel channel);
