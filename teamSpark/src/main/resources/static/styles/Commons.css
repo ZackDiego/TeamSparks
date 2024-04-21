@@ -1,0 +1,42 @@
+@font-face {
+    font-family: PingFangTC;
+    src: url('/styles/PingFang-TC-Regular-2.otf') format('opentype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: PingFangTC;
+    src: url('/styles/PingFang-TC-Thin-2.otf') format('opentype');
+    font-weight: 100;
+}
+
+@font-face {
+    font-family: NotoSansTC;
+    src: url('/styles/NotoSansTC-Regular.otf') format('opentype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: NotoSansTC;
+    src: url('/styles/NotoSansTC-Bold.otf') format('opentype');
+    font-weight: bold;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: NotoSansTC;
+    min-height: 100vh; /* Ensure the body takes up at least the height of the viewport */
+}
+
+main {
+    flex: 1; /* Allow the main content to grow to fill the available space */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 140px 0 45px 0;
+}

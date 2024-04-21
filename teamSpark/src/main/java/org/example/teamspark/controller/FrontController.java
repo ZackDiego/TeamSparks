@@ -10,4 +10,9 @@ public class FrontController {
     public String homePage() {
         return "index";
     }
+
+    @GetMapping("/login")
+    public String loginPage() {
+        return "loginPage";
+    }
 }
