@@ -1,0 +1,328 @@
+
+#sidebar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#workspaces-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #490091;
+    width: 60px;
+    height: 100%;
+}
+
+.workspace-card {
+    margin: 10px;
+    height: 40px;
+    width: 40px;
+    border-radius: 5px;
+    background-color: lightblue;
+    border: 2px solid whitesmoke;
+    box-shadow: none;
+}
+
+#sidebar-container {
+    background-color: #F8E3FF;
+    min-width: 250px;
+    height: 100%;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+#upper-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: 10px;
+}
+
+#workspace-name {
+    font-size: 25px;
+    padding: 0 0 10px 10px;
+}
+
+/* sidebar buttons */
+#btn-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 50px;
+    width: 100%;
+    padding: 10px;
+}
+
+.sidebar-btn {
+    width: 30px;
+    height: 30px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+
+#btn-text-message {
+    background-image: url('/icons/speech-bubble.png');
+}
+
+#btn-label {
+    background-image: url('/icons/label.png');
+    margin: 5px;
+}
+
+#btn-event {
+    background-image: url('/icons/calendar-check.png');
+}
+
+#btn-meeting {
+    background-image: url('/icons/businessmen.png');
+}
+
+.divider {
+    width: 100%;
+    height: 1px; /* Adjust the height as needed */
+    background-color: #ccc; /* Adjust the color as needed */
+    margin: 10px 0; /* Adjust the margin as needed */
+}
+
+#list-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 10px;
+}
+
+.details-container {
+    margin: 10px; /* Adjust the indentation by changing the value */
+}
+
+.channel::before {
+    content: "#"; /* Add the '#' symbol before each channel name */
+    margin-right: 5px; /* Adjust the spacing between the '#' symbol and the channel name */
+}
+
+.details-item {
+    padding: 5px 5px 5px 15px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.chat-partner-avatar {
+    width: 30px; /* Set the width of the avatar */
+    height: 30px; /* Set the height of the avatar */
+    border-radius: 50%; /* Make the avatar round */
+    display: inline-block;
+    margin-right: 15px; /* Adjust spacing between avatar and username */
+    object-fit: cover;
+}
+
+
+#user-status-container {
+    width: 100%;
+    height: 80px;
+    background-color: #9A929E;
+}
+
+
+/* header */
+.header-logo > a {
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.header-search-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 100px;
+    max-width: 45vw;
+}
+
+.header-search-input {
+    width: 100%; /* Adjust for icon size */
+    padding: 6px 20px 6px 20px;
+    border: solid 1px #979797;
+    border-radius: 5px;
+    font-size: 20px;
+    height: 30px;
+}
+
+.header-search-input:focus {
+    outline: none;
+}
+
+.header-search-button {
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.header-search-button img {
+    width: 25px; /* Adjust icon size */
+    height: auto;
+}
+
+/* notification bell */
+.header-link-bell {
+    width: 44px;
+    height: 44px;
+    background-image: url(/icons/cart.png);
+    background-size: contain;
+    margin-right: 15px;
+}
+
+
+/* user status container */
+#user-status-container {
+    display: flex;
+    align-items: center;
+    padding: 10px 10px 20px 10px;
+}
+
+.user-avatar {
+    border-radius: 50%; /* Make the avatar round */
+    overflow: hidden; /* Ensure the image stays within the round border */
+    margin-right: 10px; /* Add some spacing between avatar and user info */
+}
+
+.user-avatar img {
+    width: 50px; /* Set the width of the avatar image */
+    height: 50px; /* Set the height of the avatar image */
+}
+
+.user-info {
+    flex-grow: 1; /* Allow user info to take up remaining space */
+}
+
+.user-info > div {
+    color: white; /* Allow user info to take up remaining space */
+}
+
+.user-settings {
+    display: flex;
+    align-items: center; /* Vertically center items */
+    height: 100%;
+    padding-right: 10px;
+}
+
+.user-settings button {
+    width: 30px;
+    height: 30px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    background-image: url('/icons/setting.png');
+}
+
+/* main content */
+#right-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+    flex-grow: 1;
+}
+
+#content-header {
+    display: flex;
+    justify-content: space-between;
+    height: 50px;
+    width: 100%;
+    align-items: center;
+    border-bottom: 1px solid #9aa2ab;
+    padding: 10px;
+}
+
+.content-header-btn {
+    width: 30px;
+    height: 30px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.content-header-btn-container {
+    display: flex;
+    width: 100px;
+    justify-content: space-around;
+}
+
+#btn-phone-call {
+    background-image: url('/icons/phone-call-button.png');
+}
+
+#btn-video-call {
+    background-image: url('/icons/video-call.png');
+}
+
+.message-container {
+    flex-grow: 1;
+    overflow-y: auto; /* Add scrollbar when messages overflow */
+    display: flex;
+    flex-direction: column-reverse; /* Stack messages from bottom to top */
+    padding: 10px;
+}
+
+
+/* message editor */
+/* Center the Summernote editor */
+.editor-container, .title {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+}
+
+.title {
+    margin: 40px;
+}
+
+/* Add space around the Summernote editor */
+.editor-container #summernote {
+    margin: 20px; /* Adjust the margin as needed */
+}
+
+/* Style for code block */
+pre {
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    color: #666;
+    page-break-inside: avoid;
+    font-family: monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 1.6em;
+    max-width: 100%;
+    overflow: auto;
+    padding: 1em 1.5em;
+    display: block;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    border-radius: 5px;
+    min-height: 60px;
+}
+
+.note-editor {
+    width: 100%;
+}
+
+.btnSend {
+
+}
