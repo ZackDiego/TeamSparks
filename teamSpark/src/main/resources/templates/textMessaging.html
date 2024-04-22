@@ -99,18 +99,19 @@
             </div>
         </div>
         <div class="message-history-container">
-            <div class="message"></div>
         </div>
         <div class="editor-container">
             <div class="message-editor"></div>
         </div>
     </div>
 </div>
+<!-- fixed userInfo for testing and demo -->
+<script th:src="@{/js/userBasic.js}"></script>
 <!--include tam-emoji js-->
 <script th:src="@{/tam-emoji/js/config.js}"></script>
 <script th:src="@{/tam-emoji/js/tam-emoji.min.js?v=1.1}"></script>
-<script th:src="@{/js/summernote-editor.js}"></script>
-<script th:src="@{/js/textMessagingPageRender.js}"></script>
-<script th:src="@{/js/textMessagingStomp.js}"></script>
+<script th:src="@{/js/textMessaging/summernote-editor.js}"></script>
+<script th:src="@{/js/textMessaging/textMessagingPageRender.js}"></script>
+<script th:src="@{/js/textMessaging/textMessagingStomp.js}"></script>
 </body>
 </html>

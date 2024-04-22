@@ -73,7 +73,8 @@
 
 #btn-label {
     background-image: url('/icons/label.png');
-    margin: 5px;
+    background-size: 25px;
+    background-position: center;
 }
 
 #btn-event {
@@ -246,12 +247,12 @@
     width: 100%;
     align-items: center;
     border-bottom: 1px solid #9aa2ab;
-    padding: 10px;
+    padding: 10px 10px 15px 10px;
 }
 
 .content-header-btn {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     background-size: contain;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -279,7 +280,7 @@
     flex-grow: 1;
     overflow-y: auto; /* Add scrollbar when messages overflow */
     display: flex;
-    flex-direction: column-reverse; /* Stack messages from bottom to top */
+    flex-direction: column; /* Stack messages from bottom to top */
     padding: 10px;
 }
 
@@ -314,6 +315,10 @@
 .message-content {
     flex-grow: 1; /* Allow message content to grow to fill remaining space */
     font-size: 0.8em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 

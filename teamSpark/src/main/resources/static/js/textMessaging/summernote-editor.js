@@ -65,7 +65,7 @@ $('.message-editor').summernote({
             $('.note-editing-area').after(customToolbar);
 
             // Add send button
-            var sendButton = $('<button type="button" class="note-btn btn btn-sm btn-primary btnSend mr-2">Send</button>');
+            var sendButton = $('<button type="button" class="note-btn btn btn-sm btn-primary btn-send mr-2">Send</button>');
             customToolbar.append(sendButton);
         }
     },
