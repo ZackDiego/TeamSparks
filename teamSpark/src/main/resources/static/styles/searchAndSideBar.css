@@ -377,6 +377,10 @@ pre {
 
 @media (prefers-color-scheme: dark) {
     .toast {
-        background-color: rgba(255, 255, 255, .9); /* Override the Bootstrap style */
+        background-color: rgba(82, 196, 41, .8); /* Override the Bootstrap style */
     }
+}
+
+.toast {
+    width: 300px;
 }

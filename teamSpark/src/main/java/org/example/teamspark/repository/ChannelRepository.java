@@ -54,4 +54,10 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
             "    c.id = :channelId",
             nativeQuery = true)
     List<Object[]> findChannelsWithMembersByChannelId(@Param("channelId") Long channelId);
+
+    @Query(value = "SELECT c.* FROM channel c " +
+            "INNER JOIN channel_member cm ON c.id = cm.channel_id " +
+            "INNER JOIN workspace_member wm ON cm.member_id = wm.id " +
+            "WHERE wm.user_id = :userId", nativeQuery = true)
+    List<Channel> findChannelsByUserId(@Param("userId") Long userId);
 }
