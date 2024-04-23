@@ -362,3 +362,21 @@ pre {
 .note-editor {
     width: 100%;
 }
+
+
+.toast-container {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    z-index: 11
+}
+
+.toast:not(.showing):not(.show) {
+    display: none !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    .toast {
+        background-color: rgba(255, 255, 255, .9); /* Override the Bootstrap style */
+    }
+}

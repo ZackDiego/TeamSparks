@@ -1,6 +1,7 @@
 package org.example.teamspark.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.apachecommons.CommonsLog;
 import org.example.teamspark.data.UserNotificationDto;
 import org.example.teamspark.data.dto.MessageDto;
 import org.example.teamspark.data.dto.UserDto;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@CommonsLog
 public class NotificationService {
 
     private final UserNotificationRepository userNotificationRepository;
@@ -73,7 +75,11 @@ public class NotificationService {
 
     public void notifyUsers(List<UserNotificationDto> dtos) {
         dtos.forEach(userNotification ->
-                messageTemplate.convertAndSend("/userNotification/" + userNotification.getUser().getId()
-                        , userNotification));
+                {
+                    messageTemplate.convertAndSend("/userNotification/" + userNotification.getUser().getId()
+                            , userNotification);
+                    log.info("send notification to " + "/userNotification/" + userNotification.getUser().getId());
+                }
+        );
     }
 }

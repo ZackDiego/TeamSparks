@@ -19,6 +19,15 @@
     <!-- summernote -->
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+    <!--  toasts  -->
+    <link crossorigin="anonymous"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-toaster/4.0.1/css/bootstrap-toaster.min.css"
+          integrity="sha512-RLiJ5uLcu8jWxsJBevOZWLU0zWv51vwpha0Gh4jRKOqkcWbVR7+U8kKaiGsMhSua3fIkviCHRClSH+XZYKIoZA=="
+          referrerpolicy="no-referrer" rel="stylesheet"/>
+    <script crossorigin="anonymous"
+            integrity="sha512-YmkrdAXo8RdHV1JFfepR7QWLDfF7vs8Mc/t+6qKIxrEFeWbi0u/lajryYSPK6GC5nupW5t6XfPdxQpIY79+USg=="
+            referrerpolicy="no-referrer"
+            src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-toaster/4.0.1/js/bootstrap-toaster.min.js"></script>
     <!--include tam-emoji ccs-->
     <link rel="stylesheet" th:href="@{/tam-emoji/css/emoji.css}">
     <!--include fontawesome-->
@@ -104,6 +113,7 @@
             <div class="message-editor"></div>
         </div>
     </div>
+    <div class="toast-container"></div>
 </div>
 <!-- fixed userInfo for testing and demo -->
 <script th:src="@{/js/userBasic.js}"></script>

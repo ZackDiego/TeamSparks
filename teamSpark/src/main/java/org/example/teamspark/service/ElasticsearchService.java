@@ -100,7 +100,7 @@ public class ElasticsearchService {
         }
 
         // Get the index
-        String searchUrl = ESUrl + "/" + indexName + "/_search";
+        String searchUrl = ESUrl + "/" + indexName + "/_search?size=10000";
 
         String requestBody = "{\"query\": {\"match_all\": {}}}"; // all documents
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
