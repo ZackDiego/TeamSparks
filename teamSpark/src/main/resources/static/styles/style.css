@@ -1,10 +1,77 @@
 
+.media-control-btn-panel {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    justify-content: center;
+    width: 100%;
+    height: 80px;
+    background-color: #979797;
+}
+
+.video-panel {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    flex-grow: 1;
+    padding: 25px;
+}
+
+.video-container {
+    margin: 20px;
+    aspect-ratio: 14/9;
+    position: relative;
+    z-index: 0;
+}
+
+.video-container.big {
+    width: calc(40% - 20px); /* Adjust the width of each container */
+    min-width: calc(40% - 20px);
+}
+
+.video-container.small {
+    width: calc(33.3% - 20px); /* Adjust the width of each container */
+    min-width: 250px;
+}
+
+.video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    border-radius: 5px;
+}
+
+
+.streamer-name {
+    position: absolute;
+    bottom: 5px; /* Adjust this value to adjust the distance from the bottom */
+    left: 5px; /* Adjust this value to adjust the distance from the left */
+    margin: 0;
+    color: white; /* Set the color of the identity text */
+    background-color: rgba(0, 0, 0, 0.3); /* Set the background color for better readability */
+    padding: 0.5em 0.8em; /* Adjust padding as needed */
+    border-radius: 5px; /* Add border radius for rounded corners */
+    z-index: 1;
+    font-size: 10px;
+}
+
+/*.video-container video {*/
+/*    position: absolute;*/
+/*    width: 100%; !* Ensure the video fills the container *!*/
+/*    height: 100%; !* Ensure the video fills the container *!*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*}*/
+
 .btn-circle {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     margin: 5px;
     border-radius: 50%;
     border: none;
@@ -23,4 +90,12 @@
 
 .disabled-style {
     background-color: #ff3030;
+}
+
+.media-control-btn-panel > button {
+    margin: 0 15px 0 15px;
+}
+
+.right-content {
+    padding: 0;
 }

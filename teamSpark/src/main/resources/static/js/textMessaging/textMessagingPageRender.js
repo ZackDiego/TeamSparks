@@ -63,7 +63,9 @@ function renderMessageHistory(data) {
     // Add the messages into the messages container
     const messagesContainer = $('.message-history-container');
 
-    const messages = data.messages;
+    // Sort messages by date
+    const messages = data.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
     $.each(messages, function (index, message) {
         const avatarSrc = '/img/profile.png'; // Fixed avatar source for now, you can replace it with actual avatar source
         const avatar = $('<img>').addClass('avatar').attr('src', avatarSrc);

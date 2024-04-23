@@ -1,13 +1,33 @@
-// const LOCAL_IP_ADDRESS = "zackawesome.net";
-const LOCAL_IP_ADDRESS = "localhost:8001";
+const userInf = JSON.parse(localStorage.getItem('user_inf'));
+const channelInf = JSON.parse(localStorage.getItem('channel_inf'));
 
-const getElement = id => document.getElementById(id);
-const [btnConnect, btnToggleVideo, btnToggleAudio, divRoomConfig,
-    roomDiv, roomNameInput, localVideo, remoteVideo] =
-    ["btnConnect", "toggleVideo", "toggleAudio", "roomConfig", "roomDiv", "roomName",
-        "localVideo", "remoteVideo"].map(getElement);
-let remoteDescriptionPromise, roomName, localStream, remoteStream,
-    rtcPeerConnection, isCaller;
+
+const localVideo = $('.localVideo')[0];
+let remoteDescriptionPromise, localStream, remoteStream;
+let roomName = "channel_" + channelInf.channel_id;
+
+
+// Connect to video call socketIOServer
+// const LOCAL_IP_ADDRESS = "zackawesome.net";
+// let socket = io.connect(`https://${LOCAL_IP_ADDRESS}`, {secure: true});
+let socket = io.connect("http://localhost:8001");
+
+
+// Listen for the "connect" event
+socket.on("connect", () => {
+    console.log("Connected to Socket.IO server");
+
+    // add name in local stream
+    $('.localStream > h3').text("user: " + socket.id);
+
+    // Join room when connect ready
+    if (roomName != null) {
+        socket.emit("joinRoom", roomName);
+    } else {
+        alert('channel_id is not properly set!');
+    }
+});
+
 
 let rtcPeerConnectionsMap = new Map();
 
@@ -30,54 +50,8 @@ const iceServers = {
 
 const streamConstraints = {audio: true, video: true};
 
-// let socket = io.connect(`https://${LOCAL_IP_ADDRESS}`, {secure: true});
-let socket = io.connect("http://" + LOCAL_IP_ADDRESS);
 
-btnToggleVideo.addEventListener("click", () => toggleTrack("video"));
-btnToggleAudio.addEventListener("click", () => toggleTrack("audio"));
-
-$('#btnLeave').click(() => {
-    console.log("leave room")
-    socket.emit("leaveRoom", roomName)
-    socket.disconnect();
-    // refresh the page when leave room
-    window.location.reload();
-});
-
-function toggleTrack(trackType) {
-    if (!localStream) {
-        return;
-    }
-
-    const track = trackType === "video" ? localStream.getVideoTracks()[0]
-        : localStream.getAudioTracks()[0];
-    const enabled = !track.enabled;
-    track.enabled = enabled;
-
-    const toggleButton = getElement(
-        `toggle${trackType.charAt(0).toUpperCase() + trackType.slice(1)}`);
-    const icon = getElement(`${trackType}Icon`);
-    toggleButton.classList.toggle("disabled-style", !enabled);
-    toggleButton.classList.toggle("enabled-style", enabled);
-    icon.classList.toggle("bi-camera-video-fill",
-        trackType === "video" && enabled);
-    icon.classList.toggle("bi-camera-video-off-fill",
-        trackType === "video" && !enabled);
-    icon.classList.toggle("bi-mic-fill", trackType === "audio" && enabled);
-    icon.classList.toggle("bi-mic-mute-fill", trackType === "audio" && !enabled);
-}
-
-btnConnect.onclick = () => {
-    if (roomNameInput.value === "") {
-        alert("Room can not be null!");
-    } else {
-        roomName = roomNameInput.value;
-        socket.emit("joinRoom", roomName);
-        divRoomConfig.classList.add("d-none");
-        roomDiv.classList.remove("d-none");
-    }
-};
-
+// Handle Event
 const handleSocketEvent = (eventName, callback) => socket.on(eventName,
     callback);
 
@@ -86,7 +60,6 @@ handleSocketEvent("created", async function () {
     const stream = await navigator.mediaDevices.getUserMedia(streamConstraints)
     localStream = stream;
     localVideo.srcObject = stream;
-    isCaller = true;
 });
 
 handleSocketEvent("joined", async function (e) {
@@ -97,28 +70,30 @@ handleSocketEvent("joined", async function (e) {
     localStream = stream;
     localVideo.srcObject = stream;
 
+    console.log(socket.id);
     // loop through existing clients to send offer
     for (let existingClientId of e) {
-        rtcPeerConnection = new RTCPeerConnection(iceServers);
-        rtcPeerConnection.onicecandidate = event => onIceCandidate(event, existingClientId);
-        rtcPeerConnection.ontrack = event => onAddStream(event, existingClientId);
-        rtcPeerConnection.addTrack(localStream.getTracks()[0], localStream);
-        rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
-        const sessionDescription = await rtcPeerConnection.createOffer();
-        await rtcPeerConnection.setLocalDescription(sessionDescription);
+        if (existingClientId !== socket.id) {
+            rtcPeerConnection = new RTCPeerConnection(iceServers);
+            rtcPeerConnection.onicecandidate = event => onIceCandidate(event, existingClientId);
+            rtcPeerConnection.ontrack = event => onAddStream(event, existingClientId);
+            rtcPeerConnection.addTrack(localStream.getTracks()[0], localStream);
+            rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
+            const sessionDescription = await rtcPeerConnection.createOffer();
+            await rtcPeerConnection.setLocalDescription(sessionDescription);
 
-        console.log("send offer to existing client: " + existingClientId)
+            console.log("send offer to existing client: " + existingClientId)
 
-        // send offer event to new client through signal server
-        socket.emit("offer", {
-            type: "offer", sdp: sessionDescription, room: roomName,
-            targetClientId: existingClientId,
-        });
+            // send offer event to new client through signal server
+            socket.emit("offer", {
+                type: "offer", sdp: sessionDescription, room: roomName,
+                targetClientId: existingClientId,
+            });
 
-        // save connection into map for management
-        rtcPeerConnectionsMap.set(existingClientId, rtcPeerConnection);
+            // save connection into map for management
+            rtcPeerConnectionsMap.set(existingClientId, rtcPeerConnection);
+        }
     }
-    console.log(rtcPeerConnectionsMap);
 });
 
 
@@ -204,10 +179,6 @@ handleSocketEvent("userDisconnected", (clientId) => {
     rtcPeerConnectionsMap.delete(clientId);
 });
 
-handleSocketEvent("setCaller", callerId => {
-    isCaller = socket.id === callerId;
-});
-
 const onIceCandidate = (e, clientId) => {
     console.log("onIceCandidate " + clientId)
     if (e.candidate) {
@@ -234,22 +205,91 @@ const onAddStream = (e, clientId) => {
 function createRemoteVideoScreen(stream, clientId) {
 
     const clientIdVideoElement = $(`#remoteVideo_${clientId}`)
+
+    // make sure video doesn't add duplicate
     if (clientIdVideoElement.length === 0) {
+        const $videoPanel = $('.video-panel');
 
-        const $videoElement = $('<video autoplay ></video>')
-            .addClass('img-responsive center-block')
-            .prop('srcObject', stream);
-
-        const $remoteStreamsDiv = $('#remoteStreams');
         const $participantDiv = $('<div></div>')
+            .addClass("video-container")
+            .addClass("remoteStream")
             .attr('id', `remoteVideo_${clientId}`);
 
-        const $remoteParticipantHeader = $('<h3 class="text-center"></h3>').text(`Participant: ${clientId}`);
+        const $videoElement = $('<video autoplay muted></video>')
+            .addClass("remoteVideo")
+            .prop('srcObject', stream);
+
+        const $remoteParticipantHeader = $('<h3></h3>')
+            .addClass("text-center")
+            .addClass("streamer-name")
+            .text(`Participant: ${clientId}`);
 
         $participantDiv.append($remoteParticipantHeader);
         $participantDiv.append($videoElement);
-        $remoteStreamsDiv.append($participantDiv);
+        $videoPanel.append($participantDiv);
+
+        // adjust width if needed
+        adjustVideoContainerSize();
     }
+}
 
 
+// button control
+$(".btnToggleVideo").click(() => toggleTrack("video"));
+$(".btnToggleAudio").click(() => toggleTrack("audio"));
+
+function toggleTrack(trackType) {
+    if (!localStream) {
+        return;
+    }
+    const track = trackType === "video" ? localStream.getVideoTracks()[0]
+        : localStream.getAudioTracks()[0];
+    const enabled = !track.enabled;
+    track.enabled = enabled;
+
+    const toggleButton = $(`.toggle${trackType}`);
+    const icon = $(`#${trackType}Icon`);
+    toggleButton.classList.toggle("disabled-style", !enabled);
+    toggleButton.classList.toggle("enabled-style", enabled);
+    icon.classList.toggle("bi-camera-video-fill",
+        trackType === "video" && enabled);
+    icon.classList.toggle("bi-camera-video-off-fill",
+        trackType === "video" && !enabled);
+    icon.classList.toggle("bi-mic-fill", trackType === "audio" && enabled);
+    icon.classList.toggle("bi-mic-mute-fill", trackType === "audio" && !enabled);
+}
+
+$('.btnLeave').click(() => {
+    console.log("leave room")
+    socket.emit("leaveRoom", roomName)
+    socket.disconnect();
+
+    // remove all removeStream videos
+    $('.remoteStream').remove();
+    adjustVideoContainerSize();
+});
+
+$(window).on('beforeunload', function () {
+    // disconnect before leave room
+    console.log("leave room")
+    socket.emit("leaveRoom", roomName)
+    socket.disconnect();
+});
+
+
+// Function to adjust the size of video containers
+function adjustVideoContainerSize() {
+    const videoContainers = $('.video-container');
+    const numContainers = videoContainers.length;
+    console.log(numContainers);
+
+    // Remove existing size classes
+    videoContainers.removeClass('big small');
+
+    // Determine the appropriate class based on the number of containers
+    if (numContainers <= 4) {
+        videoContainers.addClass('big');
+    } else {
+        videoContainers.addClass('small');
+    }
 }
