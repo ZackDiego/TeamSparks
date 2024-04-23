@@ -1,9 +1,12 @@
 package org.example.teamspark.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.example.teamspark.exception.ElasticsearchFailedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -56,7 +59,7 @@ public class ElasticsearchService {
         }
     }
 
-    public void addDocumentToIndex(String indexName, String json) {
+    public String addDocumentToIndex(String indexName, String json) throws JsonProcessingException, ElasticsearchFailedException {
 
         String indexEndpoint = ESUrl + "/" + indexName + "/_doc";
 
@@ -70,8 +73,14 @@ public class ElasticsearchService {
 
         if (response.getStatusCode().is2xxSuccessful()) {
             log.info("Message added to index: " + indexName);
+
+            // return saved document id
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            JsonNode rootNode = objectMapper.readTree(response.getBody());
+            return rootNode.path("_id").asText();
         } else {
-            log.error("Failed to add message to index: " + indexName);
+            throw new ElasticsearchFailedException("Failed to add message to index: " + indexName);
         }
     }
 

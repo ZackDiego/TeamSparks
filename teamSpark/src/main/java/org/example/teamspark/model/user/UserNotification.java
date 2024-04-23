@@ -1,10 +1,14 @@
 package org.example.teamspark.model.user;
 
 import jakarta.persistence.*;
-
-import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserNotification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,13 +21,12 @@ public class UserNotification {
     @Column(name = "type")
     private NotificationType type;
 
-    @ManyToOne
-    @JoinColumn(name = "from_user_id")
-    private User fromUserId;
+    @Column(name = "channel_id")
+    private Long channelId;
 
-    @Column(name = "content")
-    private Date createdAt;
+    @Column(name = "message_id")
+    private String messageId;
 
-    @Column(name = "is_private")
-    private Boolean isPrivate;
+    @Column(name = "is_seen")
+    private boolean isSeen = false;
 }

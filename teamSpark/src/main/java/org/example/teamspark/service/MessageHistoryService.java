@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.apachecommons.CommonsLog;
 import org.example.teamspark.data.dto.MessageDto;
 import org.example.teamspark.data.dto.MessageHistoryDto;
+import org.example.teamspark.exception.ElasticsearchFailedException;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.channel.Channel;
 import org.example.teamspark.model.channel.ChannelMember;
@@ -92,7 +93,7 @@ public class MessageHistoryService {
 
     }
 
-    public void addMessageHistoryByChannelId(Long channelId, MessageDto message) {
+    public String addMessageHistoryByChannelId(Long channelId, MessageDto message) throws JsonProcessingException, ElasticsearchFailedException {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String messageJson = null;
@@ -103,7 +104,7 @@ public class MessageHistoryService {
             log.error("Error when converting message to json");
         }
         String indexName = "channel-" + channelId;
-        elasticsearchService.addDocumentToIndex(indexName, messageJson);
+        return elasticsearchService.addDocumentToIndex(indexName, messageJson);
     }
 
 

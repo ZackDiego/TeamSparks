@@ -1,10 +1,10 @@
-const stompClient = new StompJs.Client({
-    brokerURL: 'ws://localhost:8080/textMessagingWebsocket'
-});
+// const stompClient = new StompJs.Client({
+//     brokerURL: 'ws://localhost:8080/textMessagingWebsocket'
+// });
 
 // get from localStorage
-const channelInf = JSON.parse(localStorage.getItem('channel_inf'));
-const userInf = JSON.parse(localStorage.getItem('user_inf'));
+// const channelInf = JSON.parse(localStorage.getItem('channel_inf'));
+// const userInf = JSON.parse(localStorage.getItem('user_inf'));
 
 stompClient.onConnect = (frame) => {
     setConnected(true);

@@ -30,7 +30,8 @@ async function fetchMessageHistoryData(url) {
 
     if (!accessToken) {
         console.error("Access token not found in local storage. Redirecting to login page.");
-        window.location.href = '/login'; // Redirect to profile page
+        // window.location.href = '/login'; // Redirect to profile page
+        alert("please add access token!")
         return;
     }
 
