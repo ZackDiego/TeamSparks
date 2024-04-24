@@ -28,48 +28,61 @@
             integrity="sha512-YmkrdAXo8RdHV1JFfepR7QWLDfF7vs8Mc/t+6qKIxrEFeWbi0u/lajryYSPK6GC5nupW5t6XfPdxQpIY79+USg=="
             referrerpolicy="no-referrer"
             src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-toaster/4.0.1/js/bootstrap-toaster.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet"/>
     <!--include tam-emoji ccs-->
     <link rel="stylesheet" th:href="@{/tam-emoji/css/emoji.css}">
     <!--include fontawesome-->
     <script src="https://use.fontawesome.com/52e183519a.js"></script>
     <link rel="stylesheet" th:href="@{/styles/Commons.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/styles/style.css}" type="text/css"/>
     <link rel="stylesheet" th:href="@{/styles/searchAndSideBar.css}" type="text/css"/>
 </head>
 <body>
 <div class="header">
     <div class="header-logo">
-        <a href="https://example.com">TeamSpark</a>
+        <a href="http://localhost:8080/textMessaging/1">TeamSpark</a>
     </div>
     <div class="header-search-container">
         <input class="header-search-input" placeholder="" type="text">
         <button class="header-search-button"><img alt="Search" src="/icons/search.png"></button>
     </div>
+    <div id="welcome-message"></div>
 </div>
 <div class="main-content">
     <div id="workspaces-tab">
         <button class="workspace-card">寬</button>
+        <button class="workspace-card">BE</button>
     </div>
     <div id="sidebar-container">
         <div id="upper-sidebar">
-            <div id="workspace-name">阿寬公司</div>
-            <div id="btn-container">
-                <button class="sidebar-btn" id="btn-text-message"></button>
-                <button class="sidebar-btn" id="btn-label"></button>
-                <button class="sidebar-btn" id="btn-event"></button>
-                <button class="sidebar-btn" id="btn-meeting"></button>
-            </div>
+
+            <button aria-expanded="false" class="btn dropdown-toggle" data-bs-toggle="dropdown" id="workspace-name"
+                    type="button">
+                阿寬公司
+            </button>
+            <ul aria-labelledby="workspace-name" class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Create channel/private chat</a></li>
+                <li><a class="dropdown-item" href="#">Manage channel/private chat</a></li>
+                <li><a class="dropdown-item" href="#">Delete channel/private chat</a></li>
+            </ul>
+            <!--            <div id="btn-container">-->
+            <!--                <button class="sidebar-btn active" id="btn-text-message"></button>-->
+            <!--                <button class="sidebar-btn" id="btn-label"></button>-->
+            <!--                <button class="sidebar-btn" id="btn-event"></button>-->
+            <!--                <button class="sidebar-btn" id="btn-meeting"></button>-->
+            <!--            </div>-->
             <div class="divider"></div>
             <div id="list-container">
                 <details class="details-container" id="channel-container">
                     <summary>Channels</summary>
-                    <div class="channel details-item">Channel 1</div>
+                    <div class="channel details-item active">Channel 1</div>
                     <div class="channel details-item">Channel 2</div>
                     <div class="channel details-item">Channel 3</div>
                 </details>
                 <details class="details-container" id="chat-container">
                     <summary>Private Chat</summary>
                     <div class="chat details-item">
-                        <img class="chat-partner-avatar" src="/img/profile.png">
+                        <img class="chat-partner-avatar chat-partner-demo" src="/img/profile2.png">
                         Alice
                     </div>
                     <div class="chat details-item">
@@ -88,7 +101,7 @@
                 <img alt="User Avatar" src="/img/profile.png">
             </div>
             <div class="user-info">
-                <div class="username">Zack Chiang</div>
+                <div class="username"></div>
                 <div class="status">Online</div>
             </div>
             <div class="user-settings">
@@ -97,26 +110,61 @@
         </div>
     </div>
     <div class="right-content">
-        <div class="content-header">
-            <div class="channel-title chat-partner-title">
-                <img class="chat-partner-avatar" src="/img/profile.png">
-                Alice
+        <!--  text messaging content  -->
+        <div class="text-messaging-content">
+            <div class="content-header">
+                <div class="channel-title chat-partner-title">
+                    <!--                    <img class="chat-partner-avatar" src="/img/profile2.png">-->
+                    # Channel 1
+                </div>
+                <div class="content-header-btn-container">
+                    <button class="content-header-btn btn-phone-call"></button>
+                    <button class="content-header-btn btn-video-call"></button>
+                </div>
             </div>
-            <div class="content-header-btn-container">
-                <button class="content-header-btn btn-phone-call"></button>
-                <button class="content-header-btn btn-video-call"></button>
+            <div class="message-history-container">
+            </div>
+            <div class="editor-container">
+                <div class="message-editor"></div>
             </div>
         </div>
-        <div class="message-history-container">
+
+        <!--  video call content  -->
+        <div class="video-call-content">
+            <div class="video-panel">
+                <div class="video-container big localStream">
+                    <h3 class="text-center streamer-name"></h3>
+                    <video autoplay class="localVideo" muted></video>
+                </div>
+
+                <!--            <div class="video-container remoteStream">-->
+                <!--                <h3 class="text-center streamer-name">Others</h3>-->
+                <!--                <video autoplay class="remoteVideo" muted></video>-->
+                <!--            </div>-->
+                <!-- Remote streams will be added dynamically -->
+            </div>
+            <!-- media control buttons -->
+            <div class="media-control-btn-panel" style="margin-top: 20px;">
+                <!-- Button for toggling video -->
+                <button class="btn-circle enabled-style mr-2" id="btnToggleVideo">
+                    <i class="bi bi-camera-video-fill" id="VideoIcon"></i>
+                </button>
+                <!-- Button for toggling audio -->
+                <button class="btn-circle enabled-style mr-2" id="btnToggleAudio">
+                    <i class="bi bi-mic-fill" id="AudioIcon"></i>
+                </button>
+                <button class="btn-circle disabled-style" id="btnLeave">
+                    <i class="bi bi-telephone-x-fill" id="leaveIcon"></i>
+                </button>
+            </div>
         </div>
-        <div class="editor-container">
-            <div class="message-editor"></div>
-        </div>
+
     </div>
     <div class="toast-container"></div>
 </div>
 <!-- fixed userInfo for testing and demo -->
 <script th:src="@{/js/userBasic.js}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
 <!--include tam-emoji js-->
 <script th:src="@{/tam-emoji/js/config.js}"></script>
 <script th:src="@{/tam-emoji/js/tam-emoji.min.js?v=1.1}"></script>
@@ -124,5 +172,6 @@
 <script th:src="@{/js/textMessaging/textMessagingPageRender.js}"></script>
 <script th:src="@{/js/userNotificationAndStatus.js}"></script>
 <script th:src="@{/js/textMessaging/textMessagingStomp.js}"></script>
+<script th:src="@{/js/videoCall/groupWebRtc.js}"></script>
 </body>
 </html>

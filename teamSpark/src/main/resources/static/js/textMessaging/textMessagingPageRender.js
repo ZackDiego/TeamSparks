@@ -1,16 +1,7 @@
-// const userInf = JSON.parse(localStorage.getItem('user_inf'));
-//
-// const channelInf = JSON.parse(localStorage.getItem('channel_inf'));
-
-
-// TODO: load the message history
 $(document).ready(async function () {
 
     // TODO: load the channelId
     let channelId = 1;
-
-    // const urlParams = new URLSearchParams(window.location.search);
-    // const id = urlParams.get('id');
 
     // Fetch message history by channelId
     const url = `/api/v1/channelId/${channelId}/message`;
@@ -19,9 +10,18 @@ $(document).ready(async function () {
     // Render message history
     renderMessageHistory(messageHistoryData);
 
+    $('#welcome-message').text('Welcome, ' + userInf.name);
+    $('.username').text(userInf.name);
+
     scrollMessageContainerToBottom();
     // // Button setting
-    // addInteractiveSelectorButton();
+    toggleChannelOrChat();
+    toggleRightContent();
+    toggleSidebarBtn();
+
+    // Initially hide the video call content
+    $(".video-call-content").hide();
+    $("details").attr("open", true);
 });
 
 async function fetchMessageHistoryData(url) {
@@ -89,3 +89,50 @@ function scrollMessageContainerToBottom() {
     var messageContainer = $('.message-history-container');
     messageContainer.scrollTop(messageContainer[0].scrollHeight);
 }
+
+function toggleChannelOrChat() {
+    $('.details-item').click(function () {
+        // Remove active class from all details-item elements
+        $('.details-item').removeClass('active');
+        // Add active class to the details-item elements inside the clicked details element
+        $(this).addClass('active');
+    });
+}
+
+function toggleSidebarBtn() {
+    $('.sidebar-btn').click(function () {
+        // Remove active class from all details-item elements
+        $('.sidebar-btn').removeClass('active');
+        // Add active class to the details-item elements inside the clicked details element
+        $(this).addClass('active');
+    });
+}
+
+
+// Add event listener to the video call button
+function toggleRightContent() {
+    var $videoCallContent = $(".video-call-content");
+    var $textMessagingContent = $(".text-messaging-content");
+
+    $(".btn-video-call").click(function () {
+        switchToVideoCall();
+
+        // Add event listener to switch back to text messaging when clicked
+        $(this).click(function () {
+            switchToTextMessaging();
+        });
+    });
+
+    // Function to switch to video call content
+    function switchToVideoCall() {
+        $textMessagingContent.hide();
+        $videoCallContent.show();
+    }
+
+    // Function to switch back to text messaging content
+    function switchToTextMessaging() {
+        $textMessagingContent.show();
+        $videoCallContent.hide();
+    }
+}
+

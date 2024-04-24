@@ -19,8 +19,10 @@ async function signInUser(email, password) {
             localStorage.setItem('access_token', responseData.data.access_token);
             localStorage.setItem('user', JSON.stringify(responseData.data.user));
 
-            // TODO: Redirect to textMessaging page
-            // window.location.href = '/profile';
+            // channel
+            localStorage.setItem('user', JSON.stringify(responseData.data.user));
+
+            window.location.href = '/textMessaging/1';
         } else {
             // Handle login error
             alert(responseData.message)

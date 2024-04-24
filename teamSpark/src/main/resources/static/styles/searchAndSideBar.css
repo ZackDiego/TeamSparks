@@ -10,7 +10,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    background-color: #490091;
+    background-color: #5B0888;
     width: 60px;
     height: 100%;
 }
@@ -23,6 +23,8 @@
     background-color: lightblue;
     border: 2px solid whitesmoke;
     box-shadow: none;
+    font-size: 0.8em;
+    white-space: normal;
 }
 
 #sidebar-container {
@@ -43,7 +45,8 @@
 
 #workspace-name {
     font-size: 25px;
-    padding: 0 0 10px 10px;
+    padding: 15px;
+    word-spacing: 0.2em;
 }
 
 /* sidebar buttons */
@@ -53,7 +56,7 @@
     align-items: center;
     height: 50px;
     width: 100%;
-    padding: 10px;
+    padding: 5px;
 }
 
 .sidebar-btn {
@@ -64,8 +67,13 @@
     background-color: transparent;
     border: none;
     cursor: pointer;
+    margin: 5px;
+    border-radius: 1px;
 }
 
+.sidebar-btn.active {
+    background-color: lightgray;
+}
 
 #btn-text-message {
     background-image: url('/icons/speech-bubble.png');
@@ -97,6 +105,7 @@
     flex-direction: column;
     flex-grow: 1;
     padding: 10px;
+    width: 100%;
 }
 
 .details-container {
@@ -113,6 +122,10 @@
     margin: 5px;
     display: flex;
     align-items: center;
+}
+
+.details-item.active {
+    background-color: lightgray;
 }
 
 .chat-partner-avatar {
@@ -151,10 +164,10 @@
 
 .header-search-input {
     width: 100%; /* Adjust for icon size */
-    padding: 6px 20px 6px 20px;
+    padding: 3px 10px 3px 10px;
     border: solid 1px #979797;
     border-radius: 5px;
-    font-size: 20px;
+    font-size: 16px;
     height: 30px;
 }
 
@@ -233,12 +246,28 @@
 
 /* main content */
 .right-content {
+    width: 100%;
+}
+
+/* text messaging */
+.text-messaging-content {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     padding: 10px;
-    flex-grow: 1;
+    height: 100%;
 }
+
+/* text messaging */
+.video-call-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+    height: 100%;
+    background-color: rgba(28, 28, 28, 0.87);
+}
+
 
 .content-header {
     display: flex;
@@ -377,6 +406,12 @@ pre {
 
 @media (prefers-color-scheme: dark) {
     .toast {
-        background-color: rgba(255, 255, 255, .9); /* Override the Bootstrap style */
+        background-color: rgba(101, 182, 0, 0.85); /* Override the Bootstrap style */
+        color: white;
     }
+}
+
+#welcome-message {
+    color: white;
+    margin-right: 20px;
 }

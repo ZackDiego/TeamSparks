@@ -18,9 +18,10 @@ public class FrontController {
         return "loginPage";
     }
 
-    @GetMapping("/videoCall/{channelId}")
-    public String homePage(@PathVariable String channelId, Model model) {
-        model.addAttribute("channel_id", channelId);
-        return "videoCall";
+    @GetMapping("/user/{userId}/workspace/{workspaceId}")
+    public String workspacePage(@PathVariable String userId, @PathVariable String workspaceId, Model model) {
+        model.addAttribute("user_id", userId);
+        model.addAttribute("workspace_id", userId);
+        return "textMessaging";
     }
 }

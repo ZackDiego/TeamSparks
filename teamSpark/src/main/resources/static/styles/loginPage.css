@@ -1,3 +1,35 @@
+.header {
+    display: flex;
+    /*position: fixed;*/
+    top: 0;
+    left: 0;
+    height: 60px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 54px 0 60px;
+    /*z-index: 99;*/
+    background-color: #B266FF;
+    align-items: center;
+    font-family: PingFangTC;
+    justify-content: flex-start;
+}
+
+.header-logo > a {
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: calc(100vh - 60px);
+    width: 100%;
+    padding: 20px;
+}
+
 @font-face {
     font-family: PingFangTC;
     src: url('/styles/PingFang-TC-Regular-2.otf') format('opentype');
@@ -35,27 +67,6 @@ html, body {
     padding: 0;
 }
 
-.header {
-    display: flex;
-    /*position: fixed;*/
-    top: 0;
-    left: 0;
-    height: 70px;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0 54px 0 60px;
-    /*z-index: 99;*/
-    background-color: #3F0E41;
-    align-items: center;
-    font-family: PingFangTC;
-    justify-content: space-between;
-}
-
-.main-content {
-    flex: 1; /* Allow the main content to grow to fill the available space */
-    width: 100%;
-    display: flex;
-    align-items: stretch;
-    height: calc(100vh - 60px);
-    min-width: 450px;
+.sign-up input {
+    padding: 5px;
 }

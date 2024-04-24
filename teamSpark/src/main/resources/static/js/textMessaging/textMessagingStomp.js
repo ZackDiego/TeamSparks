@@ -69,6 +69,9 @@
                 }
             })
         });
+
+        // clear the message editor
+        $('.message-editor').summernote('code', '');
     }
 
     function renderMessage(data) {
