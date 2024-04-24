@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Spring Boot Chat Room</title>
+    <title>TeamSpark Video Call</title>
     <meta charset="utf-8"/>
     <!-- jquery -->
     <script crossorigin="anonymous" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -16,99 +16,46 @@
             src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet"/>
     <link rel="stylesheet" th:href="@{/styles/Commons.css}" type="text/css"/>
-    <link rel="stylesheet" th:href="@{/styles/searchAndSideBar.css}" type="text/css"/>
-    <link rel="stylesheet" th:href="@{/styles/style.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/styles/videoCall.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/styles/textMessaging.css}" type="text/css"/>
 </head>
 <body>
 <div class="header">
     <div class="header-logo">
-        <a href="https://example.com">TeamSpark</a>
+        <a href="http://localhost:8080/textMessaging/1">TeamSpark</a>
     </div>
     <div class="header-search-container">
         <input class="header-search-input" placeholder="" type="text">
         <button class="header-search-button"><img alt="Search" src="/icons/search.png"></button>
     </div>
+    <div id="welcome-message"></div>
 </div>
-<div class="main-content">
-    <div id="workspaces-tab">
-        <button class="workspace-card">寬</button>
+<div class="video-call-content">
+    <div class="video-panel">
+        <div class="video-container big localStream">
+            <h3 class="text-center streamer-name"></h3>
+            <video autoplay class="localVideo" muted></video>
+        </div>
+
+        <!--            <div class="video-container remoteStream">-->
+        <!--                <h3 class="text-center streamer-name">Others</h3>-->
+        <!--                <video autoplay class="remoteVideo" muted></video>-->
+        <!--            </div>-->
+        <!-- Remote streams will be added dynamically -->
     </div>
-    <div id="sidebar-container">
-        <div id="upper-sidebar">
-            <div id="workspace-name">阿寬公司</div>
-            <div id="btn-container">
-                <button class="sidebar-btn" id="btn-text-message"></button>
-                <button class="sidebar-btn" id="btn-label"></button>
-                <button class="sidebar-btn" id="btn-event"></button>
-                <button class="sidebar-btn" id="btn-meeting"></button>
-            </div>
-            <div class="divider"></div>
-            <div id="list-container">
-                <details class="details-container" id="channel-container">
-                    <summary>Channels</summary>
-                    <div class="channel details-item">Channel 1</div>
-                    <div class="channel details-item">Channel 2</div>
-                    <div class="channel details-item">Channel 3</div>
-                </details>
-                <details class="details-container" id="chat-container">
-                    <summary>Private Chat</summary>
-                    <div class="chat details-item">
-                        <img class="chat-partner-avatar" src="/img/profile.png">
-                        Alice
-                    </div>
-                    <div class="chat details-item">
-                        <img class="chat-partner-avatar" src="/img/profile.png">
-                        Bob
-                    </div>
-                    <div class="chat details-item">
-                        <img class="chat-partner-avatar" src="/img/profile.png">
-                        Claire
-                    </div>
-                </details>
-            </div>
-        </div>
-        <div id="user-status-container">
-            <div class="user-avatar">
-                <img alt="User Avatar" src="/img/profile.png">
-            </div>
-            <div class="user-info">
-                <div class="username">Zack Chiang</div>
-                <div class="status">Online</div>
-            </div>
-            <div class="user-settings">
-                <button></button>
-            </div>
-        </div>
-    </div>
-    <div class="right-content">
-        <div class="video-panel">
-            <div class="video-container big localStream">
-                <h3 class="text-center streamer-name"></h3>
-                <video autoplay class="localVideo" muted></video>
-            </div>
-
-            <!--            <div class="video-container remoteStream">-->
-            <!--                <h3 class="text-center streamer-name">Others</h3>-->
-            <!--                <video autoplay class="remoteVideo" muted></video>-->
-            <!--            </div>-->
-            <!-- Remote streams will be added dynamically -->
-        </div>
-
-
-        <!-- media control buttons -->
-        <div class="media-control-btn-panel" style="margin-top: 20px;">
-            <!-- Button for toggling video -->
-            <button class="btn-circle enabled-style mr-2" id="toggleVideo">
-                <i class="bi bi-camera-video-fill" id="videoIcon"></i>
-            </button>
-            <!-- Button for toggling audio -->
-            <button class="btn-circle enabled-style mr-2" id="toggleAudio">
-                <i class="bi bi-mic-fill" id="audioIcon"></i>
-            </button>
-            <button class="btn-circle disabled-style" id="btnLeave">
-                <i class="bi bi-telephone-x-fill" id="leaveIcon"></i>
-            </button>
-        </div>
+    <!-- media control buttons -->
+    <div class="media-control-panel" style="margin-top: 20px;">
+        <!-- Button for toggling video -->
+        <button class="btn-circle enabled-style mr-2" id="btnToggleVideo">
+            <i class="bi bi-camera-video-fill" id="VideoIcon"></i>
+        </button>
+        <!-- Button for toggling audio -->
+        <button class="btn-circle enabled-style mr-2" id="btnToggleAudio">
+            <i class="bi bi-mic-fill" id="AudioIcon"></i>
+        </button>
+        <button class="btn-circle disabled-style" id="btnLeave">
+            <i class="bi bi-telephone-x-fill" id="leaveIcon"></i>
+        </button>
     </div>
 </div>
 <!-- fixed userInfo for testing and demo -->

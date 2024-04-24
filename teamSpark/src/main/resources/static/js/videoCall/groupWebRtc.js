@@ -26,15 +26,6 @@ function toggleTrack(trackType) {
     icon.toggleClass("bi-mic-mute-fill", trackType === "Audio" && !enabled);
 }
 
-var $videoCallContent = $(".video-call-content");
-var $textMessagingContent = $(".text-messaging-content");
-
-// Function to switch back to text messaging content
-function switchToTextMessaging() {
-    $textMessagingContent.show();
-    $videoCallContent.hide();
-}
-
 
 // Function to adjust the size of video containers
 function adjustVideoContainerSize() {
@@ -284,39 +275,37 @@ function connectToSocketServer() {
     return socket;
 }
 
-// Call the connectToSocketServer function when btn-video-call is clicked
-$('.btn-video-call').click(() => {
+// Function to disconnect from the socket server when leaving the video call
+function disconnectFromSocketServer() {
+
+    // Disable video track
+    if (localStream) {
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (videoTrack) {
+            videoTrack.stop();
+        }
+    }
+    // Disable audio track
+    if (localStream) {
+        const audioTrack = localStream.getAudioTracks()[0];
+        if (audioTrack) {
+            audioTrack.stop();
+        }
+    }
+
+    console.log("Leaving room");
+    socket.emit("leaveRoom", roomName);
+    socket.disconnect();
+
+    // remove all remoteStream videos
+    $('.remoteStream').remove();
+}
+
+
+$(function () {
     console.log("start video call")
     // Establish connection to the socket server
     let socket = connectToSocketServer();
-
-    // Function to disconnect from the socket server when leaving the video call
-    function disconnectFromSocketServer() {
-
-        // Disable video track
-        if (localStream) {
-            const videoTrack = localStream.getVideoTracks()[0];
-            if (videoTrack) {
-                videoTrack.stop();
-            }
-        }
-        // Disable audio track
-        if (localStream) {
-            const audioTrack = localStream.getAudioTracks()[0];
-            if (audioTrack) {
-                audioTrack.stop();
-            }
-        }
-
-        console.log("Leaving room");
-        socket.emit("leaveRoom", roomName);
-        socket.disconnect();
-
-        // remove all remoteStream videos
-        $('.remoteStream').remove();
-        adjustVideoContainerSize();
-        switchToTextMessaging();
-    }
 
     // Bind the disconnectFromSocketServer function to the "beforeunload" event
     $(window).on('beforeunload', disconnectFromSocketServer);
@@ -324,4 +313,6 @@ $('.btn-video-call').click(() => {
     $('#btnLeave').click(() => {
         disconnectFromSocketServer();
     });
+
+    // TODO: redirect to workspace channel
 });

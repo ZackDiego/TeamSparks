@@ -35,7 +35,7 @@
     <script src="https://use.fontawesome.com/52e183519a.js"></script>
     <link rel="stylesheet" th:href="@{/styles/Commons.css}" type="text/css"/>
     <link rel="stylesheet" th:href="@{/styles/style.css}" type="text/css"/>
-    <link rel="stylesheet" th:href="@{/styles/searchAndSideBar.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/styles/textMessaging.css}" type="text/css"/>
 </head>
 <body>
 <div class="header">
@@ -124,39 +124,7 @@
             </div>
             <div class="message-history-container">
             </div>
-            <div class="editor-container">
-                <div class="message-editor"></div>
-            </div>
-        </div>
-
-        <!--  video call content  -->
-        <div class="video-call-content">
-            <div class="video-panel">
-                <div class="video-container big localStream">
-                    <h3 class="text-center streamer-name"></h3>
-                    <video autoplay class="localVideo" muted></video>
-                </div>
-
-                <!--            <div class="video-container remoteStream">-->
-                <!--                <h3 class="text-center streamer-name">Others</h3>-->
-                <!--                <video autoplay class="remoteVideo" muted></video>-->
-                <!--            </div>-->
-                <!-- Remote streams will be added dynamically -->
-            </div>
-            <!-- media control buttons -->
-            <div class="media-control-btn-panel" style="margin-top: 20px;">
-                <!-- Button for toggling video -->
-                <button class="btn-circle enabled-style mr-2" id="btnToggleVideo">
-                    <i class="bi bi-camera-video-fill" id="VideoIcon"></i>
-                </button>
-                <!-- Button for toggling audio -->
-                <button class="btn-circle enabled-style mr-2" id="btnToggleAudio">
-                    <i class="bi bi-mic-fill" id="AudioIcon"></i>
-                </button>
-                <button class="btn-circle disabled-style" id="btnLeave">
-                    <i class="bi bi-telephone-x-fill" id="leaveIcon"></i>
-                </button>
-            </div>
+            <div class="message-editor"></div>
         </div>
 
     </div>
@@ -164,7 +132,6 @@
 </div>
 <!-- fixed userInfo for testing and demo -->
 <script th:src="@{/js/userBasic.js}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
 <!--include tam-emoji js-->
 <script th:src="@{/tam-emoji/js/config.js}"></script>
 <script th:src="@{/tam-emoji/js/tam-emoji.min.js?v=1.1}"></script>
@@ -172,6 +139,5 @@
 <script th:src="@{/js/textMessaging/textMessagingPageRender.js}"></script>
 <script th:src="@{/js/userNotificationAndStatus.js}"></script>
 <script th:src="@{/js/textMessaging/textMessagingStomp.js}"></script>
-<script th:src="@{/js/videoCall/groupWebRtc.js}"></script>
 </body>
 </html>

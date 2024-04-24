@@ -24,4 +24,10 @@ public class FrontController {
         model.addAttribute("workspace_id", userId);
         return "textMessaging";
     }
+
+    @GetMapping("/channel/{channelId}/videoCall")
+    public String workspacePage(@PathVariable String channelId, Model model) {
+        model.addAttribute("channel_id", channelId);
+        return "videoCall";
+    }
 }

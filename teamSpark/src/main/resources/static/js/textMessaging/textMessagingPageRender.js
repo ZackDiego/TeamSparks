@@ -14,13 +14,13 @@ $(document).ready(async function () {
     $('.username').text(userInf.name);
 
     scrollMessageContainerToBottom();
-    // // Button setting
+    
+    // Button setting
     toggleChannelOrChat();
-    toggleRightContent();
     toggleSidebarBtn();
+    startVideoCall();
 
-    // Initially hide the video call content
-    $(".video-call-content").hide();
+    // open the details when entering
     $("details").attr("open", true);
 });
 
@@ -108,31 +108,8 @@ function toggleSidebarBtn() {
     });
 }
 
-
-// Add event listener to the video call button
-function toggleRightContent() {
-    var $videoCallContent = $(".video-call-content");
-    var $textMessagingContent = $(".text-messaging-content");
-
-    $(".btn-video-call").click(function () {
-        switchToVideoCall();
-
-        // Add event listener to switch back to text messaging when clicked
-        $(this).click(function () {
-            switchToTextMessaging();
-        });
+function startVideoCall() {
+    $('.btn-video-call').click(function () {
+        window.location.replace("/channel/" + channelInf.id + "/videoCall");
     });
-
-    // Function to switch to video call content
-    function switchToVideoCall() {
-        $textMessagingContent.hide();
-        $videoCallContent.show();
-    }
-
-    // Function to switch back to text messaging content
-    function switchToTextMessaging() {
-        $textMessagingContent.show();
-        $videoCallContent.hide();
-    }
 }
-

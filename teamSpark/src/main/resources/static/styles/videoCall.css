@@ -1,8 +1,18 @@
+/* video call */
+.video-call-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+    height: calc(100% - 70px);
+    width: 100%;
+    background-color: rgba(28, 28, 28, 0.87);
+}
 
-.media-control-btn-panel {
+.media-control-panel {
     display: flex;
     align-items: center;
-    margin-top: 20px;
+    margin: 20px;
     justify-content: center;
     width: 100%;
     height: 80px;
