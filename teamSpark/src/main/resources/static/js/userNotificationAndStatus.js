@@ -30,27 +30,27 @@
         if (stompClient !== null) {
             stompClient.deactivate();
         }
-        setConnected(false);
+        // setConnected(false);
         console.log("Disconnected");
     }
 
     function renderNotification(data) {
 
-        console.log(data)
-        // Create a temporary element
-        var tempElement = document.createElement('div');
+        if (data.from_user.id !== userInf.user_id) {
+            // Create a temporary element
+            var tempElement = document.createElement('div');
 
-        // Set the HTML content of the temporary element to the message
-        tempElement.innerHTML = data.message.content;
+            // Set the HTML content of the temporary element to the message
+            tempElement.innerHTML = data.message.content;
 
-        // Extract the text content from the temporary element
-        const messageText = tempElement.textContent || tempElement.innerText;
+            // Extract the text content from the temporary element
+            const messageText = tempElement.textContent || tempElement.innerText;
 
-        // Create the toast HTML
-        var toastHtml = `
+            // Create the toast HTML
+            var toastHtml = `
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
-                    <strong class="mr-auto">${data.from_user.name}</strong>
+                    <strong class="mr-auto">${data.from_user.name}</strong> 
                     <small>${new Date(data.message.created_at).toLocaleString()}</small>
                     <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -60,14 +60,15 @@
             </div>
         `;
 
-        // Append the toast HTML to the body
-        $('.toast-container').eq(0).append(toastHtml);
-        // Show the toast
+            // Append the toast HTML to the body
+            $('.toast-container').eq(0).append(toastHtml);
+            // Show the toast
 
-        $(".toast").toast({
-            autohide: false
-        });
-        $('.toast').toast('show');
+            $(".toast").toast({
+                autohide: false
+            });
+            $('.toast').toast('show');
+        }
     }
 
     $(function () {

@@ -3,13 +3,14 @@ $(document).ready(async function () {
     // Check if access token exists
     const accessToken = localStorage.getItem('access_token');
 
-    if (accessToken) {
-        // TODO: Redirect to Text messaging Page
-
-    } else {
-        // If no access token, redirect to login page
-        $("#login").show();
-    }
+    // if (accessToken) {
+    //     // TODO: Redirect to Text messaging Page
+    //
+    // } else {
+    //     // If no access token, redirect to login page
+    //     $("#login").show();
+    // }
+    $("#login").show();
 
     ToggleSignInSignUpForm();
 });

@@ -21,7 +21,7 @@ public class SearchMessageService {
         this.channelRepository = channelRepository;
     }
 
-    public List<MessageDto> getSearchMessages(User user, SearchCondition searchCondition){
+    public List<MessageDto> getSearchMessages(User user, SearchCondition searchCondition) {
 
         // get the channels of user
         List<Channel> userChannels = channelRepository.findChannelsByUserId(user.getId());
@@ -29,13 +29,14 @@ public class SearchMessageService {
         boolean hasAccess = userChannels.stream()
                 .anyMatch(channel -> channel.getId().equals(searchCondition.getChannelId()));
 
-        if (!hasAccess){
-            throw new ResourceAccessException("User don't have access to channel id "+ searchCondition.getChannelId());
+        if (!hasAccess) {
+            throw new ResourceAccessException("User don't have access to channel id " + searchCondition.getChannelId());
         }
 
-        List<MessageDto> messages = elasticsearchService.searchMessageWithCondition(userChannels, searchCondition);
+//        List<MessageDto> messages = elasticsearchService.searchMessageWithCondition(userChannels, searchCondition);
 
 
-        List<MessageDto> messages =
+//        List<MessageDto> messages =
+        return null;
     }
 }

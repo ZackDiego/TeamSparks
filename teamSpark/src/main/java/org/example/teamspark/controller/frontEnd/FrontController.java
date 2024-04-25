@@ -1,9 +1,7 @@
 package org.example.teamspark.controller.frontEnd;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class FrontController {
@@ -18,9 +16,18 @@ public class FrontController {
         return "loginPage";
     }
 
-    @GetMapping("/videoCall/{channelId}")
-    public String homePage(@PathVariable String channelId, Model model) {
-        model.addAttribute("channel_id", channelId);
+    @GetMapping("/user")
+    public String userPage() {
+        return "user";
+    }
+
+    @GetMapping("/workspace/{workspaceId}")
+    public String workspacePage() {
+        return "textMessaging";
+    }
+
+    @GetMapping("/channel/{channelId}/videoCall")
+    public String channelVideoCallPage() {
         return "videoCall";
     }
 }

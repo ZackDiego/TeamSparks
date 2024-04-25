@@ -6,15 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.example.teamspark.data.dto.SearchCondition;
 import org.example.teamspark.exception.ElasticsearchFailedException;
-import org.example.teamspark.model.channel.Channel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
 
 @Service
 @CommonsLog
@@ -130,44 +126,44 @@ public class ElasticsearchService {
         return headers;
     }
 
-    public String searchMessageWithCondition(List<Channel> channels, SearchCondition condition) {
-        String searchUrl;
-        if (condition.getChannelId() == null) {
-            searchUrl = ESUrl + "/channel-*/_search?size=10000";
-        } else {
-            searchUrl = ESUrl + "/channel-" + condition.getChannelId() + "/_search?size=10000";
-        }
-
-        // Create HttpHeaders with authentication
-        HttpHeaders headers = createHeaders(ESUserName, ESPassword);
-
-
-        // Create the request body
-        String requestBody = "{\n" +
-                "    \"query\": {\n" +
-                "        \"bool\": {\n" +
-                "            \"must\": {\n" +
-                "                \"match\": {\n" +
-                "                    \"content\": \"" + condition.getSearchKeyword() + "\"\n" +
-                "                }\n" +
-                "            },\n" +
-                "            \"filter\": [\n" +
-                "                { \"term\": { \"from_id\": " + condition.getSearchKeyword() + " } },\n" +
-                "                { \"term\": { \"contain_link\": " + condition.getContainLink() + " } },\n" +
-                "                { \"term\": { \"file_url\": " + condition.getContainFile() + " } },\n" +
-                "                { \"term\": { \"image_url\": " + condition.getContainImage() + " } }\n" +
-                "            ]\n" +
-                "        }\n" +
-                "    }\n" +
-                "}";
-
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<String> response = restTemplate.exchange(searchUrl, HttpMethod.GET, requestEntity, String.class);
-
-        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            return response.getBody();
-        } else {
-            throw new RuntimeException("Failed to get data from index: " + indexName);
-        }
-    }
+//    public String searchMessageWithCondition(List<Channel> channels, SearchCondition condition) {
+//        String searchUrl;
+//        if (condition.getChannelId() == null) {
+//            searchUrl = ESUrl + "/channel-*/_search?size=10000";
+//        } else {
+//            searchUrl = ESUrl + "/channel-" + condition.getChannelId() + "/_search?size=10000";
+//        }
+//
+//        // Create HttpHeaders with authentication
+//        HttpHeaders headers = createHeaders(ESUserName, ESPassword);
+//
+//
+//        // Create the request body
+//        String requestBody = "{\n" +
+//                "    \"query\": {\n" +
+//                "        \"bool\": {\n" +
+//                "            \"must\": {\n" +
+//                "                \"match\": {\n" +
+//                "                    \"content\": \"" + condition.getSearchKeyword() + "\"\n" +
+//                "                }\n" +
+//                "            },\n" +
+//                "            \"filter\": [\n" +
+//                "                { \"term\": { \"from_id\": " + condition.getSearchKeyword() + " } },\n" +
+//                "                { \"term\": { \"contain_link\": " + condition.getContainLink() + " } },\n" +
+//                "                { \"term\": { \"file_url\": " + condition.getContainFile() + " } },\n" +
+//                "                { \"term\": { \"image_url\": " + condition.getContainImage() + " } }\n" +
+//                "            ]\n" +
+//                "        }\n" +
+//                "    }\n" +
+//                "}";
+//
+//        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+//        ResponseEntity<String> response = restTemplate.exchange(searchUrl, HttpMethod.GET, requestEntity, String.class);
+//
+//        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+//            return response.getBody();
+//        } else {
+//            throw new RuntimeException("Failed to get data from index: " + indexName);
+//        }
+//    }
 }

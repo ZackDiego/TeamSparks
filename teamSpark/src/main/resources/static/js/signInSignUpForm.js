@@ -16,11 +16,7 @@ async function signInUser(email, password) {
 
         // Check if login was successful
         if (response.ok) {
-            localStorage.setItem('access_token', responseData.data.access_token);
-            localStorage.setItem('user', JSON.stringify(responseData.data.user));
-
-            // TODO: Redirect to textMessaging page
-            // window.location.href = '/profile';
+            saveUserInfAndRedirect(responseData);
         } else {
             // Handle login error
             alert(responseData.message)
@@ -48,12 +44,7 @@ async function signUpUser(name, email, password) {
 
         // Check if login was successful
         if (response.ok) {
-            // Save access token to localStorage
-            localStorage.setItem('access_token', responseData.data.access_token);
-            localStorage.setItem('user', responseData.data.user);
-
-            // TODO: Redirect to textMessaging page
-            // window.location.href = '/profile';
+            saveUserInfAndRedirect(responseData);
         } else {
             // Handle login error
             alert(responseData.message)
@@ -61,4 +52,13 @@ async function signUpUser(name, email, password) {
     } catch (error) {
         alert(error.message + ', please try again.')
     }
+}
+
+
+saveUserInfAndRedirect = function (responseData) {
+    localStorage.setItem('access_token', responseData.data.access_token);
+    localStorage.setItem('user', JSON.stringify(responseData.data.user));
+
+    // redirect to user page
+    window.location.href = '/user';
 }

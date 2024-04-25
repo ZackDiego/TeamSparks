@@ -28,55 +28,67 @@
             integrity="sha512-YmkrdAXo8RdHV1JFfepR7QWLDfF7vs8Mc/t+6qKIxrEFeWbi0u/lajryYSPK6GC5nupW5t6XfPdxQpIY79+USg=="
             referrerpolicy="no-referrer"
             src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-toaster/4.0.1/js/bootstrap-toaster.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet"/>
     <!--include tam-emoji ccs-->
     <link rel="stylesheet" th:href="@{/tam-emoji/css/emoji.css}">
     <!--include fontawesome-->
     <script src="https://use.fontawesome.com/52e183519a.js"></script>
     <link rel="stylesheet" th:href="@{/styles/Commons.css}" type="text/css"/>
-    <link rel="stylesheet" th:href="@{/styles/searchAndSideBar.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/styles/textMessaging.css}" type="text/css"/>
 </head>
 <body>
 <div class="header">
     <div class="header-logo">
-        <a href="https://example.com">TeamSpark</a>
+        <a href="http://localhost:8080/textMessaging/1">TeamSpark</a>
     </div>
     <div class="header-search-container">
         <input class="header-search-input" placeholder="" type="text">
         <button class="header-search-button"><img alt="Search" src="/icons/search.png"></button>
     </div>
+    <div id="welcome-message"></div>
 </div>
 <div class="main-content">
     <div id="workspaces-tab">
-        <button class="workspace-card">寬</button>
+        <button class="workspace-card active">寬</button>
+        <button class="workspace-card">BE</button>
     </div>
     <div id="sidebar-container">
         <div id="upper-sidebar">
-            <div id="workspace-name">阿寬公司</div>
-            <div id="btn-container">
-                <button class="sidebar-btn" id="btn-text-message"></button>
-                <button class="sidebar-btn" id="btn-label"></button>
-                <button class="sidebar-btn" id="btn-event"></button>
-                <button class="sidebar-btn" id="btn-meeting"></button>
-            </div>
+
+            <button aria-expanded="false" class="btn dropdown-toggle" data-bs-toggle="dropdown" id="workspace-name"
+                    type="button">
+                阿寬公司
+            </button>
+            <ul aria-labelledby="workspace-name" class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Create channel/private chat</a></li>
+                <li><a class="dropdown-item" href="#">Manage channel/private chat</a></li>
+                <li><a class="dropdown-item" href="#">Delete channel/private chat</a></li>
+            </ul>
+            <!--            <div id="btn-container">-->
+            <!--                <button class="sidebar-btn active" id="btn-text-message"></button>-->
+            <!--                <button class="sidebar-btn" id="btn-label"></button>-->
+            <!--                <button class="sidebar-btn" id="btn-event"></button>-->
+            <!--                <button class="sidebar-btn" id="btn-meeting"></button>-->
+            <!--            </div>-->
             <div class="divider"></div>
             <div id="list-container">
-                <details class="details-container" id="channel-container">
+                <details class="details-container" id="channel-container" open="true">
                     <summary>Channels</summary>
-                    <div class="channel details-item">Channel 1</div>
-                    <div class="channel details-item">Channel 2</div>
-                    <div class="channel details-item">Channel 3</div>
+                    <div class="channel-title details-item active">Channel 1</div>
+                    <div class="channel-title details-item">Channel 2</div>
+                    <div class="channel-title details-item">Channel 3</div>
                 </details>
-                <details class="details-container" id="chat-container">
+                <details class="details-container" id="chat-container" open="true">
                     <summary>Private Chat</summary>
-                    <div class="chat details-item">
-                        <img class="chat-partner-avatar" src="/img/profile.png">
+                    <div class="chat-partner details-item">
+                        <img class="chat-partner-avatar chat-partner-demo" src="/img/profile2.png">
                         Alice
                     </div>
-                    <div class="chat details-item">
+                    <div class="chat-partner details-item">
                         <img class="chat-partner-avatar" src="/img/profile.png">
                         Bob
                     </div>
-                    <div class="chat details-item">
+                    <div class="chat-partner details-item">
                         <img class="chat-partner-avatar" src="/img/profile.png">
                         Claire
                     </div>
@@ -88,7 +100,7 @@
                 <img alt="User Avatar" src="/img/profile.png">
             </div>
             <div class="user-info">
-                <div class="username">Zack Chiang</div>
+                <div class="username"></div>
                 <div class="status">Online</div>
             </div>
             <div class="user-settings">
@@ -97,21 +109,25 @@
         </div>
     </div>
     <div class="right-content">
-        <div class="content-header">
-            <div class="channel-title chat-partner-title">
-                <img class="chat-partner-avatar" src="/img/profile.png">
-                Alice
+        <!--  text messaging content  -->
+        <div class="text-messaging-content">
+            <div class="content-header">
+                <div class="channel-title chat-partner-title">
+                    <!--                    <img class="chat-partner-avatar" src="/img/profile2.png">-->
+                    # Channel 1
+                </div>
+                <div class="content-header-btn-container">
+                    <button class="content-header-btn btn-phone-call"></button>
+                    <button class="content-header-btn btn-video-call"></button>
+                </div>
             </div>
-            <div class="content-header-btn-container">
-                <button class="content-header-btn btn-phone-call"></button>
-                <button class="content-header-btn btn-video-call"></button>
+            <div class="message-history-container">
             </div>
-        </div>
-        <div class="message-history-container">
-        </div>
-        <div class="editor-container">
             <div class="message-editor"></div>
         </div>
+
+        <!--  append each message history here -->
+
     </div>
     <div class="toast-container"></div>
 </div>
