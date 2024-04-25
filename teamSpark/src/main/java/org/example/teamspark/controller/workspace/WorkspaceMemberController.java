@@ -1,6 +1,5 @@
 package org.example.teamspark.controller.workspace;
 
-import org.example.teamspark.data.dto.UserDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.service.WorkspaceMemberService;
@@ -11,8 +10,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Controller
-@RequestMapping("api/v1/workspace/{workspace_id}/member")
+@RequestMapping("api/v1/workspace/{workspaceId}/member")
 public class WorkspaceMemberController {
 
     private final WorkspaceMemberService workspaceMemberService;
@@ -22,24 +23,24 @@ public class WorkspaceMemberController {
         this.workspaceMemberService = channelMemberService;
     }
 
-    // add channel member
-    @PostMapping(value = "", consumes = {"application/json"})
-    public ResponseEntity<?> handleCreateChannel(
-            @PathVariable("workspace_id") Long workspaceId,
-            @RequestBody UserDto userDto) throws ResourceAccessDeniedException {
+    // add workspace member
+    @PostMapping(value = "")
+    public ResponseEntity<?> handleAddWorkspaceMember(
+            @PathVariable Long workspaceId,
+            @RequestParam Long userId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        workspaceMemberService.addWorkspaceMember(user, workspaceId, userDto);
+        Long savedWorkspaceId = workspaceMemberService.addWorkspaceMember(user, workspaceId, userId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("id", savedWorkspaceId));
     }
 
-    // remove channel member
-    @DeleteMapping("/{member_id}")
-    public ResponseEntity<?> handleDeleteChannel(
-            @PathVariable("workspace_id") Long workspaceId,
-            @PathVariable("member_id") Long memberId) throws ResourceAccessDeniedException {
+    // remove workspace member
+    @DeleteMapping("/{memberId}")
+    public ResponseEntity<?> handleRemoveWorkspaceMember(
+            @PathVariable Long workspaceId,
+            @PathVariable Long memberId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 

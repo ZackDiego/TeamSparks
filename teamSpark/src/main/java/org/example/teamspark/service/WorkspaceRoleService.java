@@ -5,8 +5,10 @@ import org.example.teamspark.data.dto.RoleDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.model.workspace.Workspace;
+import org.example.teamspark.model.workspace.WorkspaceMember;
 import org.example.teamspark.model.workspace.role.Role;
 import org.example.teamspark.repository.RoleRepository;
+import org.example.teamspark.repository.WorkspaceMemberRepository;
 import org.example.teamspark.repository.WorkspaceRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,23 +20,28 @@ import java.util.stream.Collectors;
 @Service
 public class WorkspaceRoleService {
     private final WorkspaceRepository workspaceRepository;
+    private final WorkspaceMemberRepository workspaceMemberRepository;
     private final RoleRepository roleRepository;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public WorkspaceRoleService(WorkspaceRepository workspaceRepository, RoleRepository roleRepository, ModelMapper modelMapper) {
+    public WorkspaceRoleService(WorkspaceRepository workspaceRepository, WorkspaceMemberRepository workspaceMemberRepository, RoleRepository roleRepository, ModelMapper modelMapper) {
         this.workspaceRepository = workspaceRepository;
+        this.workspaceMemberRepository = workspaceMemberRepository;
         this.roleRepository = roleRepository;
         this.modelMapper = modelMapper;
     }
 
     public RoleDto createWorkspacesRole(Long workspaceId, User user, RoleDto roleDto) throws ResourceAccessDeniedException {
 
+        // Find the workspace by id
         Workspace workspace = workspaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Workspace not found with ID: " + workspaceId));
 
-        // check if user owns the workspace
-        if (!workspace.getCreator().getId().equals(user.getId())) {
+        // Check if user owns the workspace
+        WorkspaceMember creator = workspaceMemberRepository.findCreatorByWorkspaceId(workspaceId);
+
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 
@@ -47,11 +54,15 @@ public class WorkspaceRoleService {
     }
 
     public List<RoleDto> getWorkspacesRoles(Long workspaceId, User user) throws ResourceAccessDeniedException {
+        
+        // Find the workspace by id
         Workspace workspace = workspaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Workspace not found with ID: " + workspaceId));
 
-        // check if user owns the workspace
-        if (!workspace.getCreator().getId().equals(user.getId())) {
+        // Check if user owns the workspace
+        WorkspaceMember creator = workspaceMemberRepository.findCreatorByWorkspaceId(workspaceId);
+
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 
@@ -63,11 +74,15 @@ public class WorkspaceRoleService {
     }
 
     public void deleteWorkspaceRole(Long workspaceId, Long roleId, User user) throws ResourceAccessDeniedException {
-        Workspace workspace = workspaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace not found"));
 
-        // check if user owns the workspace
-        if (!workspace.getCreator().getId().equals(user.getId())) {
+        // Find the workspace by id
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new EntityNotFoundException("Workspace not found with ID: " + workspaceId));
+
+        // Check if user owns the workspace
+        WorkspaceMember creator = workspaceMemberRepository.findCreatorByWorkspaceId(workspaceId);
+
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 
@@ -75,11 +90,15 @@ public class WorkspaceRoleService {
     }
 
     public RoleDto updateWorkspaceRole(Long workspaceId, Long roleId, RoleDto roleDto, User user) throws ResourceAccessDeniedException {
+
+        // Find the workspace by id
         Workspace workspace = workspaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Workspace not found with ID: " + workspaceId));
 
         // Check if user owns the workspace
-        if (!workspace.getCreator().getId().equals(user.getId())) {
+        WorkspaceMember creator = workspaceMemberRepository.findCreatorByWorkspaceId(workspaceId);
+
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 

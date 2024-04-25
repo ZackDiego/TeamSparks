@@ -3,7 +3,6 @@ package org.example.teamspark.model.channel;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.example.teamspark.model.workspace.Workspace;
-import org.example.teamspark.model.workspace.WorkspaceMember;
 
 import java.util.Date;
 
@@ -21,10 +20,6 @@ public class Channel {
 
     @Column(name = "name")
     private String name;
-
-    @ManyToOne
-    @JoinColumn(name = "creator_id")
-    private WorkspaceMember creator;
 
     @Column(name = "created_at")
     private Date createdAt = new Date();

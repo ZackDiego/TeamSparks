@@ -19,9 +19,6 @@ public class WorkspaceDto {
     @JsonProperty("name")
     private String name;
 
-    @JsonProperty("creator")
-    private WorkspaceMemberDto creator;
-
     @JsonProperty("created_at")
     private Date createdAt;
 

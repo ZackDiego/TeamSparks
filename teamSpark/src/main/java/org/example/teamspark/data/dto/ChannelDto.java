@@ -16,11 +16,11 @@ public class ChannelDto {
     @JsonProperty("id")
     private Long id;
 
+    @JsonProperty("workspace_id")
+    private Long workspaceId;
+
     @JsonProperty("name")
     private String name;
-
-    @JsonProperty("creator")
-    private WorkspaceMemberDto creator;
 
     @JsonProperty("created_at")
     private Date createdAt;

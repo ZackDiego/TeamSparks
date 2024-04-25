@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("api/v1")
@@ -25,9 +26,9 @@ public class ChannelController {
     }
 
     // get channel by workspace member id
-    @GetMapping(value = "/member/{member_id}/channel")
+    @GetMapping(value = "/member/{memberId}/channel")
     public ResponseEntity<?> handleGetChannelsByMemberId(
-            @PathVariable("member_id") Long memberId) throws ResourceAccessDeniedException {
+            @PathVariable Long memberId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -38,43 +39,40 @@ public class ChannelController {
     }
 
     // create channel
-    @PostMapping(value = "/creator/{creator_id}/channel", consumes = {"application/json"})
+    @PostMapping(value = "/channel", consumes = {"application/json"})
     public ResponseEntity<?> handleCreateChannel(
-            @PathVariable("creator_id") Long creatorId,
             @RequestBody ChannelDto channelDto) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        ChannelDto createdChannelDto = channelService.createChannel(user, creatorId, channelDto);
+        Long createdChannelId = channelService.createChannel(user, channelDto);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new DataResponse<>(createdChannelDto));
+                .body(new DataResponse<>(Map.of("id", createdChannelId)));
     }
 
     // update channel
-    @PutMapping(value = "/creator/{creator_id}/channel/{channel_id}", consumes = {"application/json"})
+    @PutMapping(value = "/channel/{channel_id}", consumes = {"application/json"})
     public ResponseEntity<?> handleUpdateChannel(
-            @PathVariable("creator_id") Long creatorId,
             @PathVariable("channel_id") Long channelId,
             @RequestBody ChannelDto channelDto) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        ChannelDto updatedChannelDto = channelService.updateChannel(user, creatorId, channelId, channelDto);
+        ChannelDto updatedChannelDto = channelService.updateChannel(user, channelId, channelDto);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new DataResponse<>(updatedChannelDto));
     }
 
     // delete channel
-    @DeleteMapping("/creator/{creator_id}/channel/{channel_id}")
+    @DeleteMapping("/channel/{channel_id}")
     public ResponseEntity<?> handleDeleteChannel(
-            @PathVariable("creator_id") Long creatorId,
             @PathVariable("channel_id") Long channelId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        channelService.deleteChannel(user, creatorId, channelId);
+        channelService.deleteChannel(user, channelId);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

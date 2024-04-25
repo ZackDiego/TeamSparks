@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("api/v1/workspace")
@@ -52,9 +53,9 @@ public class WorkspaceController {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        workspaceService.createWorkspace(user, workspaceDto);
+        Long savedWorkspaceId = workspaceService.createWorkspace(user, workspaceDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(new DataResponse<>(Map.of("id", savedWorkspaceId)));
     }
 
     @PutMapping(value = "/{id}", consumes = {"application/json"})
