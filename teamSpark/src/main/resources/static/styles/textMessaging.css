@@ -11,14 +11,14 @@
     align-items: center;
     justify-content: flex-start;
     background-color: #5B0888;
-    width: 60px;
+    width: 65px;
     height: 100%;
 }
 
 .workspace-card {
     margin: 10px;
-    height: 40px;
-    width: 40px;
+    height: 45px;
+    width: 45px;
     border-radius: 5px;
     background-color: lightblue;
     border: 2px solid whitesmoke;
@@ -282,6 +282,10 @@
     display: flex;
     width: 100px;
     justify-content: space-around;
+}
+
+.btn-channel-member {
+    background-image: url('/icons/group.png');
 }
 
 .btn-phone-call {

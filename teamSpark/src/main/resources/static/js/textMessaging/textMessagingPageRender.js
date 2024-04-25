@@ -11,24 +11,27 @@ $(document).ready(async function () {
         // Get message history of each channel
         try {
             // Fetch message history by channelId
-            const messageHistoryData = await fetchMessageHistoryData(channel.id);
+            const messageHistory = await fetchMessageHistoryData(channel.id);
             // Render message history
-            renderMessageHistory(messageHistoryData, member_id);
+            renderChannelContent(channel, messageHistory, member_id);
         } catch (e) {
             console.error("Error when fetching message history from" + channel.id + ":", e);
         }
     }
 
+    renderMessageEditor();
+
     // display user inf
-    const user = localStorage.getItem('user');
+    const user = JSON.parse(localStorage.getItem('user'));
     $('#welcome-message').text('Welcome, ' + user.name);
     $('.username').text(user.name);
 
     scrollMessageContainerToBottom();
     // Button setting
-    toggleChannelOrChat();
+    toggleSideBarChannel();
     toggleSidebarBtn();
     startVideoCall();
+    toggleChannelMember();
 
     // open the details when entering
     $("details").attr("open", true);
@@ -63,39 +66,66 @@ async function fetchMessageHistoryData(channel_id) {
     }
 }
 
-function renderMessageHistory(data, member_id) {
+function renderChannelContent(channel, messageHistory, member_id) {
+
+    console.log(messageHistory);
 
     // Create a new text-messaging-content container
     const textMessagingContent = $('<div class="text-messaging-content d-none"></div>');
-    textMessagingContent.attr('data-channel-id', data.channel_id);
-    textMessagingContent.attr('data-is-private', data.is_private);
+    textMessagingContent.attr('data-channel-id', messageHistory.channel_id);
+    textMessagingContent.attr('data-is-private', messageHistory.is_private);
 
-    // Update channel title and chat partner name/avatar based on is_private flag
+    // --- Channel title
     const channelTitleContainer = $('<div class="content-header"></div>');
     const channelTitle = $('<div class="channel-title chat-partner-title"></div>');
-    if (data.is_private) {
+
+    if (messageHistory.is_private) {
         // Find the private chat partner
-        const chat_partner = data.members.find(member => member.id !== member_id);
-        channelTitle.html('<img class="chat-partner-avatar" src="' + chat_partner.avatar + '">' + chat_partner.name);
+        const chat_partner = channel.members.find(member => member.id !== member_id);
+        channelTitle.html('<img class="chat-partner-avatar" src="' + "/img/profile2.png" + '">' + "Alice"); // TODO: replace fixd value
     } else {
         // Use channel name
-        channelTitle.text('# ' + data.channel.name);
+        channelTitle.text('# ' + channel.name);
     }
 
-    // Add buttons to the header
+    channelTitleContainer.append(channelTitle);
+
     const contentHeaderBtnContainer = $('<div class="content-header-btn-container"></div>');
+    // Add buttons to the header
     contentHeaderBtnContainer.append('<button class="content-header-btn btn-phone-call"></button>');
     contentHeaderBtnContainer.append('<button class="content-header-btn btn-video-call"></button>');
 
-    // Append channel title and buttons to the header container
-    channelTitleContainer.append(channelTitle);
-    channelTitleContainer.append(contentHeaderBtnContainer);
+    // --- Channel member
+    if (!messageHistory.is_private) {
+        // add channel member button
+        contentHeaderBtnContainer.append('<button class="content-header-btn btn-channel-member"></button>');
 
-    // Create a message history container
-    const messagesContainer = $('<div class="message-history-container d-none"></div>');
+        // Create the channel member container
+        const channelMemberContainer = $('<div class="channel-member-container d-none"></div>');
+
+        // Populate the channel member container
+        for (const member of messageHistory.members) {
+            // member
+            const memberDiv = $('<div class="channel-member"></div>').attr('data-id', member.id);
+            // member avatar
+            const avatarImg = $('<img>').attr('src', member.user.avatar);
+            // member name
+            const nameSpan = $('<span></span>').text(member.user.name);
+            memberDiv.append(avatarImg, nameSpan);
+            // Append the member
+            channelMemberContainer.append(memberDiv);
+        }
+        textMessagingContent.append(channelMemberContainer);
+    }
+
+    channelTitleContainer.append(contentHeaderBtnContainer);
+    textMessagingContent.append(channelTitleContainer);
+
+    // --- Message history container
+    const messagesContainer = $('<div class="message-history-container"></div>');
 
     // Sort messages by date
-    const messages = data.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    const messages = messageHistory.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
     $.each(messages, function (index, message) {
         const avatarSrc = '/img/profile.png'; // Fixed avatar source for now, you can replace it with actual avatar source
@@ -113,7 +143,6 @@ function renderMessageHistory(data, member_id) {
     });
 
     // Append the header, message history container, and message editor to the text messaging content container
-    textMessagingContent.append(channelTitleContainer);
     textMessagingContent.append(messagesContainer);
     textMessagingContent.append('<div class="message-editor"></div>');
 
@@ -126,12 +155,16 @@ function scrollMessageContainerToBottom() {
     messageContainer.scrollTop(messageContainer[0].scrollHeight);
 }
 
-function toggleChannelOrChat() {
+function toggleSideBarChannel() {
     $('.details-item').click(function () {
-        // Remove active class from all details-item elements
+        // button display
         $('.details-item').removeClass('active');
-        // Add active class to the details-item elements inside the clicked details element
         $(this).addClass('active');
+
+        // channel page render
+        const channel_id = $(this).data('channel-id');
+        $('.text-messaging-content').addClass('d-none');
+        $(`.text-messaging-content[data-channel-id="${channel_id}"]`).removeClass('d-none');
     });
 }
 
@@ -211,22 +244,31 @@ async function fetchChannelsByMemberId(member_id) {
 }
 
 function addChannelInSideBar(channel) {
-
-
     // Check if the channel is private
     if (channel.is_private) {
-
         // Create a new channel element
         const channelElement = $('<div class="chat-partner details-item"></div>');
-        channelElement.append(<img className="chat-partner-avatar" src=channel.chatpartner.avatar/>)
-        channelElement.text(channel.chatpartner.name);
+        const avatarImg = $('<img class="chat-partner-avatar">').attr('src', '/img/profile2.png');// TODO: replace fixed value
+        channelElement.append(avatarImg);
+        channelElement.append("Alice");  // TODO: replace fixed value
 
-        // If it's private, add it to the private chat container
+        channelElement.attr('data-channel-id', channel.id);
         $('#chat-container').append(channelElement);
+        console.log("add private channel in left sidebar");
     } else {
         // If it's not private
         const channelElement = $('<div class="channel-title details-item"></div>');
         channelElement.text(channel.name);
+
+        channelElement.attr('data-channel-id', channel.id);
         $('#channel-container').append(channelElement);
+        console.log("add channel in left sidebar");
     }
+}
+
+function toggleChannelMember() {
+    // Add an event listener to the channel member button to toggle the visibility of the container
+    $('.btn-channel_member').click(function () {
+        $('.channel-member-container').toggleClass('d-none');
+    });
 }
