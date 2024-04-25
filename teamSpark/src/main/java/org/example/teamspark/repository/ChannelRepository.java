@@ -57,19 +57,22 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
 
     @Query(value = "SELECT " +
             "    c.id AS channelId, " +
+            "    c.workspace_id AS workSpaceId, " +
             "    c.name AS channelName, " +
+            "    c.created_at AS createdAt, " +
             "    c.is_private AS channelIsPrivate, " +
             "    wm.id AS memberId, " +
-            "    u.name AS memberName, " +
-            "    u.avatar AS memberAvatar, " +
-            "    c.created_at AS createdAt " +
+            "    u.id AS userId, " +
+            "    u.name AS userName, " +
+            "    u.avatar AS userAvatar, " +
+            "    wm.is_creator AS memberIsCreator " +
             "FROM " +
             "    channel c " +
-            "    INNER JOIN workspace_member wm ON c.creator_id = wm.id " +
-            "    INNER JOIN user cu ON wm.user_id = cu.id " +
-            "    INNER JOIN channel_member cm ON c.id = cm.channel_id " +
+            "    LEFT JOIN channel_member cm ON c.id = cm.channel_id " +
+            "    LEFT JOIN workspace_member wm ON cm.member_id = wm.id " +
+            "    LEFT JOIN user u ON wm.user_id = u.id " +
             "WHERE " +
-            "    c.id IN :channelIds",  // Use IN clause to filter by multiple channel IDs
+            "    c.id IN :channelIds",
             nativeQuery = true)
     List<Object[]> findChannelsWithMembersByChannelIds(@Param("channelIds") List<Long> channelIds);
 

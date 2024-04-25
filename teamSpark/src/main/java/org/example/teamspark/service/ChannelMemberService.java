@@ -10,6 +10,7 @@ import org.example.teamspark.repository.ChannelMemberRepository;
 import org.example.teamspark.repository.ChannelRepository;
 import org.example.teamspark.repository.WorkspaceMemberRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ChannelMemberService {
@@ -25,7 +26,7 @@ public class ChannelMemberService {
 
     public void addChannelMember(User user,
                                  Long channelId,
-                                 Long memberId) throws ResourceAccessDeniedException {
+                                 Long wsMemberId) throws ResourceAccessDeniedException {
 
         WorkspaceMember creator = channelMemberRepository.findCreatorByChannelId(channelId);
 
@@ -34,7 +35,7 @@ public class ChannelMemberService {
                 .orElseThrow(() -> new EntityNotFoundException("Channel not found with ID: " + channelId));
 
         // Check if the member is the channel's creator
-        if (!creator.getId().equals(user.getId())) {
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 
@@ -42,26 +43,23 @@ public class ChannelMemberService {
         ChannelMember channelMember = new ChannelMember();
 
         // Find the member by memberId
-        WorkspaceMember member = workspaceMemberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + memberId));
+        WorkspaceMember member = workspaceMemberRepository.findById(wsMemberId)
+                .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + wsMemberId));
 
         channelMember.setMember(member);
         channelMember.setChannel(channel);
         channelMemberRepository.save(channelMember);
     }
 
+    @Transactional
     public void removeChannelMember(User user,
                                     Long channelId,
                                     Long memberId) throws ResourceAccessDeniedException {
 
         WorkspaceMember creator = channelMemberRepository.findCreatorByChannelId(channelId);
 
-        // Find the Channel by channelId
-        Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new EntityNotFoundException("Channel not found with ID: " + channelId));
-
         // Check if the member is the channel's creator
-        if (!creator.getId().equals(user.getId())) {
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("api/v1")
@@ -25,9 +26,9 @@ public class ChannelController {
     }
 
     // get channel by workspace member id
-    @GetMapping(value = "/member/{member_id}/channel")
+    @GetMapping(value = "/member/{memberId}/channel")
     public ResponseEntity<?> handleGetChannelsByMemberId(
-            @PathVariable("member_id") Long memberId) throws ResourceAccessDeniedException {
+            @PathVariable Long memberId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -44,10 +45,10 @@ public class ChannelController {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        ChannelDto createdChannelDto = channelService.createChannel(user, channelDto);
+        Long createdChannelId = channelService.createChannel(user, channelDto);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new DataResponse<>(createdChannelDto));
+                .body(new DataResponse<>(Map.of("id", createdChannelId)));
     }
 
     // update channel

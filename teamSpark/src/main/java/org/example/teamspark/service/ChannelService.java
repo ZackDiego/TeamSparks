@@ -13,6 +13,7 @@ import org.example.teamspark.repository.ChannelMemberRepository;
 import org.example.teamspark.repository.ChannelRepository;
 import org.example.teamspark.repository.WorkspaceMemberRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,21 +42,10 @@ public class ChannelService {
             ChannelDto channelDto = channelDtoMap.computeIfAbsent(channelId, id -> {
                 ChannelDto newChannelDto = new ChannelDto();
                 newChannelDto.setId(channelId);
-                newChannelDto.setName((String) row[1]);
-                newChannelDto.setPrivate((Boolean) row[2]);
-
-                // creator
-                WorkspaceMemberDto creatorDto = new WorkspaceMemberDto();
-                creatorDto.setId((Long) row[3]);
-
-                UserDto userDto = new UserDto();
-                // TODO: set id in userDto
-                userDto.setName((String) row[4]);
-                userDto.setAvatar((String) row[5]);
-
-                creatorDto.setUserDto(userDto);
-                
-                newChannelDto.setCreatedAt((Date) row[9]);
+                newChannelDto.setWorkspaceId((Long) row[1]);
+                newChannelDto.setName((String) row[2]);
+                newChannelDto.setCreatedAt((Date) row[3]);
+                newChannelDto.setPrivate((Boolean) row[4]);
 
                 newChannelDto.setMembers(new ArrayList<>());
                 return newChannelDto;
@@ -63,15 +53,15 @@ public class ChannelService {
 
             // Create a WorkspaceMemberDto for the member
             WorkspaceMemberDto memberDto = new WorkspaceMemberDto();
-            memberDto.setId((Long) row[6]);
+            memberDto.setId((Long) row[5]);
 
             UserDto userDto = new UserDto();
-            // TODO: set id in userDto
+            userDto.setId((Long) row[6]);
             userDto.setName((String) row[7]);
             userDto.setAvatar((String) row[8]);
-
             memberDto.setUserDto(userDto);
 
+            memberDto.setCreator((boolean) row[9]);
             // Add the member to the channelDto
             channelDto.getMembers().add(memberDto);
 
@@ -82,7 +72,8 @@ public class ChannelService {
         return channelDtos;
     }
 
-    public ChannelDto createChannel(User user, ChannelDto channelDto) throws ResourceAccessDeniedException {
+    @Transactional
+    public Long createChannel(User user, ChannelDto channelDto) throws ResourceAccessDeniedException {
         // check user
         WorkspaceMember member = workspaceMemberRepository.findByWorkspaceIdAndUserId(channelDto.getWorkspaceId(), user.getId());
 
@@ -99,12 +90,10 @@ public class ChannelService {
         newMember.setMember(member);
         newMember.setChannel(createdChannel);
         newMember.setCreator(true);
-        ChannelMember savedMember = channelMemberRepository.save(newMember);
+        channelMemberRepository.save(newMember);
 
         // form the savedChannelDto
-        List<Object[]> rs = channelRepository.findChannelWithMembersByChannelId(createdChannel.getId());
-
-        return mapResultSetToChannelDtos(rs).get(0);
+        return createdChannel.getId();
     }
 
     public List<ChannelDto> getChannelsByMemberId(User user, Long memberId) throws ResourceAccessDeniedException {
@@ -117,8 +106,6 @@ public class ChannelService {
         if (!member.getUser().equals(user)) {
             throw new ResourceAccessDeniedException("User is unauthorized to access channels for workspace member with ID " + memberId);
         }
-
-//        List<Object[]> rs = channelRepository.findChannelsWithMembersByMemberId(memberId);
 
         List<Channel> channels = channelRepository.findChannelsByMemberId(memberId);
         List<Long> channelIds = channels.stream()

@@ -55,9 +55,6 @@ public class WorkspaceMemberService {
     public void removeWorkspaceMember(User user,
                                       Long workspaceId,
                                       Long memberId) throws ResourceAccessDeniedException {
-        // Find the workspace by id
-        Workspace workspace = workspaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace not found with ID: " + workspaceId));
 
         // Check if user owns the workspace
         WorkspaceMember creator = workspaceMemberRepository.findCreatorByWorkspaceId(workspaceId);

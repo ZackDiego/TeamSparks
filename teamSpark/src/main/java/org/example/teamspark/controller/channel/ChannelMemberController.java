@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("api/v1/channel/{channel_id}/member/{member_id}")
+@RequestMapping("api/v1/channel/{channelId}/member")
 public class ChannelMemberController {
 
     private final ChannelMemberService channelMemberService;
@@ -23,27 +23,27 @@ public class ChannelMemberController {
     }
 
     // add channel member
-    @PostMapping(value = "")
+    @PostMapping(value = "/{wsMemberId}")
     public ResponseEntity<?> handleCreateChannel(
-            @PathVariable("channel_id") Long channelId,
-            @PathVariable("member_id") Long memberId) throws ResourceAccessDeniedException {
+            @PathVariable Long channelId,
+            @PathVariable Long wsMemberId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        channelMemberService.addChannelMember(user, channelId, memberId);
+        channelMemberService.addChannelMember(user, channelId, wsMemberId);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // remove channel member
-    @DeleteMapping("")
+    @DeleteMapping("/{wsMemberId}")
     public ResponseEntity<?> handleDeleteChannel(
-            @PathVariable("channel_id") Long channelId,
-            @PathVariable("member_id") Long memberId) throws ResourceAccessDeniedException {
+            @PathVariable Long channelId,
+            @PathVariable Long wsMemberId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        channelMemberService.removeChannelMember(user, channelId, memberId);
+        channelMemberService.removeChannelMember(user, channelId, wsMemberId);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
