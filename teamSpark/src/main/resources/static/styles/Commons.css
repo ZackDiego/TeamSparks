@@ -49,6 +49,12 @@ body {
     justify-content: space-between;
 }
 
+.header-logo > a {
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+}
+
 .main-content {
     flex: 1; /* Allow the main content to grow to fill the available space */
     width: 100%;

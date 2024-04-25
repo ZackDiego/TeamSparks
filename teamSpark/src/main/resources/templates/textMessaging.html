@@ -34,7 +34,6 @@
     <!--include fontawesome-->
     <script src="https://use.fontawesome.com/52e183519a.js"></script>
     <link rel="stylesheet" th:href="@{/styles/Commons.css}" type="text/css"/>
-    <link rel="stylesheet" th:href="@{/styles/style.css}" type="text/css"/>
     <link rel="stylesheet" th:href="@{/styles/textMessaging.css}" type="text/css"/>
 </head>
 <body>
@@ -50,7 +49,7 @@
 </div>
 <div class="main-content">
     <div id="workspaces-tab">
-        <button class="workspace-card">寬</button>
+        <button class="workspace-card active">寬</button>
         <button class="workspace-card">BE</button>
     </div>
     <div id="sidebar-container">
@@ -73,23 +72,23 @@
             <!--            </div>-->
             <div class="divider"></div>
             <div id="list-container">
-                <details class="details-container" id="channel-container">
+                <details class="details-container" id="channel-container" open="true">
                     <summary>Channels</summary>
-                    <div class="channel details-item active">Channel 1</div>
-                    <div class="channel details-item">Channel 2</div>
-                    <div class="channel details-item">Channel 3</div>
+                    <div class="channel-title details-item active">Channel 1</div>
+                    <div class="channel-title details-item">Channel 2</div>
+                    <div class="channel-title details-item">Channel 3</div>
                 </details>
-                <details class="details-container" id="chat-container">
+                <details class="details-container" id="chat-container" open="true">
                     <summary>Private Chat</summary>
-                    <div class="chat details-item">
+                    <div class="chat-partner details-item">
                         <img class="chat-partner-avatar chat-partner-demo" src="/img/profile2.png">
                         Alice
                     </div>
-                    <div class="chat details-item">
+                    <div class="chat-partner details-item">
                         <img class="chat-partner-avatar" src="/img/profile.png">
                         Bob
                     </div>
-                    <div class="chat details-item">
+                    <div class="chat-partner details-item">
                         <img class="chat-partner-avatar" src="/img/profile.png">
                         Claire
                     </div>
@@ -126,6 +125,8 @@
             </div>
             <div class="message-editor"></div>
         </div>
+
+        <!--  append each message history here -->
 
     </div>
     <div class="toast-container"></div>
