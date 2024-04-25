@@ -14,19 +14,14 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
             "w.name, " +
             "w.created_at, " +
             "w.avatar, " +
-            "cw.id AS creatorId, " + // Include the creator ID
-            "cu.id AS creatorUserId, " + // Include the creator user ID
-            "cu.name AS creatorName, " + // Include the creator name
-            "cu.avatar AS creatorAvatar, " + // Include the creator avatar
-            "wm.id, " +
-            "u.id, " +
-            "u.name, " +
-            "u.avatar " +
-            "FROM workspace w " +
-            "JOIN workspace_member wm ON w.id = wm.workspace_id " +
-            "JOIN user u ON wm.user_id = u.id " +
-            "JOIN workspace_member cw ON w.creator_id = cw.id " + // Join with the creator workspace member
-            "JOIN user cu ON cw.user_id = cu.id " + // Join with the creator user
+            "wm.id AS memberId, " +
+            "u.id AS userId, " +
+            "u.name AS userName, " +
+            "u.avatar AS userAvatar, " +
+            "wm.is_creator AS isCreator " +
+            "FROM user u " +
+            "LEFT JOIN workspace_member wm ON u.id = wm.user_id " +
+            "LEFT JOIN workspace w ON wm.workspace_id = w.id " +
             "WHERE wm.user_id = :userId",
             nativeQuery = true)
     List<Object[]> findWorkspaceWithMembersByUserId(@Param("userId") Long userId);
@@ -36,19 +31,14 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
             "w.name, " +
             "w.created_at, " +
             "w.avatar, " +
-            "cw.id AS creatorId, " + // Include the creator ID
-            "cu.id AS creatorUserId, " + // Include the creator user ID
-            "cu.name AS creatorName, " + // Include the creator name
-            "cu.avatar AS creatorAvatar, " + // Include the creator avatar
             "wm.id, " +
             "u.id, " +
             "u.name, " +
-            "u.avatar " +
+            "u.avatar, " +
+            "wm.is_creator " +
             "FROM workspace w " +
-            "JOIN workspace_member wm ON w.id = wm.workspace_id " +
-            "JOIN user u ON wm.user_id = u.id " +
-            "JOIN workspace_member cw ON w.creator_id = cw.id " + // Join with the creator workspace member
-            "JOIN user cu ON cw.user_id = cu.id " + // Join with the creator user
+            "LEFT JOIN workspace_member wm ON w.id = wm.workspace_id " +
+            "LEFT JOIN user u ON wm.user_id = u.id " +
             "WHERE w.id = :id",
             nativeQuery = true)
     List<Object[]> findWorkspaceWithMembersById(@Param("id") Long id);

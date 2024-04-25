@@ -52,29 +52,19 @@ public class WorkspaceService {
                     workspaceDto.setCreatedAt((Date) entry.getValue().get(0)[2]);
                     workspaceDto.setAvatar((String) entry.getValue().get(0)[3]);
 
-                    // workspace creator
-                    WorkspaceMemberDto creatorDto = new WorkspaceMemberDto();
-                    creatorDto.setId((Long) entry.getValue().get(0)[4]);
-                    UserDto creatorUserDto = new UserDto();
-                    creatorUserDto.setId((Long) entry.getValue().get(0)[5]);
-                    creatorUserDto.setName((String) entry.getValue().get(0)[6]);
-                    creatorUserDto.setAvatar((String) entry.getValue().get(0)[7]);
-                    creatorDto.setUserDto(creatorUserDto);
-                    workspaceDto.setCreator(creatorDto);
-
                     List<WorkspaceMemberDto> members = entry.getValue().stream()
                             .map(row -> {
                                 WorkspaceMemberDto memberDto = new WorkspaceMemberDto();
-                                memberDto.setId((Long) row[8]);
+                                memberDto.setId((Long) row[4]);
 
                                 // Map user details to UserDto
                                 UserDto userDto = new UserDto();
-                                userDto.setId((Long) row[9]);
-                                userDto.setName((String) row[10]);
-                                userDto.setAvatar((String) row[11]);
-
+                                userDto.setId((Long) row[5]);
+                                userDto.setName((String) row[6]);
+                                userDto.setAvatar((String) row[7]);
                                 memberDto.setUserDto(userDto);
 
+                                memberDto.setCreator((boolean) row[8]);
                                 return memberDto;
                             }).collect(Collectors.toList());
 
@@ -85,11 +75,10 @@ public class WorkspaceService {
     }
 
     @Transactional
-    public void createWorkspace(User creator, WorkspaceDto dto) {
+    public Long createWorkspace(User creator, WorkspaceDto dto) {
 
         Workspace workspace = modelMapper.map(dto, Workspace.class);
 
-        workspace.setCreator(creator);
         workspace.setCreatedAt(new Date());
 
         Workspace savedWorkspace = workspaceRepository.save(workspace);
@@ -98,7 +87,9 @@ public class WorkspaceService {
         WorkspaceMember newMember = new WorkspaceMember();
         newMember.setWorkspace(workspace);
         newMember.setUser(creator);
+        newMember.setCreator(true);
         workspaceMemberRepository.save(newMember);
+        return savedWorkspace.getId();
     }
 
     public List<WorkspaceDto> getWorkspacesWithMembersByUser(User user) {
@@ -110,30 +101,35 @@ public class WorkspaceService {
         return workspaceDtos;
     }
 
-    public WorkspaceDto getWorkspaceById(User user, Long id) throws ResourceAccessDeniedException {
+    public WorkspaceDto getWorkspaceById(User user, Long workspaceId) throws ResourceAccessDeniedException {
 
-        Workspace workspace = workspaceRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace not found"));
+        // Find the workspace by id
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new EntityNotFoundException("Workspace not found with ID: " + workspaceId));
 
-        // check if user owns the workspace
-        if (!workspace.getCreator().getId().equals(user.getId())) {
+        // Check if user owns the workspace
+        WorkspaceMember creator = workspaceMemberRepository.findCreatorByWorkspaceId(workspaceId);
+
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 
-
-        List<Object[]> rs = workspaceRepository.findWorkspaceWithMembersById(id);
+        List<Object[]> rs = workspaceRepository.findWorkspaceWithMembersById(workspaceId);
 
         return mapResultSetToWorkspaceDtos(rs).get(0);
     }
 
     @Transactional
-    public void updateWorkspace(Long id, User user, WorkspaceDto dto) throws ResourceAccessDeniedException {
+    public void updateWorkspace(Long workspaceId, User user, WorkspaceDto dto) throws ResourceAccessDeniedException {
 
-        Workspace workspace = workspaceRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace not found"));
+        // Find the workspace by id
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new EntityNotFoundException("Workspace not found with ID: " + workspaceId));
 
-        // check if user owns the workspace
-        if (!workspace.getCreator().getId().equals(user.getId())) {
+        // Check if user owns the workspace
+        WorkspaceMember creator = workspaceMemberRepository.findCreatorByWorkspaceId(workspaceId);
+
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 
@@ -191,19 +187,22 @@ public class WorkspaceService {
     }
 
     @Transactional
-    public void deleteWorkspace(Long id, User user) throws ResourceAccessDeniedException {
+    public void deleteWorkspace(Long workspaceId, User user) throws ResourceAccessDeniedException {
 
-        Workspace workspace = workspaceRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace not found"));
+        // Find the workspace by id
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new EntityNotFoundException("Workspace not found with ID: " + workspaceId));
 
-        // check if user owns the workspace
-        if (!workspace.getCreator().getId().equals(user.getId())) {
+        // Check if user owns the workspace
+        WorkspaceMember creator = workspaceMemberRepository.findCreatorByWorkspaceId(workspaceId);
+
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 
         // Delete associated WorkspaceMember records
         workspaceMemberRepository.deleteByWorkspace(workspace);
 
-        workspaceRepository.deleteById(id);
+        workspaceRepository.deleteById(workspaceId);
     }
 }

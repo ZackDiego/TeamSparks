@@ -38,43 +38,40 @@ public class ChannelController {
     }
 
     // create channel
-    @PostMapping(value = "/creator/{creator_id}/channel", consumes = {"application/json"})
+    @PostMapping(value = "/channel", consumes = {"application/json"})
     public ResponseEntity<?> handleCreateChannel(
-            @PathVariable("creator_id") Long creatorId,
             @RequestBody ChannelDto channelDto) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        ChannelDto createdChannelDto = channelService.createChannel(user, creatorId, channelDto);
+        ChannelDto createdChannelDto = channelService.createChannel(user, channelDto);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new DataResponse<>(createdChannelDto));
     }
 
     // update channel
-    @PutMapping(value = "/creator/{creator_id}/channel/{channel_id}", consumes = {"application/json"})
+    @PutMapping(value = "/channel/{channel_id}", consumes = {"application/json"})
     public ResponseEntity<?> handleUpdateChannel(
-            @PathVariable("creator_id") Long creatorId,
             @PathVariable("channel_id") Long channelId,
             @RequestBody ChannelDto channelDto) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        ChannelDto updatedChannelDto = channelService.updateChannel(user, creatorId, channelId, channelDto);
+        ChannelDto updatedChannelDto = channelService.updateChannel(user, channelId, channelDto);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new DataResponse<>(updatedChannelDto));
     }
 
     // delete channel
-    @DeleteMapping("/creator/{creator_id}/channel/{channel_id}")
+    @DeleteMapping("/channel/{channel_id}")
     public ResponseEntity<?> handleDeleteChannel(
-            @PathVariable("creator_id") Long creatorId,
             @PathVariable("channel_id") Long channelId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        channelService.deleteChannel(user, creatorId, channelId);
+        channelService.deleteChannel(user, channelId);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

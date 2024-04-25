@@ -1,7 +1,6 @@
 package org.example.teamspark.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.example.teamspark.data.dto.UserDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.model.workspace.Workspace;
@@ -25,28 +24,32 @@ public class WorkspaceMemberService {
         this.userRepository = userRepository;
     }
 
-    public void addWorkspaceMember(User user,
+    public Long addWorkspaceMember(User user,
                                    Long workspaceId,
-                                   UserDto userDto) throws ResourceAccessDeniedException {
+                                   Long userId) throws ResourceAccessDeniedException {
 
         // Find the workspace by id
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new EntityNotFoundException("Workspace not found with ID: " + workspaceId));
 
         // Check if user owns the workspace
-        if (!workspace.getCreator().getId().equals(user.getId())) {
+        WorkspaceMember creator = workspaceMemberRepository.findCreatorByWorkspaceId(workspaceId);
+
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 
         // Create new channelMember instance
         WorkspaceMember workspaceMember = new WorkspaceMember();
 
-        User addUser = userRepository.findById(userDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userDto.getId()));
+        User addUser = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
 
         workspaceMember.setWorkspace(workspace);
         workspaceMember.setUser(addUser);
-        workspaceMemberRepository.save(workspaceMember);
+        WorkspaceMember savedWorkspaceMember = workspaceMemberRepository.save(workspaceMember);
+
+        return savedWorkspaceMember.getId();
     }
 
     public void removeWorkspaceMember(User user,
@@ -57,7 +60,9 @@ public class WorkspaceMemberService {
                 .orElseThrow(() -> new EntityNotFoundException("Workspace not found with ID: " + workspaceId));
 
         // Check if user owns the workspace
-        if (!workspace.getCreator().getId().equals(user.getId())) {
+        WorkspaceMember creator = workspaceMemberRepository.findCreatorByWorkspaceId(workspaceId);
+
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 

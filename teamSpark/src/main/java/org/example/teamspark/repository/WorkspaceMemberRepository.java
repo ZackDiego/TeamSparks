@@ -13,6 +13,8 @@ import java.util.Set;
 public interface WorkspaceMemberRepository extends JpaRepository<WorkspaceMember, Long> {
     void deleteByWorkspaceIdAndUserId(Long workspaceId, Long userId);
 
+    WorkspaceMember findByWorkspaceIdAndUserId(Long workspaceId, Long userId);
+
     List<WorkspaceMember> findByWorkspace(Workspace workspace);
 
     List<WorkspaceMember> findByUser(User user);
@@ -24,6 +26,9 @@ public interface WorkspaceMemberRepository extends JpaRepository<WorkspaceMember
 
     @Query("SELECT wm.user FROM WorkspaceMember wm WHERE wm.workspace = :workspace")
     Set<User> findUsersByWorkspace(@Param("workspace") Workspace workspace);
+
+    @Query("SELECT wm FROM WorkspaceMember wm WHERE wm.workspace.id = :workspaceId AND wm.isCreator = true")
+    WorkspaceMember findCreatorByWorkspaceId(@Param("workspaceId") Long workspaceId);
 
     @Query(value = "SELECT " +
             "    wm.id AS id, " +

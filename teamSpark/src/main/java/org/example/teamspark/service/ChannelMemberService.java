@@ -1,7 +1,6 @@
 package org.example.teamspark.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.example.teamspark.data.dto.WorkspaceMemberDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.channel.Channel;
 import org.example.teamspark.model.channel.ChannelMember;
@@ -25,35 +24,26 @@ public class ChannelMemberService {
     }
 
     public void addChannelMember(User user,
-                                 Long creatorId,
                                  Long channelId,
-                                 WorkspaceMemberDto workspaceMemberDto) throws ResourceAccessDeniedException {
+                                 Long memberId) throws ResourceAccessDeniedException {
 
-        // Find the creator by creatorId
-        WorkspaceMember creator = workspaceMemberRepository.findById(creatorId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + creatorId));
-
-        // Check if the WorkspaceMember belongs to the provided user
-        if (!creator.getUser().equals(user)) {
-            throw new ResourceAccessDeniedException("User is unauthorized to access channels for workspace member with ID " + creatorId);
-        }
+        WorkspaceMember creator = channelMemberRepository.findCreatorByChannelId(channelId);
 
         // Find the Channel by channelId
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new EntityNotFoundException("Channel not found with ID: " + channelId));
 
         // Check if the member is the channel's creator
-        if (!channel.getCreator().getId().equals(creatorId)) {
-            throw new ResourceAccessDeniedException("User is unauthorized to update channel with ID " + channelId);
+        if (!creator.getId().equals(user.getId())) {
+            throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
-
 
         // Create new channelMember instance
         ChannelMember channelMember = new ChannelMember();
 
         // Find the member by memberId
-        WorkspaceMember member = workspaceMemberRepository.findById(workspaceMemberDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + creatorId));
+        WorkspaceMember member = workspaceMemberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + memberId));
 
         channelMember.setMember(member);
         channelMember.setChannel(channel);
@@ -61,27 +51,20 @@ public class ChannelMemberService {
     }
 
     public void removeChannelMember(User user,
-                                    Long creatorId,
                                     Long channelId,
-                                    WorkspaceMemberDto workspaceMemberDto) throws ResourceAccessDeniedException {
-        // Find the creator by creatorId
-        WorkspaceMember creator = workspaceMemberRepository.findById(creatorId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + creatorId));
+                                    Long memberId) throws ResourceAccessDeniedException {
 
-        // Check if the WorkspaceMember belongs to the provided user
-        if (!creator.getUser().equals(user)) {
-            throw new ResourceAccessDeniedException("User is unauthorized to access channels for workspace member with ID " + creatorId);
-        }
+        WorkspaceMember creator = channelMemberRepository.findCreatorByChannelId(channelId);
 
         // Find the Channel by channelId
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new EntityNotFoundException("Channel not found with ID: " + channelId));
 
         // Check if the member is the channel's creator
-        if (!channel.getCreator().getId().equals(creatorId)) {
-            throw new ResourceAccessDeniedException("User is unauthorized to update channel with ID " + channelId);
+        if (!creator.getId().equals(user.getId())) {
+            throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 
-        channelMemberRepository.deleteByMemberId(workspaceMemberDto.getId());
+        channelMemberRepository.deleteByMemberId(memberId);
     }
 }

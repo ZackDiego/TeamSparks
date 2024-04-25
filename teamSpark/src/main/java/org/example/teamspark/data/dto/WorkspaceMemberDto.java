@@ -18,6 +18,9 @@ public class WorkspaceMemberDto {
     @JsonProperty("user")
     private UserDto userDto;
 
+    @JsonProperty("is_creator")
+    private boolean isCreator;
+
     @JsonProperty("roles")
     private List<RoleDto> roles;
 }

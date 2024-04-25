@@ -29,6 +29,9 @@ public class ChannelMember implements Serializable {
     @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
 
+    @Column(name = "is_creator")
+    private boolean isCreator;
+
     @Column(name = "joined_at")
     private Date joined_at = new Date();
 

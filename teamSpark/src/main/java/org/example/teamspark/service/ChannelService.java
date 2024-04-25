@@ -15,6 +15,7 @@ import org.example.teamspark.repository.WorkspaceMemberRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ChannelService {
@@ -53,9 +54,7 @@ public class ChannelService {
                 userDto.setAvatar((String) row[5]);
 
                 creatorDto.setUserDto(userDto);
-
-                newChannelDto.setCreator(creatorDto);
-
+                
                 newChannelDto.setCreatedAt((Date) row[9]);
 
                 newChannelDto.setMembers(new ArrayList<>());
@@ -83,33 +82,27 @@ public class ChannelService {
         return channelDtos;
     }
 
-    public ChannelDto createChannel(User user, Long creatorId, ChannelDto channelDto) throws ResourceAccessDeniedException {
-        // Find the creator by creatorId
-        WorkspaceMember creator = workspaceMemberRepository.findById(creatorId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + creatorId));
-
-        // Check if the WorkspaceMember belongs to the provided user
-        if (!creator.getUser().equals(user)) {
-            throw new ResourceAccessDeniedException("User is unauthorized to access channels for workspace member with ID " + creatorId);
-        }
+    public ChannelDto createChannel(User user, ChannelDto channelDto) throws ResourceAccessDeniedException {
+        // check user
+        WorkspaceMember member = workspaceMemberRepository.findByWorkspaceIdAndUserId(channelDto.getWorkspaceId(), user.getId());
 
         // Create a new Channel instance
         Channel channel = new Channel();
-        channel.setWorkspace(creator.getWorkspace());
+        channel.setWorkspace(member.getWorkspace());
         channel.setName(channelDto.getName());
-        channel.setCreator(creator);
         channel.setIsPrivate(channelDto.isPrivate());
 
         Channel createdChannel = channelRepository.save(channel);
 
         // add the creator as channel member
         ChannelMember newMember = new ChannelMember();
-        newMember.setMember(creator);
+        newMember.setMember(member);
         newMember.setChannel(createdChannel);
+        newMember.setCreator(true);
         ChannelMember savedMember = channelMemberRepository.save(newMember);
 
         // form the savedChannelDto
-        List<Object[]> rs = channelRepository.findChannelsWithMembersByChannelId(createdChannel.getId());
+        List<Object[]> rs = channelRepository.findChannelWithMembersByChannelId(createdChannel.getId());
 
         return mapResultSetToChannelDtos(rs).get(0);
     }
@@ -125,29 +118,29 @@ public class ChannelService {
             throw new ResourceAccessDeniedException("User is unauthorized to access channels for workspace member with ID " + memberId);
         }
 
-        List<Object[]> rs = channelRepository.findChannelsWithMembersByMemberId(memberId);
+//        List<Object[]> rs = channelRepository.findChannelsWithMembersByMemberId(memberId);
+
+        List<Channel> channels = channelRepository.findChannelsByMemberId(memberId);
+        List<Long> channelIds = channels.stream()
+                .map(Channel::getId)
+                .collect(Collectors.toList());
+
+        List<Object[]> rs = channelRepository.findChannelsWithMembersByChannelIds(channelIds);
 
         return mapResultSetToChannelDtos(rs);
     }
 
-    public ChannelDto updateChannel(User user, Long creatorId, Long channelId, ChannelDto channelDto) throws ResourceAccessDeniedException {
+    public ChannelDto updateChannel(User user, Long channelId, ChannelDto channelDto) throws ResourceAccessDeniedException {
 
-        // Find the creator by creatorId
-        WorkspaceMember creator = workspaceMemberRepository.findById(creatorId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + creatorId));
-
-        // Check if the WorkspaceMember belongs to the provided user
-        if (!creator.getUser().equals(user)) {
-            throw new ResourceAccessDeniedException("User is unauthorized to access channels for workspace member with ID " + creatorId);
-        }
+        WorkspaceMember creator = channelMemberRepository.findCreatorByChannelId(channelId);
 
         // Find the Channel by channelId
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new EntityNotFoundException("Channel not found with ID: " + channelId));
 
         // Check if the member is the channel's creator
-        if (!channel.getCreator().getId().equals(creatorId)) {
-            throw new ResourceAccessDeniedException("User is unauthorized to update channel with ID " + channelId);
+        if (!creator.getId().equals(user.getId())) {
+            throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 
         // Update the channel details
@@ -158,29 +151,22 @@ public class ChannelService {
         channelRepository.save(channel);
 
         // form the updatedChannelDto
-        List<Object[]> rs = channelRepository.findChannelsWithMembersByChannelId(channelId);
+        List<Object[]> rs = channelRepository.findChannelWithMembersByChannelId(channelId);
 
         return mapResultSetToChannelDtos(rs).get(0);
     }
 
-    public void deleteChannel(User user, Long creatorId, Long channelId) throws ResourceAccessDeniedException {
+    public void deleteChannel(User user, Long channelId) throws ResourceAccessDeniedException {
 
-        // Find the creator by creatorId
-        WorkspaceMember creator = workspaceMemberRepository.findById(creatorId)
-                .orElseThrow(() -> new EntityNotFoundException("Workspace member not found with ID: " + creatorId));
-
-        // Check if the WorkspaceMember belongs to the provided user
-        if (!creator.getUser().equals(user)) {
-            throw new ResourceAccessDeniedException("User is unauthorized to access channels for workspace member with ID " + creatorId);
-        }
+        WorkspaceMember creator = channelMemberRepository.findCreatorByChannelId(channelId);
 
         // Find the Channel by channelId
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new EntityNotFoundException("Channel not found with ID: " + channelId));
 
         // Check if the member is the channel's creator
-        if (!channel.getCreator().getId().equals(creatorId)) {
-            throw new ResourceAccessDeniedException("User is unauthorized to delete channel with ID " + channelId);
+        if (!creator.getId().equals(user.getId())) {
+            throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 
         channelRepository.delete(channel);

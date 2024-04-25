@@ -29,7 +29,9 @@ public class WorkspaceMember implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(name = "is_creator")
+    private boolean isCreator;
+
     @Column(name = "joined_at")
     private Date joinedAt = new Date();
-
 }
