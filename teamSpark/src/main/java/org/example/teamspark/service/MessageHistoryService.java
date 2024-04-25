@@ -1,7 +1,6 @@
 package org.example.teamspark.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.apachecommons.CommonsLog;
@@ -17,8 +16,6 @@ import org.example.teamspark.repository.ChannelRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Service
 @CommonsLog
@@ -35,35 +32,6 @@ public class MessageHistoryService {
         this.channelMemberRepository = channelMemberRepository;
     }
 
-    private List<MessageDto> mapResponseBodyToMessageDocuments(String responseBody) throws JsonProcessingException {
-        // map response body to
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        // Deserialize the Elasticsearch response body to a JsonNode
-        JsonNode responseObj = objectMapper.readTree(responseBody);
-
-        // Extract the hits from the responseBody
-        JsonNode hits = responseObj.get("hits").get("hits");
-
-        Stream<JsonNode> hitsStream = StreamSupport.stream(hits.spliterator(), false);
-
-        // Map each hit to your model class using ObjectMapper and collect them into a List
-        return hitsStream
-                .map(hit -> {
-                    JsonNode source = hit.get("_source");
-                    MessageDto dto = new MessageDto();
-                    try {
-                        dto = objectMapper.treeToValue(hit.get("_source"), MessageDto.class);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    dto.setMessageId(hit.get("_id").asText());
-                    return dto;
-                })
-                .toList();
-    }
-
     public MessageHistoryDto getMessagesByChannelId(Long channelId, User user) throws ResourceAccessDeniedException, JsonProcessingException {
 
         if (!isUserMemberOfChannel(user.getId(), channelId)) {
@@ -78,7 +46,7 @@ public class MessageHistoryService {
         // Find the message history in elasticsearch
         String responseBody = elasticsearchService.getDocumentsByIndexName(indexName);
 
-        List<MessageDto> messageDtos = mapResponseBodyToMessageDocuments(responseBody);
+        List<MessageDto> messageDtos = ElasticsearchService.mapResponseBodyToMessageDocuments(responseBody);
 
         MessageHistoryDto dto = new MessageHistoryDto();
         dto.setChannelId(channelId);

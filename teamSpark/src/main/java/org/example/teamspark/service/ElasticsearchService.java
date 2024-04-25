@@ -6,11 +6,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.example.teamspark.data.dto.MessageDto;
+import org.example.teamspark.data.dto.SearchCondition;
 import org.example.teamspark.exception.ElasticsearchFailedException;
+import org.example.teamspark.model.channel.Channel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 @CommonsLog
@@ -28,6 +37,35 @@ public class ElasticsearchService {
 
     public ElasticsearchService() {
         this.restTemplate = new RestTemplate();
+    }
+
+    public static List<MessageDto> mapResponseBodyToMessageDocuments(String responseBody) throws JsonProcessingException {
+        // map response body to
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Deserialize the Elasticsearch response body to a JsonNode
+        JsonNode responseObj = objectMapper.readTree(responseBody);
+
+        // Extract the hits from the responseBody
+        JsonNode hits = responseObj.get("hits").get("hits");
+
+        Stream<JsonNode> hitsStream = StreamSupport.stream(hits.spliterator(), false);
+
+        // Map each hit to your model class using ObjectMapper and collect them into a List
+        return hitsStream
+                .map(hit -> {
+                    JsonNode source = hit.get("_source");
+                    MessageDto dto = new MessageDto();
+                    try {
+                        dto = objectMapper.treeToValue(hit.get("_source"), MessageDto.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    dto.setMessageId(hit.get("_id").asText());
+                    return dto;
+                })
+                .toList();
     }
 
     public void createIndexIfNotExists(String indexName) throws JsonProcessingException {
@@ -113,7 +151,6 @@ public class ElasticsearchService {
         }
     }
 
-
     private HttpHeaders createHeaders(String username, String password) {
         String auth = username + ":" + password;
         byte[] plainCredsBytes = auth.getBytes();
@@ -126,44 +163,90 @@ public class ElasticsearchService {
         return headers;
     }
 
-//    public String searchMessageWithCondition(List<Channel> channels, SearchCondition condition) {
-//        String searchUrl;
-//        if (condition.getChannelId() == null) {
-//            searchUrl = ESUrl + "/channel-*/_search?size=10000";
-//        } else {
-//            searchUrl = ESUrl + "/channel-" + condition.getChannelId() + "/_search?size=10000";
-//        }
-//
-//        // Create HttpHeaders with authentication
-//        HttpHeaders headers = createHeaders(ESUserName, ESPassword);
-//
-//
-//        // Create the request body
-//        String requestBody = "{\n" +
-//                "    \"query\": {\n" +
-//                "        \"bool\": {\n" +
-//                "            \"must\": {\n" +
-//                "                \"match\": {\n" +
-//                "                    \"content\": \"" + condition.getSearchKeyword() + "\"\n" +
-//                "                }\n" +
-//                "            },\n" +
-//                "            \"filter\": [\n" +
-//                "                { \"term\": { \"from_id\": " + condition.getSearchKeyword() + " } },\n" +
-//                "                { \"term\": { \"contain_link\": " + condition.getContainLink() + " } },\n" +
-//                "                { \"term\": { \"file_url\": " + condition.getContainFile() + " } },\n" +
-//                "                { \"term\": { \"image_url\": " + condition.getContainImage() + " } }\n" +
-//                "            ]\n" +
-//                "        }\n" +
-//                "    }\n" +
-//                "}";
-//
-//        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-//        ResponseEntity<String> response = restTemplate.exchange(searchUrl, HttpMethod.GET, requestEntity, String.class);
-//
-//        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-//            return response.getBody();
-//        } else {
-//            throw new RuntimeException("Failed to get data from index: " + indexName);
-//        }
-//    }
+    public String searchMessageWithCondition(List<Channel> channels, SearchCondition condition) throws ElasticsearchFailedException {
+
+        if (condition.getChannelId() == null) {
+            String indices = channels.stream()
+                    .map(channel -> "channel-" + channel.getId())
+                    .collect(Collectors.joining(","));
+
+            String searchUrl = ESUrl + "/" + indices + "/_search?size=10000";
+
+            ResponseEntity<String> response = getElasticsearchSearchResult(condition, searchUrl);
+
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                return response.getBody();
+            } else {
+                throw new ElasticsearchFailedException("Failed to get data from index: " + indices);
+            }
+        } else {
+            String index = "channel-" + condition.getChannelId();
+            String searchUrl = ESUrl + "/" + index + "/_search?size=10000";
+
+            ResponseEntity<String> response = getElasticsearchSearchResult(condition, searchUrl);
+
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                return response.getBody();
+            } else {
+                throw new ElasticsearchFailedException("Failed to get data from index: " + index);
+            }
+        }
+    }
+
+    private ResponseEntity<String> getElasticsearchSearchResult(SearchCondition condition, String searchUrl) {
+        // Create HttpHeaders with authentication
+        HttpHeaders headers = createHeaders(ESUserName, ESPassword);
+
+        String requestBody = """
+                {
+                    "query": {
+                        "bool": {
+                """;
+
+        if (condition.getSearchKeyword() != null && !condition.getSearchKeyword().isEmpty()) {
+            requestBody += "                    \"must\": {\n" +
+                    "                        \"match\": {\n" +
+                    "                            \"content\": \"" + condition.getSearchKeyword() + "\"\n" +
+                    "                        }\n" +
+                    "                    },";
+        }
+
+        requestBody += """
+                            "filter": [
+                """;
+
+        // Build filter conditions
+        List<String> filterConditions = new ArrayList<>();
+        if (condition.getFromId() != null) {
+            filterConditions.add("{ \"term\": { \"from_id\": " + condition.getFromId() + " } }");
+        }
+        if (condition.getBeforeDate() != null) {
+            filterConditions.add("{ \"range\": { \"created_at\": { \"lte\": " + condition.getBeforeDate().getTime() + " } } }");
+        }
+        if (condition.getAfterDate() != null) {
+            filterConditions.add("{ \"range\": { \"created_at\": { \"gte\": " + condition.getAfterDate().getTime() + " } } }");
+        }
+        if (condition.getContainLink() != null) {
+            filterConditions.add("{ \"term\": { \"contain_link\": " + condition.getContainLink() + " } }");
+        }
+        if (condition.getContainFile() != null && condition.getContainFile()) {
+            filterConditions.add("{ \"exists\": { \"field\": \"file_url\" } }");
+        }
+        if (condition.getContainImage() != null) {
+            filterConditions.add("{ \"exists\": { \"field\": \"image_url\" } }");
+        }
+
+        // Concatenate filter conditions with commas
+        requestBody += String.join(",\n", filterConditions);
+
+        // Close the JSON structure
+        requestBody += """
+                            ]
+                        }
+                    }
+                }""";
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+        return restTemplate.exchange(searchUrl, HttpMethod.POST, requestEntity, String.class);
+    }
 }

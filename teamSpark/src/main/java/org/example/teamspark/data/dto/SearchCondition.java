@@ -1,5 +1,6 @@
 package org.example.teamspark.data.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,14 +11,28 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SearchCondition {
-    private Long SenderId;
-    private Long ChannelId;
-    private String senderName;
-    private String channelName;
-    private Date beforeDate;
-    private Date afterDate;
-    private Boolean containLink;
-    private Boolean containImage;
-    private Boolean containFile;
+
+    @JsonProperty("search_keyword")
     private String searchKeyword;
+
+    @JsonProperty("from_id")
+    private Long fromId;
+
+    @JsonProperty("channel_id")
+    private Long channelId;
+
+    @JsonProperty("before_date")
+    private Date beforeDate;
+
+    @JsonProperty("after_date")
+    private Date afterDate;
+
+    @JsonProperty("contain_link")
+    private Boolean containLink;
+
+    @JsonProperty("contain_image")
+    private Boolean containImage;
+
+    @JsonProperty("contain_file")
+    private Boolean containFile;
 }
