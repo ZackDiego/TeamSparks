@@ -1,4 +1,4 @@
-package org.example.teamspark.data.dto;
+package org.example.teamspark.data.dto.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

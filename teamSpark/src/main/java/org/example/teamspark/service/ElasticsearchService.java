@@ -5,8 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.example.teamspark.data.dto.MessageDto;
 import org.example.teamspark.data.dto.SearchCondition;
+import org.example.teamspark.data.dto.message.MessageDto;
+import org.example.teamspark.data.dto.message.MessageId;
 import org.example.teamspark.exception.ElasticsearchFailedException;
 import org.example.teamspark.model.channel.Channel;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,7 +62,7 @@ public class ElasticsearchService {
                         throw new RuntimeException(e);
                     }
 
-                    dto.setMessageId(hit.get("_id").asText());
+                    dto.setMessageId(new MessageId(hit.get("_index").asText(), hit.get("_id").asText()));
                     return dto;
                 })
                 .toList();
@@ -86,7 +87,7 @@ public class ElasticsearchService {
         }
     }
 
-    public String addDocumentToIndex(String indexName, String json) throws JsonProcessingException, ElasticsearchFailedException {
+    public MessageId addDocumentToIndex(String indexName, String json) throws JsonProcessingException, ElasticsearchFailedException {
 
         String indexEndpoint = ESUrl + "/" + indexName + "/_doc";
 
@@ -105,7 +106,10 @@ public class ElasticsearchService {
             ObjectMapper objectMapper = new ObjectMapper();
 
             JsonNode rootNode = objectMapper.readTree(response.getBody());
-            return rootNode.path("_id").asText();
+            MessageId messageId = new MessageId();
+            messageId.setIndexName(rootNode.path("_index").asText());
+            messageId.setDoucmentId(rootNode.path("_id").asText());
+            return messageId;
         } else {
             throw new ElasticsearchFailedException("Failed to add message to index: " + indexName);
         }
@@ -119,7 +123,6 @@ public class ElasticsearchService {
         // Get the index
         String searchUrl = ESUrl + "/" + indexName + "/_search?size=10000";
 
-//        String requestBody = "{\"query\": {\"match_all\": {}}}"; // all documents
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         try {
@@ -228,5 +231,25 @@ public class ElasticsearchService {
 
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
         return restTemplate.exchange(searchUrl, HttpMethod.POST, requestEntity, String.class);
+    }
+
+
+    public String getDocumentsByIdList(List indexName) throws JsonProcessingException {
+
+        // Create HttpHeaders with authentication
+        HttpHeaders headers = createHeaders(ESUserName, ESPassword);
+
+        // Get the index
+        String searchUrl = ESUrl + "/" + indexName + "/_search?size=10000";
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(searchUrl, HttpMethod.GET, requestEntity, String.class);
+            return response.getBody();
+        } catch (Exception e) {
+            log.error("Index already exists in Elasticsearch: " + indexName);
+            throw new RuntimeException("Failed to get data from index: " + indexName);
+        }
     }
 }

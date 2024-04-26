@@ -4,8 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.apachecommons.CommonsLog;
-import org.example.teamspark.data.dto.MessageDto;
-import org.example.teamspark.data.dto.MessageHistoryDto;
+import org.example.teamspark.data.dto.message.MessageDto;
+import org.example.teamspark.data.dto.message.MessageHistoryDto;
+import org.example.teamspark.data.dto.message.MessageId;
 import org.example.teamspark.exception.ElasticsearchFailedException;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.channel.Channel;
@@ -61,7 +62,7 @@ public class MessageHistoryService {
 
     }
 
-    public String addMessageHistoryByChannelId(Long channelId, MessageDto message) throws JsonProcessingException, ElasticsearchFailedException {
+    public MessageId addMessageHistoryByChannelId(Long channelId, MessageDto message) throws JsonProcessingException, ElasticsearchFailedException {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String messageJson = null;

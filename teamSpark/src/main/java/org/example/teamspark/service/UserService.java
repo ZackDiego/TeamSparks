@@ -1,7 +1,6 @@
 package org.example.teamspark.service;
 
 import lombok.extern.apachecommons.CommonsLog;
-import org.example.teamspark.data.UserNotificationDto;
 import org.example.teamspark.data.dto.SignInAndUpDto;
 import org.example.teamspark.data.dto.UserDto;
 import org.example.teamspark.data.dto.UserWorkspaceMemberDto;
@@ -10,7 +9,6 @@ import org.example.teamspark.data.form.SignUpForm;
 import org.example.teamspark.exception.EmailAlreadyExistsException;
 import org.example.teamspark.exception.UserAuthenticationException;
 import org.example.teamspark.model.user.User;
-import org.example.teamspark.model.user.UserNotification;
 import org.example.teamspark.model.workspace.WorkspaceMember;
 import org.example.teamspark.repository.UserNotificationRepository;
 import org.example.teamspark.repository.UserRepository;
@@ -112,9 +110,10 @@ public class UserService {
                 }).toList();
     }
 
-    public List<UserNotificationDto> getUserNotifications(User user) {
-        List<UserNotification> notifications = userNotificationRepository.findByUser(user);
-
-
-    }
+//    public List<UserNotificationDto> getUserNotifications(User user) {
+//        List<UserNotification> notifications = userNotificationRepository.findByUser(user);
+//
+//        // map notifications to dto
+//
+//    }
 }

@@ -2,7 +2,7 @@ package org.example.teamspark.controller.textMessage;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.example.teamspark.data.DataResponse;
-import org.example.teamspark.data.dto.MessageHistoryDto;
+import org.example.teamspark.data.dto.message.MessageHistoryDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.service.MessageHistoryService;

@@ -1,6 +1,5 @@
-package org.example.teamspark.data.dto;
+package org.example.teamspark.data.dto.message;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -14,8 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class MessageDto {
     @JsonProperty("message_id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String messageId;
+    private MessageId messageId;
 
     @NotBlank
     @JsonProperty("from_id")

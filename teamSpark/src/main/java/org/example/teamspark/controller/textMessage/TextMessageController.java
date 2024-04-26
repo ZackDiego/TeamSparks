@@ -2,8 +2,9 @@ package org.example.teamspark.controller.textMessage;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.apachecommons.CommonsLog;
-import org.example.teamspark.data.dto.MessageDto;
 import org.example.teamspark.data.dto.message.InMessageDto;
+import org.example.teamspark.data.dto.message.MessageDto;
+import org.example.teamspark.data.dto.message.MessageId;
 import org.example.teamspark.exception.ElasticsearchFailedException;
 import org.example.teamspark.service.MessageHistoryService;
 import org.example.teamspark.service.NotificationService;
@@ -36,12 +37,11 @@ public class TextMessageController {
         MessageDto messageDto = modelMapper.map(inMessageDto.getMessage(), MessageDto.class);
 
         // store message to elasticsearch
-        String documentId = messageHistoryService.addMessageHistoryByChannelId(inMessageDto.getChannelId(), messageDto);
-        messageDto.setMessageId(documentId);
+        MessageId messageId = messageHistoryService.addMessageHistoryByChannelId(inMessageDto.getChannelId(), messageDto);
+        messageDto.setMessageId(messageId);
         notificationService.handleChannelMessageNotifications(inMessageDto.getChannelId(), messageDto);
 
         // Send to Message to channel
-        log.info("receive and send message to" + "/textMessagingChannel/" + inMessageDto.getChannelId() + "documentId" + documentId);
         messageTemplate.convertAndSend(
                 "/textMessagingChannel/" + inMessageDto.getChannelId(),
                 messageDto);

@@ -1,8 +1,8 @@
 package org.example.teamspark.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.example.teamspark.data.dto.MessageDto;
 import org.example.teamspark.data.dto.SearchCondition;
+import org.example.teamspark.data.dto.message.MessageDto;
 import org.example.teamspark.exception.ElasticsearchFailedException;
 import org.example.teamspark.model.channel.Channel;
 import org.example.teamspark.model.user.User;

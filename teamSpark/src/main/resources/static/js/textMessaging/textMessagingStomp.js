@@ -1,11 +1,7 @@
-(function () {
+addMessagingStomp = function () {
     const stompClient = new StompJs.Client({
         brokerURL: 'ws://localhost:8080/textMessagingWebsocket'
     });
-
-// get from localStorage
-// const channelInf = JSON.parse(localStorage.getItem('channel_inf'));
-// const userInf = JSON.parse(localStorage.getItem('user_inf'));
 
     stompClient.onConnect = (frame) => {
         setConnected(true);
@@ -49,19 +45,22 @@
         console.log("Disconnected");
     }
 
-    function sendMessage() {
+    function sendMessage($messageEditor) {
 
-        const content = $('.message-editor').summernote('code');
+        const content = $messageEditor.summernote('code');
         const containsLink = /(?:http|https):\/\/\S+/i.test(content);
 
+        const channelId = $messageEditor.closest('.text-messaging-content').data('channel-id')
+        console.log(channelId);
+        const user = JSON.parse(localStorage.getItem('user'))
         // send message to websocket endpoint
         stompClient.publish({
             destination: "/websocket/textMessagingEndpoint",
             body: JSON.stringify({
-                channel_id: channelInf.channel_id,
+                channel_id: channelId,
                 message: {
-                    from_id: userInf.member_id,
-                    from_name: userInf.name,
+                    from_id: getMemberId(),
+                    from_name: user.name,
                     content: content,
                     contain_link: containsLink,
                     file_url: null,
@@ -71,7 +70,7 @@
         });
 
         // clear the message editor
-        $('.message-editor').summernote('code', '');
+        $messageEditor.summernote('code', '');
     }
 
     function renderMessage(data) {
@@ -92,12 +91,18 @@
         messagesContainer.append(messageDiv);
     }
 
-    $(function () {
-        connect();
-        $('.btn-send').click(() => sendMessage());
+    connect();
+    $('.btn-send').click(function () {
+        console.log("send message");
+        const $messageEditor = $(this)
+            .closest('.bottom-toolbar')
+            .closest('.note-editor')
+            .siblings('.message-editor');
+        console.log($messageEditor);
+        sendMessage($messageEditor);
     });
 
     $(window).on('beforeunload', function () {
         disconnect();
     });
-})();
+}

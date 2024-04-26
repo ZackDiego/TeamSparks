@@ -44,18 +44,19 @@ renderMessageEditor = function () {
             callbacks: {
                 onInit: function () {
                     // Move the emoji button to the bottom of the toolbar
-                    var toolbar = $messageEditor.siblings('.note-toolbar');
+                    var toolbar = $messageEditor.siblings('.note-editor').children('.note-toolbar');
                     var insertToolBox = toolbar.find('.note-insert');
                     // Create a new div element with the desired class
                     var customToolbar = $('<div class="note-toolbar card-header bottom-toolbar p-2 d-flex justify-content-between align-items-center" role="toolbar"></div>');
                     // Append the insertToolBox to the customToolbar
                     customToolbar.append(insertToolBox);
-                    // Append the customToolbar after the original toolbar
-                    $messageEditor.siblings('.note-editing-area').after(customToolbar);
 
                     // Add send button
                     var sendButton = $('<button type="button" class="note-btn btn btn-sm btn-primary btn-send mr-2">Send</button>');
                     customToolbar.append(sendButton);
+
+                    // Append the customToolbar after the original toolbar
+                    $messageEditor.siblings('.note-editor').children('.note-editing-area').after(customToolbar);
                 }
             },
         });

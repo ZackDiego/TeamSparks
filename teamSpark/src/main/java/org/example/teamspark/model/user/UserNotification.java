@@ -24,8 +24,11 @@ public class UserNotification {
     @Column(name = "channel_id")
     private Long channelId;
 
-    @Column(name = "message_id")
-    private String messageId;
+    @Column(name = "message_index_name")
+    private String messageIndexName;
+
+    @Column(name = "message_document_id")
+    private String messageDocumentId;
 
     @Column(name = "is_seen")
     private boolean isSeen = false;

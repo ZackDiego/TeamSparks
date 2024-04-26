@@ -127,7 +127,7 @@
         <div class="text-messaging-content">
             <div class="content-header">
                 <div class="channel-title chat-partner-title">
-                    <!--                    <img class="chat-partner-avatar" src="/img/profile2.png">-->
+                    <img class="chat-partner-avatar" src="/img/profile2.png">
                     # Channel 1
                 </div>
                 <div class="content-header-btn-container">
@@ -140,9 +140,6 @@
             </div>
             <div class="message-editor"></div>
         </div>
-
-        <!--  append each message history here -->
-
     </div>
     <div class="toast-container"></div>
 
@@ -171,11 +168,11 @@
 <!-- fixed userInfo for testing and demo -->
 <script th:src="@{/js/userBasic.js}"></script>
 <!--include tam-emoji js-->
+<script th:src="@{/js/textMessaging/textMessagingStomp.js}"></script>
 <script th:src="@{/tam-emoji/js/config.js}"></script>
 <script th:src="@{/tam-emoji/js/tam-emoji.min.js?v=1.1}"></script>
 <script th:src="@{/js/textMessaging/summernote-editor.js}"></script>
 <script th:src="@{/js/textMessaging/textMessagingPageRender.js}"></script>
 <script th:src="@{/js/userNotificationAndStatus.js}"></script>
-<script th:src="@{/js/textMessaging/textMessagingStomp.js}"></script>
 </body>
 </html>

@@ -17,10 +17,11 @@ $(document).ready(async function () {
         } catch (e) {
             console.error("Error when fetching message history from channel-" + channel.id + ":", e);
         }
+
+        addMessagingStomp();
     }
 
     renderMessageEditor();
-
     // display user inf
     const user = JSON.parse(localStorage.getItem('user'));
     $('#welcome-message').text('Welcome, ' + user.name);
@@ -36,6 +37,7 @@ $(document).ready(async function () {
     toggleSidebarBtn();
     startVideoCall();
     toggleChannelMember();
+
 
     // open the details when entering
     $("details").attr("open", true);

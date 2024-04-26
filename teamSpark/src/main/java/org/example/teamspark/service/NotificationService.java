@@ -3,14 +3,14 @@ package org.example.teamspark.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.apachecommons.CommonsLog;
 import org.example.teamspark.data.UserNotificationDto;
-import org.example.teamspark.data.dto.MessageDto;
 import org.example.teamspark.data.dto.UserDto;
+import org.example.teamspark.data.dto.message.MessageDto;
+import org.example.teamspark.data.dto.message.MessageId;
 import org.example.teamspark.model.user.NotificationType;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.model.user.UserNotification;
 import org.example.teamspark.repository.UserNotificationRepository;
 import org.example.teamspark.repository.UserRepository;
-import org.example.teamspark.repository.WorkspaceMemberRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,16 +21,13 @@ import java.util.List;
 public class NotificationService {
 
     private final UserNotificationRepository userNotificationRepository;
-    private final WorkspaceMemberRepository workspaceMemberRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messageTemplate;
 
     public NotificationService(UserNotificationRepository userNotificationRepository,
-                               WorkspaceMemberRepository workspaceMemberRepository,
                                UserRepository userRepository,
                                SimpMessagingTemplate messageTemplate) {
         this.userNotificationRepository = userNotificationRepository;
-        this.workspaceMemberRepository = workspaceMemberRepository;
         this.userRepository = userRepository;
         this.messageTemplate = messageTemplate;
     }
@@ -49,7 +46,10 @@ public class NotificationService {
             notification.setUser(user);
             notification.setType(NotificationType.MESSAGE);
             notification.setChannelId(channelId);
-            notification.setMessageId(messageDto.getMessageId());
+
+            MessageId messageId = messageDto.getMessageId();
+            notification.setMessageIndexName(messageId.getIndexName());
+            notification.setMessageDocumentId(messageId.getDoucmentId());
 
             return userNotificationRepository.save(notification);
         }).toList();
@@ -61,10 +61,6 @@ public class NotificationService {
             dto.setUser(UserDto.from(notification.getUser()));
             dto.setType(notification.getType());
             dto.setMessageDto(messageDto);
-
-            User fromUser = workspaceMemberRepository.findUserByMemberId(messageDto.getFromId());
-            dto.setFromUser(UserDto.from(fromUser));
-
             dto.setIsSeen(notification.isSeen());
             return dto;
         }).toList();
