@@ -108,7 +108,7 @@ public class ElasticsearchService {
             JsonNode rootNode = objectMapper.readTree(response.getBody());
             MessageId messageId = new MessageId();
             messageId.setIndexName(rootNode.path("_index").asText());
-            messageId.setDoucmentId(rootNode.path("_id").asText());
+            messageId.setDocumentId(rootNode.path("_id").asText());
             return messageId;
         } else {
             throw new ElasticsearchFailedException("Failed to add message to index: " + indexName);

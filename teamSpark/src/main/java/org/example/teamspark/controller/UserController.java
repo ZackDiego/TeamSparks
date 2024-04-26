@@ -82,15 +82,4 @@ public class UserController {
                 .status(HttpStatus.OK)
                 .body(new DataResponse<>(dtos));
     }
-
-//    @GetMapping(value = "/notifications")
-//    public ResponseEntity<Object> getUserNotifications() {
-//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//
-//        List<UserNotificationDto> dtos = userService.getUserNotifications(user);
-//
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(new DataResponse<>(dtos));
-//    }
 }

@@ -49,7 +49,7 @@ public class NotificationService {
 
             MessageId messageId = messageDto.getMessageId();
             notification.setMessageIndexName(messageId.getIndexName());
-            notification.setMessageDocumentId(messageId.getDoucmentId());
+            notification.setMessageDocumentId(messageId.getDocumentId());
 
             return userNotificationRepository.save(notification);
         }).toList();

@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MessageId {
     private String indexName;
-    private String doucmentId;
+    private String documentId;
 }

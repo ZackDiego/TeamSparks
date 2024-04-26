@@ -25,7 +25,8 @@ public class WorkspaceRoleService {
     private final ModelMapper modelMapper;
 
     @Autowired
-    public WorkspaceRoleService(WorkspaceRepository workspaceRepository, WorkspaceMemberRepository workspaceMemberRepository, RoleRepository roleRepository, ModelMapper modelMapper) {
+    public WorkspaceRoleService(WorkspaceRepository workspaceRepository, WorkspaceMemberRepository workspaceMemberRepository,
+                                RoleRepository roleRepository, ModelMapper modelMapper) {
         this.workspaceRepository = workspaceRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
         this.roleRepository = roleRepository;
@@ -54,7 +55,7 @@ public class WorkspaceRoleService {
     }
 
     public List<RoleDto> getWorkspacesRoles(Long workspaceId, User user) throws ResourceAccessDeniedException {
-        
+
         // Find the workspace by id
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new EntityNotFoundException("Workspace not found with ID: " + workspaceId));

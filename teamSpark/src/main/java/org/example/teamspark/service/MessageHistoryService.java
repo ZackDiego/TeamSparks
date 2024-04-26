@@ -47,7 +47,7 @@ public class MessageHistoryService {
         // Find the message history in elasticsearch
         String responseBody = elasticsearchService.getDocumentsByIndexName(indexName);
 
-        List<MessageDto> messageDtos = ElasticsearchService.mapResponseBodyToMessageDocuments(responseBody);
+        List<MessageDto> messageDtos = ElasticsearchService.mapSearchResultToMessageDocuments(responseBody);
 
         MessageHistoryDto dto = new MessageHistoryDto();
         dto.setChannelId(channelId);

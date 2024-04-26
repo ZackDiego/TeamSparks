@@ -138,6 +138,7 @@ function renderChannelContent(channel, messageHistory, member_id) {
         // Append message container to the messages container
         messagesContainer.append(messageDiv);
     });
+    scrollMessageContainerToBottom();
 }
 
 
@@ -168,7 +169,7 @@ function toggleSideBarChannel() {
             console.error("Error when fetching message history from channel-" + channelId + ":", e);
         }
 
-        addMessagingStomp();
+        addMessagingStomp(channelId);
     });
 }
 
@@ -353,34 +354,6 @@ async function getWorkspaceInf(workspaceId) {
     });
 }
 
-
-fetchNotifications = async function () {
-    const url = `/api/v1/channelId/${channel_id}/message`;
-
-    const accessToken = localStorage.getItem('access_token');
-
-    if (!accessToken) {
-        console.error("Access token not found in local storage. Redirecting to login page.");
-        // window.location.href = '/login'; // Redirect to profile page
-        alert("please add access token!")
-        return;
-    }
-
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-
-    const responseBody = await response.json();
-    if (response.ok) {
-        return responseBody.data;
-    } else {
-        console.error("Error fetching messaging");
-        return null;
-    }
-}
 
 fetchChannelById = async function (channelId) {
     const access_token = localStorage.getItem('access_token');

@@ -10,7 +10,6 @@ import org.example.teamspark.exception.EmailAlreadyExistsException;
 import org.example.teamspark.exception.UserAuthenticationException;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.model.workspace.WorkspaceMember;
-import org.example.teamspark.repository.UserNotificationRepository;
 import org.example.teamspark.repository.UserRepository;
 import org.example.teamspark.repository.WorkspaceMemberRepository;
 import org.example.teamspark.util.JwtService;
@@ -29,16 +28,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final WorkspaceMemberRepository workspaceMemberRepository;
-    private final UserNotificationRepository userNotificationRepository;
 
     @Value("${jwt.expireTimeAsSec}")
     private long jwtExpireTimeAsSec;
 
-    public UserService(UserRepository userRepository, JwtService jwtService, WorkspaceMemberRepository workspaceMemberRepository, UserNotificationRepository userNotificationRepository) {
+    public UserService(UserRepository userRepository, JwtService jwtService, WorkspaceMemberRepository workspaceMemberRepository) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.workspaceMemberRepository = workspaceMemberRepository;
-        this.userNotificationRepository = userNotificationRepository;
     }
 
     public SignInAndUpDto signUpUser(SignUpForm signUpForm) throws EmailAlreadyExistsException {
@@ -109,11 +106,4 @@ public class UserService {
                     return dto;
                 }).toList();
     }
-
-//    public List<UserNotificationDto> getUserNotifications(User user) {
-//        List<UserNotification> notifications = userNotificationRepository.findByUser(user);
-//
-//        // map notifications to dto
-//
-//    }
 }
