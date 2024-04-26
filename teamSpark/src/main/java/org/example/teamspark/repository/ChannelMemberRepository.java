@@ -22,4 +22,7 @@ public interface ChannelMemberRepository extends JpaRepository<ChannelMember, Lo
 
     @Query("SELECT cm.member FROM ChannelMember cm WHERE cm.channel.id = :channelId AND cm.isCreator = true")
     WorkspaceMember findCreatorByChannelId(@Param("channelId") Long channelId);
+
+    @Query("SELECT COUNT(cm) > 0 FROM ChannelMember cm WHERE cm.member.user.id = :userId AND cm.channel.id = :channelId")
+    Boolean checkUserChannelMember(@Param("userId") Long userId, @Param("channelId") Long channelId);
 }

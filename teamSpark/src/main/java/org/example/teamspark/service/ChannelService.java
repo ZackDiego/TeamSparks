@@ -124,6 +124,20 @@ public class ChannelService {
         return mapResultSetToChannelDtos(rs);
     }
 
+    public ChannelDto getChannelById(User user, Long channelId) throws ResourceAccessDeniedException {
+
+        // Check if user belongs to the channel
+        Boolean isChannelMember = channelMemberRepository.checkUserChannelMember(user.getId(), channelId);
+
+        if (!isChannelMember) {
+            throw new ResourceAccessDeniedException("User is unauthorized to access channel " + channelId);
+        }
+
+        List<Object[]> rs = channelRepository.findChannelWithMembersByChannelId(channelId);
+
+        return mapResultSetToChannelDtos(rs).get(0);
+    }
+
     public ChannelDto updateChannel(User user, Long channelId, ChannelDto channelDto) throws ResourceAccessDeniedException {
 
         WorkspaceMember creator = channelMemberRepository.findCreatorByChannelId(channelId);

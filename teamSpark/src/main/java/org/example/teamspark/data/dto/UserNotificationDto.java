@@ -1,10 +1,9 @@
-package org.example.teamspark.data;
+package org.example.teamspark.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.teamspark.data.dto.UserDto;
 import org.example.teamspark.data.dto.message.MessageDto;
 import org.example.teamspark.model.user.NotificationType;
 
@@ -25,7 +24,7 @@ public class UserNotificationDto {
     private Long channelId;
 
     @JsonProperty("message")
-    private MessageDto messageDto;
+    private MessageDto message;
 
     @JsonProperty("is_seen")
     private Boolean isSeen;

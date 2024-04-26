@@ -3,11 +3,11 @@
         brokerURL: 'ws://localhost:8080/notificationWebsocket'
     });
 
-    const userInf = JSON.parse(localStorage.getItem('user_inf'));
+    const user = JSON.parse(localStorage.getItem('user'));
 
     stompClient.onConnect = (frame) => {
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/userNotification/' + userInf.user_id, (result) => {
+        stompClient.subscribe('/userNotification/' + user.id, (result) => {
             console.log("receive notification");
             renderNotification(JSON.parse(result.body));
         });
@@ -35,8 +35,8 @@
     }
 
     function renderNotification(data) {
-
-        if (data.from_user.id !== userInf.user_id) {
+        console.log(data);
+        if (data.message.from_id !== getMemberId()) {
             // Create a temporary element
             var tempElement = document.createElement('div');
 

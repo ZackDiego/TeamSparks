@@ -1,27 +1,14 @@
 $(document).ready(async function () {
 
-    const member_id = getMemberId();
-
-    const channels = await fetchChannelsByMemberId(member_id);
+    const channels = await fetchChannelsByMemberId(getMemberId());
 
     for (let channel of channels) {
         // Add channel in sideBar
         addChannelInSideBar(channel);
-
-        // Get message history of each channel
-        try {
-            // Fetch message history by channelId
-            const messageHistory = await fetchMessageHistoryData(channel.id);
-            // Render message history
-            renderChannelContent(channel, messageHistory, member_id);
-        } catch (e) {
-            console.error("Error when fetching message history from channel-" + channel.id + ":", e);
-        }
-
-        addMessagingStomp();
     }
 
     renderMessageEditor();
+
     // display user inf
     const user = JSON.parse(localStorage.getItem('user'));
     $('#welcome-message').text('Welcome, ' + user.name);
@@ -34,10 +21,8 @@ $(document).ready(async function () {
     scrollMessageContainerToBottom();
     // Button setting
     toggleSideBarChannel();
-    toggleSidebarBtn();
-    startVideoCall();
+    videoCallButton();
     toggleChannelMember();
-
 
     // open the details when entering
     $("details").attr("open", true);
@@ -74,42 +59,31 @@ async function fetchMessageHistoryData(channel_id) {
 
 function renderChannelContent(channel, messageHistory, member_id) {
 
-    console.log(messageHistory);
-
-    // Create a new text-messaging-content container
-    const textMessagingContent = $('<div class="text-messaging-content d-none"></div>');
+    // Select text-messaging-content container
+    const textMessagingContent = $('.text-messaging-content');
     textMessagingContent.attr('data-channel-id', messageHistory.channel_id);
     textMessagingContent.attr('data-is-private', messageHistory.is_private);
 
     // --- Channel title
-    const channelTitleContainer = $('<div class="content-header"></div>');
-    const channelTitle = $('<div class="channel-title chat-partner-title"></div>');
+    const channelTitleContainer = $('.content-header');
+    const channelTitle = $('.channel-title.chat-partner-title');
 
     if (messageHistory.is_private) {
         // Find the private chat partner
         const chat_partner = channel.members.find(member => member.id !== member_id);
-        channelTitle.html('<img class="chat-partner-avatar" src="' + "/img/profile2.png" + '">' + "Alice"); // TODO: replace fixd value
+        channelTitle.html('<img class="chat-partner-avatar" src="' + chat_partner.user.avatar + '">' + chat_partner.user.name); // TODO: replace fixd value
     } else {
         // Use channel name
         channelTitle.text('# ' + channel.name);
     }
 
-    channelTitleContainer.append(channelTitle);
-
-    const contentHeaderBtnContainer = $('<div class="content-header-btn-container"></div>');
-    // Add buttons to the header
-    contentHeaderBtnContainer.append('<button class="content-header-btn btn-phone-call"></button>');
-    contentHeaderBtnContainer.append('<button class="content-header-btn btn-video-call"></button>');
-
     // --- Channel member
     if (!messageHistory.is_private) {
-        // add channel member button
-        contentHeaderBtnContainer.append('<button class="content-header-btn btn-channel-member"></button>');
+        $('.btn-channel-member').show();
 
-        // Create the channel member container
-        const channelMemberContainer = $('<div class="channel-member-container collapse">' +
-            '<button type="button" class="btn-close" aria-label="Close"></button></div>');
-
+        const channelMemberContainer = $('.channel-member-container');
+        // Remove all channel members in container
+        $('.channel-member').remove();
         // Populate the channel member container
         for (const member of channel.members) {
             // member
@@ -139,15 +113,14 @@ function renderChannelContent(channel, messageHistory, member_id) {
             // Append the member
             channelMemberContainer.append(memberDiv);
         }
-        textMessagingContent.append(channelMemberContainer);
+    } else {
+        $('.btn-channel-member').hide();
     }
 
-    channelTitleContainer.append(contentHeaderBtnContainer);
-    textMessagingContent.append(channelTitleContainer);
-
     // --- Message history container
-    const messagesContainer = $('<div class="message-history-container"></div>');
-
+    const messagesContainer = $('.message-history-container');
+    // Remove all message container
+    $('.message-container').remove();
     // Sort messages by date
     const messages = messageHistory.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
@@ -165,12 +138,6 @@ function renderChannelContent(channel, messageHistory, member_id) {
         // Append message container to the messages container
         messagesContainer.append(messageDiv);
     });
-
-    // Append the header, message history container, and message editor to the text messaging content container
-    textMessagingContent.append(messagesContainer);
-    textMessagingContent.append('<div class="message-editor"></div>');
-
-    $('.right-content').append(textMessagingContent);
 }
 
 
@@ -180,28 +147,32 @@ function scrollMessageContainerToBottom() {
 }
 
 function toggleSideBarChannel() {
-    $('.details-item').click(function () {
+    $('.details-item').click(async function () {
         // button display
         $('.details-item').removeClass('active');
         $(this).addClass('active');
 
         // channel page render
-        const channel_id = $(this).data('channel-id');
-        $('.text-messaging-content').addClass('d-none');
-        $(`.text-messaging-content[data-channel-id="${channel_id}"]`).removeClass('d-none');
+        const channelId = $(this).data('channel-id');
+        console.log("channel-" + channelId + " rendering")
+        // render channel content
+        try {
+            // Fetch message history by channelId
+            const messageHistory = await fetchMessageHistoryData(channelId);
+            // Fetch channel by channelId
+            const channel = await fetchChannelById(channelId);
+
+            // Render message history
+            renderChannelContent(channel, messageHistory, getMemberId());
+        } catch (e) {
+            console.error("Error when fetching message history from channel-" + channelId + ":", e);
+        }
+
+        addMessagingStomp();
     });
 }
 
-function toggleSidebarBtn() {
-    $('.sidebar-btn').click(function () {
-        // Remove active class from all details-item elements
-        $('.sidebar-btn').removeClass('active');
-        // Add active class to the details-item elements inside the clicked details element
-        $(this).addClass('active');
-    });
-}
-
-function startVideoCall() {
+function videoCallButton() {
     $('.btn-video-call').click(function () {
         window.location.replace("/channel/" + channelInf.id + "/videoCall");
     });
@@ -293,6 +264,10 @@ function addChannelInSideBar(channel) {
 function toggleChannelMember() {
     // Add an event listener to the channel member button to toggle the visibility of the container
     $('.btn-channel-member').click(function () {
+        $('.channel-member-container').toggleClass('collapse expand');
+    });
+
+    $('#collapse-channel-member').click(function () {
         $('.channel-member-container').toggleClass('collapse expand');
     });
 }
@@ -404,5 +379,26 @@ fetchNotifications = async function () {
     } else {
         console.error("Error fetching messaging");
         return null;
+    }
+}
+
+fetchChannelById = async function (channelId) {
+    const access_token = localStorage.getItem('access_token');
+
+    const response = await fetch(`/api/v1/channel/${channelId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + access_token
+        }
+    });
+
+    const responseData = await response.json();
+
+    // Check if login was successful
+    if (response.ok) {
+        return responseData.data;
+    } else {
+        console.error(responseData.message);
     }
 }

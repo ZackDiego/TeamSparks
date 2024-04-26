@@ -109,10 +109,10 @@ public class WorkspaceService {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new EntityNotFoundException("Workspace not found with ID: " + workspaceId));
 
-        // Check if user owns the workspace
-        WorkspaceMember creator = workspaceMemberRepository.findCreatorByWorkspaceId(workspaceId);
+        // Check if user is workspace member
+        WorkspaceMember member = workspaceMemberRepository.findByWorkspaceIdAndUserId(workspaceId, user.getId());
 
-        if (!creator.getUser().getId().equals(user.getId())) {
+        if (member == null) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 

@@ -37,13 +37,15 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
 
     @Query(value = "SELECT " +
             "    c.id AS channelId, " +
+            "    c.workspace_id AS workspaceId, " +
             "    c.name AS channelName, " +
-            "    c.created_at AS createdAt " +
+            "    c.created_at AS createdAt, " +
             "    c.is_private AS channelIsPrivate, " +
             "    wm.id AS memberId, " +
             "    u.id AS memberUserId, " +
             "    u.name AS memberName, " +
             "    u.avatar AS memberAvatar, " +
+            "    wm.is_creator AS isCreator " +
             "FROM " +
             "    channel c " +
             "    LEFT JOIN channel_member cm ON c.id = cm.channel_id " +

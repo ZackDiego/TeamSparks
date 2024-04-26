@@ -2,8 +2,8 @@ package org.example.teamspark.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.apachecommons.CommonsLog;
-import org.example.teamspark.data.UserNotificationDto;
 import org.example.teamspark.data.dto.UserDto;
+import org.example.teamspark.data.dto.UserNotificationDto;
 import org.example.teamspark.data.dto.message.MessageDto;
 import org.example.teamspark.data.dto.message.MessageId;
 import org.example.teamspark.model.user.NotificationType;
@@ -60,7 +60,7 @@ public class NotificationService {
             dto.setId(notification.getId());
             dto.setUser(UserDto.from(notification.getUser()));
             dto.setType(notification.getType());
-            dto.setMessageDto(messageDto);
+            dto.setMessage(messageDto);
             dto.setIsSeen(notification.isSeen());
             return dto;
         }).toList();
