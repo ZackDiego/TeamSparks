@@ -39,7 +39,7 @@ public class ElasticsearchService {
         this.restTemplate = new RestTemplate();
     }
 
-    public static List<MessageDto> mapResponseBodyToMessageDocuments(String responseBody) throws JsonProcessingException {
+    public static List<MessageDto> mapSearchResultToMessageDocuments(String responseBody) throws JsonProcessingException {
         // map response body to
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -189,7 +189,7 @@ public class ElasticsearchService {
         if (condition.getSearchKeyword() != null && !condition.getSearchKeyword().isEmpty()) {
             requestBody += "                    \"must\": {\n" +
                     "                        \"match\": {\n" +
-                    "                            \"content\": \"" + condition.getSearchKeyword() + "\"\n" +
+                    "                            \"plain_text_content\": \"" + condition.getSearchKeyword() + "\"\n" +
                     "                        }\n" +
                     "                    },";
         }
@@ -231,25 +231,5 @@ public class ElasticsearchService {
 
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
         return restTemplate.exchange(searchUrl, HttpMethod.POST, requestEntity, String.class);
-    }
-
-
-    public String getDocumentsByIdList(List indexName) throws JsonProcessingException {
-
-        // Create HttpHeaders with authentication
-        HttpHeaders headers = createHeaders(ESUserName, ESPassword);
-
-        // Get the index
-        String searchUrl = ESUrl + "/" + indexName + "/_search?size=10000";
-
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-
-        try {
-            ResponseEntity<String> response = restTemplate.exchange(searchUrl, HttpMethod.GET, requestEntity, String.class);
-            return response.getBody();
-        } catch (Exception e) {
-            log.error("Index already exists in Elasticsearch: " + indexName);
-            throw new RuntimeException("Failed to get data from index: " + indexName);
-        }
     }
 }

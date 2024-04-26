@@ -25,6 +25,9 @@ public class MessageDto {
 
     private String content;
 
+    @JsonProperty("plain_text_content")
+    private String plainTextContent;
+
     @JsonProperty("created_at")
     private Date createdAt = new Date();
 

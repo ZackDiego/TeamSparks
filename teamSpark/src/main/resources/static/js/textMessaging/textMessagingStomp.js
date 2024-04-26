@@ -48,6 +48,8 @@ addMessagingStomp = function (channelId) {
     function sendMessage($messageEditor) {
 
         const content = $messageEditor.summernote('code');
+        const plainTextContent = $(content).text()
+
         const containsLink = /(?:http|https):\/\/\S+/i.test(content);
 
         const channelId = $messageEditor.closest('.text-messaging-content').data('channel-id')
@@ -62,6 +64,7 @@ addMessagingStomp = function (channelId) {
                     from_id: getMemberId(),
                     from_name: user.name,
                     content: content,
+                    plain_text_content: plainTextContent,
                     contain_link: containsLink,
                     file_url: null,
                     image_url: null
