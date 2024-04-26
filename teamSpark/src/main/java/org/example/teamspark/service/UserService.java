@@ -1,6 +1,7 @@
 package org.example.teamspark.service;
 
 import lombok.extern.apachecommons.CommonsLog;
+import org.example.teamspark.data.UserNotificationDto;
 import org.example.teamspark.data.dto.SignInAndUpDto;
 import org.example.teamspark.data.dto.UserDto;
 import org.example.teamspark.data.dto.UserWorkspaceMemberDto;
@@ -9,11 +10,12 @@ import org.example.teamspark.data.form.SignUpForm;
 import org.example.teamspark.exception.EmailAlreadyExistsException;
 import org.example.teamspark.exception.UserAuthenticationException;
 import org.example.teamspark.model.user.User;
+import org.example.teamspark.model.user.UserNotification;
 import org.example.teamspark.model.workspace.WorkspaceMember;
+import org.example.teamspark.repository.UserNotificationRepository;
 import org.example.teamspark.repository.UserRepository;
 import org.example.teamspark.repository.WorkspaceMemberRepository;
 import org.example.teamspark.util.JwtService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,18 +28,20 @@ import java.util.List;
 public class UserService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private WorkspaceMemberRepository workspaceMemberRepository;
+    private final UserRepository userRepository;
+    private final JwtService jwtService;
+    private final WorkspaceMemberRepository workspaceMemberRepository;
+    private final UserNotificationRepository userNotificationRepository;
 
     @Value("${jwt.expireTimeAsSec}")
     private long jwtExpireTimeAsSec;
+
+    public UserService(UserRepository userRepository, JwtService jwtService, WorkspaceMemberRepository workspaceMemberRepository, UserNotificationRepository userNotificationRepository) {
+        this.userRepository = userRepository;
+        this.jwtService = jwtService;
+        this.workspaceMemberRepository = workspaceMemberRepository;
+        this.userNotificationRepository = userNotificationRepository;
+    }
 
     public SignInAndUpDto signUpUser(SignUpForm signUpForm) throws EmailAlreadyExistsException {
         User existUser = userRepository.findUserByEmail(signUpForm.getEmail());
@@ -106,5 +110,11 @@ public class UserService {
                     dto.setJoinedAt(workspaceMember.getJoinedAt());
                     return dto;
                 }).toList();
+    }
+
+    public List<UserNotificationDto> getUserNotifications(User user) {
+        List<UserNotification> notifications = userNotificationRepository.findByUser(user);
+
+
     }
 }

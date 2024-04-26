@@ -15,7 +15,7 @@ $(document).ready(async function () {
             // Render message history
             renderChannelContent(channel, messageHistory, member_id);
         } catch (e) {
-            console.error("Error when fetching message history from" + channel.id + ":", e);
+            console.error("Error when fetching message history from channel-" + channel.id + ":", e);
         }
     }
 
@@ -25,6 +25,10 @@ $(document).ready(async function () {
     const user = JSON.parse(localStorage.getItem('user'));
     $('#welcome-message').text('Welcome, ' + user.name);
     $('.username').text(user.name);
+
+    const workspace_id = getWorkspaceIdInUrl();
+    // workspace Inf
+    await getWorkspaceInf(workspace_id);
 
     scrollMessageContainerToBottom();
     // Button setting
@@ -101,16 +105,34 @@ function renderChannelContent(channel, messageHistory, member_id) {
         contentHeaderBtnContainer.append('<button class="content-header-btn btn-channel-member"></button>');
 
         // Create the channel member container
-        const channelMemberContainer = $('<div class="channel-member-container d-none"></div>');
+        const channelMemberContainer = $('<div class="channel-member-container collapse">' +
+            '<button type="button" class="btn-close" aria-label="Close"></button></div>');
 
         // Populate the channel member container
-        for (const member of messageHistory.members) {
+        for (const member of channel.members) {
             // member
             const memberDiv = $('<div class="channel-member"></div>').attr('data-id', member.id);
             // member avatar
-            const avatarImg = $('<img>').attr('src', member.user.avatar);
+            const avatarImg = $('<img>').addClass('channel-member-avatar').attr('src', member.user.avatar);
             // member name
             const nameSpan = $('<span></span>').text(member.user.name);
+            // member status
+            switch (member.user.status) {
+                case "ONLINE":
+                    avatarImg.addClass('online');
+                    break;
+                case "OFFLINE":
+                    avatarImg.addClass('offline');
+                    break;
+                case "DND":
+                    avatarImg.addClass('dnd');
+                    break;
+                case "INVISIBLE":
+                    avatarImg.addClass('invisible');
+                    break;
+                default:
+                    break;
+            }
             memberDiv.append(avatarImg, nameSpan);
             // Append the member
             channelMemberContainer.append(memberDiv);
@@ -268,7 +290,117 @@ function addChannelInSideBar(channel) {
 
 function toggleChannelMember() {
     // Add an event listener to the channel member button to toggle the visibility of the container
-    $('.btn-channel_member').click(function () {
-        $('.channel-member-container').toggleClass('d-none');
+    $('.btn-channel-member').click(function () {
+        $('.channel-member-container').toggleClass('collapse expand');
     });
+}
+
+async function getWorkspaceInf(workspaceId) {
+
+    async function fetchWorkspace() {
+        const url = `/api/v1/workspace/${workspaceId}`;
+
+        const accessToken = localStorage.getItem('access_token');
+
+        if (!accessToken) {
+            console.error("Access token not found in local storage. Redirecting to login page.");
+            // window.location.href = '/login'; // Redirect to login page
+            alert("please add access token!")
+            return;
+        }
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        const responseBody = await response.json();
+        if (response.ok) {
+            return responseBody.data;
+        } else {
+            console.error("Error fetching messaging");
+            return null;
+        }
+    }
+
+    const workspace = await fetchWorkspace();
+
+    // name
+    $('#workspace-name').text(workspace.name).attr('data-workspace-id', workspace.id);
+
+    // TODO: avatar
+
+    // members
+    workspace.members.forEach(function (member) {
+        // Create a div element for the member
+        var memberDiv = $('<div>', {
+            'class': 'member',
+            'data-member-id': member.id
+        });
+
+        // Add avatar to the div
+        var avatarImg = $('<img>', {
+            'class': 'avatar',
+            'src': member.user.avatar,
+            'alt': member.user.name + ' Avatar'
+        });
+        memberDiv.append(avatarImg);
+
+        // Add member name to the div
+        var nameSpan = $('<span>', {
+            'class': 'name',
+            'text': member.user.name
+        });
+        memberDiv.append(nameSpan);
+
+        // Add label if member is the creator
+        if (member.is_creator) {
+            var labelSpan = $('<span>', {
+                'class': 'label',
+                'text': 'Creator'
+            });
+            memberDiv.append(labelSpan);
+        }
+
+        // Append the member div to the modal body
+        $('.modal-body').append(memberDiv);
+    });
+
+    $('[data-toggle="popover"]').popover({
+        html: true,
+        content: function () {
+            return $('#notification-content').html();
+        }
+    });
+}
+
+
+fetchNotifications = async function () {
+    const url = `/api/v1/channelId/${channel_id}/message`;
+
+    const accessToken = localStorage.getItem('access_token');
+
+    if (!accessToken) {
+        console.error("Access token not found in local storage. Redirecting to login page.");
+        // window.location.href = '/login'; // Redirect to profile page
+        alert("please add access token!")
+        return;
+    }
+
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
+
+    const responseBody = await response.json();
+    if (response.ok) {
+        return responseBody.data;
+    } else {
+        console.error("Error fetching messaging");
+        return null;
+    }
 }

@@ -1,5 +1,6 @@
 package org.example.teamspark.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.teamspark.data.dto.ChannelDto;
 import org.example.teamspark.data.dto.UserDto;
@@ -24,12 +25,15 @@ public class ChannelService {
     private final ChannelMemberRepository channelMemberRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
 
+    private final ElasticsearchService elasticsearchService;
+
     public ChannelService(ChannelRepository channelRepository,
                           ChannelMemberRepository channelMemberRepository,
-                          WorkspaceMemberRepository workspaceMemberRepository) {
+                          WorkspaceMemberRepository workspaceMemberRepository, ElasticsearchService elasticsearchService) {
         this.channelRepository = channelRepository;
         this.channelMemberRepository = channelMemberRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
+        this.elasticsearchService = elasticsearchService;
     }
 
     private static List<ChannelDto> mapResultSetToChannelDtos(List<Object[]> rs) {
@@ -73,7 +77,7 @@ public class ChannelService {
     }
 
     @Transactional
-    public Long createChannel(User user, ChannelDto channelDto) throws ResourceAccessDeniedException {
+    public Long createChannel(User user, ChannelDto channelDto) throws ResourceAccessDeniedException, JsonProcessingException {
         // check user
         WorkspaceMember member = workspaceMemberRepository.findByWorkspaceIdAndUserId(channelDto.getWorkspaceId(), user.getId());
 
@@ -91,6 +95,9 @@ public class ChannelService {
         newMember.setChannel(createdChannel);
         newMember.setCreator(true);
         channelMemberRepository.save(newMember);
+
+        // create message history
+        elasticsearchService.createIndex("channel-" + createdChannel.getId());
 
         // form the savedChannelDto
         return createdChannel.getId();
@@ -126,7 +133,7 @@ public class ChannelService {
                 .orElseThrow(() -> new EntityNotFoundException("Channel not found with ID: " + channelId));
 
         // Check if the member is the channel's creator
-        if (!creator.getId().equals(user.getId())) {
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 
@@ -152,7 +159,7 @@ public class ChannelService {
                 .orElseThrow(() -> new EntityNotFoundException("Channel not found with ID: " + channelId));
 
         // Check if the member is the channel's creator
-        if (!creator.getId().equals(user.getId())) {
+        if (!creator.getUser().getId().equals(user.getId())) {
             throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
         }
 

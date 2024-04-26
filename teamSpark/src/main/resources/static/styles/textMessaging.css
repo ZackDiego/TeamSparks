@@ -153,9 +153,7 @@
 }
 
 .header-search-container {
-    position: absolute;
-    left: 0;
-    right: 0;
+    position: relative;
     margin-left: auto;
     margin-right: auto;
     min-width: 100px;
@@ -169,6 +167,7 @@
     border-radius: 5px;
     font-size: 16px;
     height: 30px;
+
 }
 
 .header-search-input:focus {
@@ -251,6 +250,7 @@
 
 /* text messaging */
 .text-messaging-content {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -410,4 +410,76 @@ pre {
 #welcome-message {
     color: white;
     margin-right: 20px;
+}
+
+/* channel member */
+.channel-member-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    top: 0;
+    right: 0;
+    height: 100%;
+    background-color: #F8E3FF;
+    overflow-x: hidden;
+    transition: width 0.5s;
+    padding: 10px;
+}
+
+.channel-member-container.collapse {
+    width: 0;
+}
+
+.channel-member-container.expand {
+    width: 250px;
+}
+
+
+.channel-member {
+    padding: 5px 5px 5px 15px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.channel-member-container.active {
+    background-color: lightgray;
+}
+
+.channel-member-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 15px;
+    object-fit: cover;
+}
+
+.btn-notification {
+    width: 25px;
+    height: 25px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    background-image: url('/icons/bell.png');
+}
+
+/* popover */
+.popover-title {
+    text-align: center;
+}
+
+.custom-popover li {
+    border: none !important;
+    text-align: center;
+}
+
+.custom-popover li:nth-child(2) {
+    border-top: 1px solid #ccc !important;
+}
+
+.custom-popover li:last-child {
+    border-top: 1px solid #ccc !important;
 }

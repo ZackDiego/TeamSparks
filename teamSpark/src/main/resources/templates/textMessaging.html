@@ -46,6 +46,18 @@
         <button class="header-search-button"><img alt="Search" src="/icons/search.png"></button>
     </div>
     <div id="welcome-message"></div>
+    <button class="btn-notification position-relative" data-placement="bottom" data-toggle="popover">
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            99+
+        </span>
+    </button>
+    <div id="notification-content" style="display: none">
+        <ul class="list-group custom-popover notification-list">
+            <li class="list-group-item">Notification 1</li>
+            <li class="list-group-item">Notification 2</li>
+            <li class="list-group-item">Notification 3</li>
+        </ul>
+    </div>
 </div>
 <div class="main-content">
     <div id="workspaces-tab">
@@ -54,16 +66,20 @@
     </div>
     <div id="sidebar-container">
         <div id="upper-sidebar">
-
-            <button aria-expanded="false" class="btn dropdown-toggle" data-bs-toggle="dropdown" id="workspace-name"
-                    type="button">
-                阿寬公司
-            </button>
-            <ul aria-labelledby="workspace-name" class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Create channel/private chat</a></li>
-                <li><a class="dropdown-item" href="#">Manage channel/private chat</a></li>
-                <li><a class="dropdown-item" href="#">Delete channel/private chat</a></li>
-            </ul>
+            <div class="dropdown">
+                <button aria-expanded="false" aria-haspopup="true" class="btn btn-secondary dropdown-toggle"
+                        data-toggle="dropdown" id="workspace-name" type="button">
+                    阿寬公司
+                </button>
+                <div aria-labelledby="dropdownMenuButton" class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Create channel/private chat</a>
+                    <a class="dropdown-item" href="#">Manage channel/private chat</a>
+                    <a class="dropdown-item" href="#">Delete channel/private chat</a>
+                    <a class="dropdown-item" data-target="#exampleModalCenter" data-toggle="modal">
+                        Workspace Members
+                    </a>
+                </div>
+            </div>
             <!--            <div id="btn-container">-->
             <!--                <button class="sidebar-btn active" id="btn-text-message"></button>-->
             <!--                <button class="sidebar-btn" id="btn-label"></button>-->
@@ -129,6 +145,28 @@
 
     </div>
     <div class="toast-container"></div>
+
+    <!-- Modal -->
+    <div aria-hidden="true" aria-labelledby="exampleModalCenterTitle" class="modal fade" id="exampleModalCenter"
+         role="dialog" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Workspace member</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-primary" type="button">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- fixed userInfo for testing and demo -->
 <script th:src="@{/js/userBasic.js}"></script>

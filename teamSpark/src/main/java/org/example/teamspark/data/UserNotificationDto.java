@@ -15,9 +15,6 @@ public class UserNotificationDto {
     @JsonProperty("id")
     private Long id;
 
-    @JsonProperty("user")
-    private UserDto user;
-
     @JsonProperty("type")
     private NotificationType type;
 

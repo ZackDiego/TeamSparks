@@ -1,5 +1,6 @@
 package org.example.teamspark.controller.channel;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.example.teamspark.data.DataResponse;
 import org.example.teamspark.data.dto.ChannelDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
@@ -41,7 +42,7 @@ public class ChannelController {
     // create channel
     @PostMapping(value = "/channel", consumes = {"application/json"})
     public ResponseEntity<?> handleCreateChannel(
-            @RequestBody ChannelDto channelDto) throws ResourceAccessDeniedException {
+            @RequestBody ChannelDto channelDto) throws ResourceAccessDeniedException, JsonProcessingException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 

@@ -35,6 +35,7 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
             "u.id, " +
             "u.name, " +
             "u.avatar, " +
+            "u.status, " +
             "wm.is_creator " +
             "FROM workspace w " +
             "LEFT JOIN workspace_member wm ON w.id = wm.workspace_id " +

@@ -6,6 +6,7 @@ import org.example.teamspark.data.dto.WorkspaceDto;
 import org.example.teamspark.data.dto.WorkspaceMemberDto;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.user.User;
+import org.example.teamspark.model.user.UserStatus;
 import org.example.teamspark.model.workspace.Workspace;
 import org.example.teamspark.model.workspace.WorkspaceMember;
 import org.example.teamspark.repository.UserRepository;
@@ -62,9 +63,10 @@ public class WorkspaceService {
                                 userDto.setId((Long) row[5]);
                                 userDto.setName((String) row[6]);
                                 userDto.setAvatar((String) row[7]);
+                                userDto.setStatus((UserStatus) row[8]);
                                 memberDto.setUserDto(userDto);
 
-                                memberDto.setCreator((boolean) row[8]);
+                                memberDto.setCreator((boolean) row[9]);
                                 return memberDto;
                             }).collect(Collectors.toList());
 

@@ -3,7 +3,6 @@ package org.example.teamspark.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.example.teamspark.data.dto.MessageDto;
@@ -68,22 +67,12 @@ public class ElasticsearchService {
                 .toList();
     }
 
-    public void createIndexIfNotExists(String indexName) throws JsonProcessingException {
+    public void createIndex(String indexName) throws JsonProcessingException {
         String indexEndpoint = ESUrl + "/" + indexName;
 
         // Create HttpHeaders with authentication
         HttpHeaders headers = createHeaders(ESUserName, ESPassword);
 
-        // Perform a HEAD request to check if the index exists
-        ResponseEntity<String> headResponse = restTemplate.exchange(indexEndpoint, HttpMethod.HEAD, new HttpEntity<>(headers), String.class);
-
-        // Check if the index exists
-        if (headResponse.getStatusCode() == HttpStatus.OK) {
-            log.info("Index already exists in Elasticsearch: " + indexName);
-            return;
-        }
-
-        // If the index does not exist, create it
         log.info("Index does not exist. Creating index in Elasticsearch: " + indexName);
         String requestBody = "{}";
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
@@ -123,30 +112,21 @@ public class ElasticsearchService {
     }
 
     public String getDocumentsByIndexName(String indexName) throws JsonProcessingException {
-        String checkExistsUrl = ESUrl + "/" + indexName;
 
         // Create HttpHeaders with authentication
         HttpHeaders headers = createHeaders(ESUserName, ESPassword);
 
-        // Perform a HEAD request to check if the index exists
-        ResponseEntity<String> headResponse = restTemplate.exchange(checkExistsUrl, HttpMethod.HEAD, new HttpEntity<>(headers), String.class);
-
-        // Check if the index exists
-        if (headResponse.getStatusCode() != HttpStatus.OK) {
-            log.info("Index already exists in Elasticsearch: " + indexName);
-            throw new EntityNotFoundException("Index " + indexName + " not found");
-        }
-
         // Get the index
         String searchUrl = ESUrl + "/" + indexName + "/_search?size=10000";
 
-        String requestBody = "{\"query\": {\"match_all\": {}}}"; // all documents
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<String> response = restTemplate.exchange(searchUrl, HttpMethod.GET, requestEntity, String.class);
+//        String requestBody = "{\"query\": {\"match_all\": {}}}"; // all documents
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
-        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(searchUrl, HttpMethod.GET, requestEntity, String.class);
             return response.getBody();
-        } else {
+        } catch (Exception e) {
+            log.error("Index already exists in Elasticsearch: " + indexName);
             throw new RuntimeException("Failed to get data from index: " + indexName);
         }
     }
