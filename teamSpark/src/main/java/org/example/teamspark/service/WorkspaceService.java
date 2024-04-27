@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.example.teamspark.data.dto.UserDto;
 import org.example.teamspark.data.dto.WorkspaceDto;
 import org.example.teamspark.data.dto.WorkspaceMemberDto;
+import org.example.teamspark.data.form.WorkspaceForm;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.model.user.UserStatus;
@@ -12,15 +13,14 @@ import org.example.teamspark.model.workspace.WorkspaceMember;
 import org.example.teamspark.repository.UserRepository;
 import org.example.teamspark.repository.WorkspaceMemberRepository;
 import org.example.teamspark.repository.WorkspaceRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,14 +29,20 @@ public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final UserRepository userRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
-    private final ModelMapper modelMapper;
+    private final FileUploadService fileUploadService;
+
+    @Value("${s3.cdn.prefix}")
+    private String s3CdnPrefix;
 
     @Autowired
-    public WorkspaceService(WorkspaceRepository workspaceRepository, UserRepository userRepository, WorkspaceMemberRepository workspaceMemberRepository, ModelMapper modelMapper) {
+    public WorkspaceService(WorkspaceRepository workspaceRepository,
+                            UserRepository userRepository,
+                            WorkspaceMemberRepository workspaceMemberRepository,
+                            FileUploadService fileUploadService) {
         this.workspaceRepository = workspaceRepository;
         this.userRepository = userRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
-        this.modelMapper = modelMapper;
+        this.fileUploadService = fileUploadService;
     }
 
     private static List<WorkspaceDto> mapResultSetToWorkspaceDtos(List<Object[]> rs) {
@@ -77,11 +83,27 @@ public class WorkspaceService {
     }
 
     @Transactional
-    public Long createWorkspace(User creator, WorkspaceDto dto) {
+    public Long createWorkspace(User creator, WorkspaceForm form) throws IOException {
 
-        Workspace workspace = modelMapper.map(dto, Workspace.class);
+        Workspace workspace = new Workspace();
 
+        workspace.setName(form.getName());
         workspace.setCreatedAt(new Date());
+
+        MultipartFile avatarImageFile = form.getAvatarImageFile();
+        if (!avatarImageFile.isEmpty()) {
+            // save avatar image
+            String extension = "." + FileUploadService.getFileExtension(avatarImageFile.getOriginalFilename());
+
+            // random Id
+            long randomId = Math.abs(UUID.randomUUID().getLeastSignificantBits());
+
+            String imageUploadPath = "workspaceAvatar-" + randomId + extension;
+            // save image
+            fileUploadService.saveMultipartFile(avatarImageFile, imageUploadPath);
+
+            workspace.setAvatar(s3CdnPrefix + imageUploadPath);
+        }
 
         Workspace savedWorkspace = workspaceRepository.save(workspace);
 

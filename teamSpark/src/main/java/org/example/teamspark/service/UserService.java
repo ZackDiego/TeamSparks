@@ -17,8 +17,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @CommonsLog
@@ -28,14 +32,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final WorkspaceMemberRepository workspaceMemberRepository;
+    private final FileUploadService fileUploadService;
 
     @Value("${jwt.expireTimeAsSec}")
     private long jwtExpireTimeAsSec;
 
-    public UserService(UserRepository userRepository, JwtService jwtService, WorkspaceMemberRepository workspaceMemberRepository) {
+    @Value("${s3.cdn.prefix}")
+    private String s3CdnPrefix;
+
+    public UserService(UserRepository userRepository, JwtService jwtService, WorkspaceMemberRepository workspaceMemberRepository, FileUploadService fileUploadService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.workspaceMemberRepository = workspaceMemberRepository;
+        this.fileUploadService = fileUploadService;
     }
 
     public SignInAndUpDto signUpUser(SignUpForm signUpForm) throws EmailAlreadyExistsException {
@@ -105,5 +114,22 @@ public class UserService {
                     dto.setJoinedAt(workspaceMember.getJoinedAt());
                     return dto;
                 }).toList();
+    }
+
+    @Transactional
+    public User setUserAvatar(User user, MultipartFile avatarImageFile) throws IOException {
+
+        String extension = "." + FileUploadService.getFileExtension(avatarImageFile.getOriginalFilename());
+
+        // random Id
+        long randomId = Math.abs(UUID.randomUUID().getLeastSignificantBits());
+        String imageUploadPath = "userAvatar-" + randomId + extension;
+
+        // save image
+        fileUploadService.saveMultipartFile(avatarImageFile, imageUploadPath);
+
+        user.setAvatar(s3CdnPrefix + imageUploadPath);
+
+        return userRepository.save(user);
     }
 }

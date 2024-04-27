@@ -18,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,5 +83,16 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new DataResponse<>(dtos));
+    }
+
+    @PutMapping(value = "/avatar")
+    public ResponseEntity<Object> uploadUserAvatar(MultipartFile avatarImageFile) throws IOException {
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        User savedUser = userService.setUserAvatar(user, avatarImageFile);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new DataResponse<>(savedUser));
     }
 }

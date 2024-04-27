@@ -22,5 +22,5 @@ public class Workspace {
     private Date createdAt;
 
     @Column(name = "avatar")
-    private String avatar = "default_workspace_avatar.jpg";
+    private String avatar;
 }
