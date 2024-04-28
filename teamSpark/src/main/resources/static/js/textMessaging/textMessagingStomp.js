@@ -1,4 +1,4 @@
-addMessagingStomp = function (channelId) {
+addMessagingStomp = function (channelIds) {
     const stompClient = new StompJs.Client({
         brokerURL: 'ws://localhost:8080/textMessagingWebsocket'
     });
@@ -6,11 +6,13 @@ addMessagingStomp = function (channelId) {
     stompClient.onConnect = (frame) => {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/textMessagingChannel/' + channelId, (result) => {
-            console.log("receive message");
-            renderMessage(JSON.parse(result.body));
-            scrollMessageContainerToBottom();
-        });
+        for (let channelId of channelIds) {
+            stompClient.subscribe('/textMessagingChannel/' + channelId, (result) => {
+                console.log("receive message");
+                renderMessage(JSON.parse(result.body), channelId);
+                scrollMessageContainerToBottom();
+            });
+        }
     };
 
     stompClient.onWebSocketError = (error) => {
@@ -76,22 +78,42 @@ addMessagingStomp = function (channelId) {
         $messageEditor.summernote('code', '');
     }
 
-    function renderMessage(data) {
-        // Add the messages into the messages container
-        const messagesContainer = $('.message-history-container');
+    function renderMessage(data, channelId) {
+        const currentChannelId = $('.text-messaging-content').data('channel-id')
+        // check if user is on the page where receive message
+        if (channelId === currentChannelId) {
+            // Add the messages into the messages container
+            const messagesContainer = $('.message-history-container');
 
-        const avatarSrc = '/img/profile.png';
-        const avatar = $('<img>').addClass('avatar').attr('src', avatarSrc);
-        const fromName = $('<div>').addClass('from-name').text(data.from_name);
-        const content = $('<div>').addClass('message-content').html(data.content)
-        const timestamp = $('<div>').addClass('timestamp').text(new Date(data.created_at).toLocaleString());
+            const avatarSrc = '/img/profile.png';
+            const avatar = $('<img>').addClass('avatar').attr('src', avatarSrc);
+            const fromName = $('<div>').addClass('from-name').text(data.from_name);
+            const content = $('<div>').addClass('message-content').html(data.content)
+            const timestamp = $('<div>').addClass('timestamp').text(new Date(data.created_at).toLocaleString());
 
-        // Create message container
-        const messageDiv = $('<div>').addClass('message-container')
-            .append(avatar, fromName, content, timestamp);
+            // Create message container
+            const messageDiv = $('<div>').addClass('message-container')
+                .append(avatar, fromName, content, timestamp);
 
-        // Append message container to the messages container
-        messagesContainer.append(messageDiv);
+            // Append message container to the messages container
+            messagesContainer.append(messageDiv);
+        } else {
+            // if not add notification on corresponding channel sidebar avatar
+            const channelReceive = $('.details-item').filter(function () {
+                return $(this).data('channel-id') === channelId;
+            });
+
+            // Check if the badge already exists
+            let badge = channelReceive.find('.notification-badge');
+            if (badge.length) {
+                // Badge already exists, update the number inside
+                let badgeNumber = parseInt(badge.text()) + 1;
+                badge.text(badgeNumber);
+            } else {
+                // Badge doesn't exist, create a new one with the number 1
+                channelReceive.append('<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">1</span>');
+            }
+        }
     }
 
     connect();
@@ -101,7 +123,6 @@ addMessagingStomp = function (channelId) {
             .closest('.bottom-toolbar')
             .closest('.note-editor')
             .siblings('.message-editor');
-        console.log($messageEditor);
         sendMessage($messageEditor);
     });
 

@@ -19,6 +19,9 @@ $(document).ready(async function () {
     await getWorkspaceInf(workspace_id);
 
     scrollMessageContainerToBottom();
+
+    const channelIds = channels.map(channel => channel.id);
+    addMessagingStomp(channelIds);
     // Button setting
     toggleSideBarChannel();
     videoCallButton();
@@ -168,8 +171,6 @@ function toggleSideBarChannel() {
         } catch (e) {
             console.error("Error when fetching message history from channel-" + channelId + ":", e);
         }
-
-        addMessagingStomp(channelId);
     });
 }
 
@@ -244,21 +245,21 @@ function addChannelInSideBar(channel) {
     if (channel.is_private) {
         // Create a new channel element
         const channelElement = $('<div class="chat-partner details-item"></div>');
-        const avatarImg = $('<img class="chat-partner-avatar">').attr('src', '/img/profile2.png');// TODO: replace fixed value
+        const avatarImg = $('<img class="chat-partner-avatar channel-title-prefix">').attr('src', '/img/profile2.png');// TODO: replace fixed value
         channelElement.append(avatarImg);
         channelElement.append("Alice");  // TODO: replace fixed value
 
         channelElement.attr('data-channel-id', channel.id);
         $('#chat-container').append(channelElement);
-        console.log("add private channel in left sidebar");
     } else {
         // If it's not private
         const channelElement = $('<div class="channel-title details-item"></div>');
-        channelElement.text(channel.name);
-
         channelElement.attr('data-channel-id', channel.id);
+        const hashSpan = $('<span class="channel-title-prefix">#</span>');
+        channelElement.append(hashSpan);
+        channelElement.append(channel.name);
+
         $('#channel-container').append(channelElement);
-        console.log("add channel in left sidebar");
     }
 }
 
