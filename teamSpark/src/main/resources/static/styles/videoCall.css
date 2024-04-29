@@ -26,8 +26,11 @@
     justify-content: center;
     align-items: center;
     align-content: center;
-    padding: 25px;
+    padding: 25px 100px 25px 100px;
     height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: scroll;
 }
 
 .video-container {
@@ -35,19 +38,23 @@
     aspect-ratio: 13/9;
     position: relative;
     z-index: 0;
-    min-width: 0;
-    min-height: 0;
-    overflow: hidden;
-    height: 100%;
-    flex-shrink: 1;
+    max-width: 530px;
 }
 
 .video-container.big {
     max-height: calc(50% - 20px); /* Adjust the height of each container */
+    flex-basis: 530px;
 }
 
 .video-container.small {
     max-height: calc(40% - 20px); /* Adjust the height of each container */
+}
+
+@media screen and (max-width: 1360px) {
+    .video-container {
+        flex-grow: 1;
+        min-width: 200px;
+    }
 }
 
 .video-container video {
