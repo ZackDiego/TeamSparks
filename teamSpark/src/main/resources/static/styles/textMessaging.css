@@ -258,7 +258,7 @@
 }
 
 /* text messaging */
-.text-messaging-content {
+#text-messaging-content {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -466,15 +466,6 @@ pre {
     object-fit: cover;
 }
 
-.btn-notification {
-    width: 25px;
-    height: 25px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-color: transparent;
-    border: none;
-    background-image: url('/icons/bell.png');
-}
 
 /* popover */
 .popover-title {

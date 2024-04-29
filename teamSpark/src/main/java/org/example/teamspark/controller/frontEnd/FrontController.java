@@ -1,10 +1,15 @@
 package org.example.teamspark.controller.frontEnd;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class FrontController {
+
+    @Value("${host.name}")
+    private String hostName;
 
     @GetMapping("/")
     public String homePage() {
@@ -27,7 +32,8 @@ public class FrontController {
     }
 
     @GetMapping("/channel/{channelId}/videoCall")
-    public String channelVideoCallPage() {
+    public String channelVideoCallPage(Model model) {
+        model.addAttribute("hostName", hostName);
         return "videoCall";
     }
 }

@@ -1,6 +1,6 @@
 addMessagingStomp = function (channelIds) {
     const stompClient = new StompJs.Client({
-        brokerURL: 'ws://localhost:8080/textMessagingWebsocket'
+        brokerURL: 'ws://' + hostName + ':8080/textMessagingWebsocket'
     });
 
     stompClient.onConnect = (frame) => {
@@ -54,7 +54,7 @@ addMessagingStomp = function (channelIds) {
 
         const containsLink = /(?:http|https):\/\/\S+/i.test(content);
 
-        const channelId = $messageEditor.closest('.text-messaging-content').data('channel-id')
+        const channelId = $messageEditor.closest('#text-messaging-content').data('channel-id')
 
         const user = JSON.parse(localStorage.getItem('user'))
         // send message to websocket endpoint
@@ -79,7 +79,7 @@ addMessagingStomp = function (channelIds) {
     }
 
     function renderMessage(data, channelId) {
-        const currentChannelId = $('.text-messaging-content').data('channel-id')
+        const currentChannelId = $('#text-messaging-content').data('channel-id')
         // check if user is on the page where receive message
         if (channelId === currentChannelId) {
             // Add the messages into the messages container

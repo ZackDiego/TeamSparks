@@ -29,6 +29,18 @@
         <button class="header-search-button"><img alt="Search" src="/icons/search.png"></button>
     </div>
     <div id="welcome-message"></div>
+    <button class="btn-notification position-relative" data-placement="bottom" data-toggle="popover">
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            99+
+        </span>
+    </button>
+    <div id="notification-content" style="display: none">
+        <ul class="list-group custom-popover notification-list">
+            <li class="list-group-item">Notification 1</li>
+            <li class="list-group-item">Notification 2</li>
+            <li class="list-group-item">Notification 3</li>
+        </ul>
+    </div>
 </div>
 <div class="video-call-content">
     <div class="video-panel">
@@ -60,7 +72,9 @@
 </div>
 <!-- fixed userInfo for testing and demo -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
-<script th:src="@{/js/userBasic.js}"></script>
+<script>
+    const hostName = '[[${hostName}]]';
+</script>
 <script th:src="@{/js/videoCall/groupWebRtc.js}"></script>
 </body>
 </html>

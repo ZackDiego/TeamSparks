@@ -124,7 +124,7 @@
     </div>
     <div class="right-content">
         <!--  text messaging content  -->
-        <div class="text-messaging-content">
+        <div id="text-messaging-content">
             <div class="content-header">
                 <div class="channel-title chat-partner-title">
                     <img class="chat-partner-avatar" src="/img/profile2.png">
@@ -170,6 +170,9 @@
         </div>
     </div>
 </div>
+<script>
+    const hostName = '[[${hostName}]]';
+</script>
 <!--include tam-emoji js-->
 <script th:src="@{/js/textMessaging/textMessagingStomp.js}"></script>
 <script th:src="@{/tam-emoji/js/config.js}"></script>

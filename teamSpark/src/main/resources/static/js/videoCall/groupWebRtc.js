@@ -1,10 +1,6 @@
-const localVideo = $('.localVideo')[0];
-let remoteDescriptionPromise, localStream, remoteStream;
-let roomName = "channel_" + channelInf.channel_id;
-
-// button control
-$("#btnToggleVideo").click(() => toggleTrack("Video"));
-$("#btnToggleAudio").click(() => toggleTrack("Audio"));
+let localStream;
+let remoteDescriptionPromisesMap = new Map();
+let remoteStreamsMap = new Map();
 
 function toggleTrack(trackType) {
     if (!localStream) {
@@ -45,14 +41,19 @@ function adjustVideoContainerSize() {
 }
 
 // Function to establish connection to socket server
-function connectToSocketServer() {
+function connectToSocketServer(roomName) {
+
+    const localVideo = $('.localVideo')[0];
+
     // Connect to video call socketIOServer
-// const LOCAL_IP_ADDRESS = "zackawesome.net";
-// let socket = io.connect(`https://${LOCAL_IP_ADDRESS}`, {secure: true});
-    let socket = io.connect("http://localhost:8001");
+    let socket;
+    if (hostName === 'localhost') {
+        socket = io.connect("http://localhost:8001");
+    } else {
+        socket = io.connect(`https://${hostName}:8001`, {secure: true});
+    }
 
-
-// Listen for the "connect" event
+    // Listen for the "connect" event
     socket.on("connect", () => {
         console.log("Connected to Socket.IO server");
 
@@ -70,8 +71,7 @@ function connectToSocketServer() {
 
     let rtcPeerConnectionsMap = new Map();
 
-// you can use public stun and turn servers,
-// but we don't need for local development
+    // iceServers
     const iceServers = {
         'iceServers': [
             {'urls': 'stun:stun.l.google.com:19302'},
@@ -90,7 +90,7 @@ function connectToSocketServer() {
     const streamConstraints = {audio: true, video: true};
 
 
-// Handle Event
+    // Handle Event
     const handleSocketEvent = (eventName, callback) => socket.on(eventName,
         callback);
 
@@ -111,6 +111,7 @@ function connectToSocketServer() {
 
         console.log(socket.id);
         // loop through existing clients to send offer
+        let rtcPeerConnection;
         for (let existingClientId of e) {
             if (existingClientId !== socket.id) {
                 rtcPeerConnection = new RTCPeerConnection(iceServers);
@@ -137,9 +138,8 @@ function connectToSocketServer() {
 
 
     handleSocketEvent("candidate", e => {
-        console.log("receive candidate event");
-        console.log("test: " + e.candidateClientId);
-        rtcPeerConnection = rtcPeerConnectionsMap.get(e.candidateClientId);
+        console.log("receive candidate event from " + e.candidateClientId);
+        let rtcPeerConnection = rtcPeerConnectionsMap.get(e.candidateClientId);
         if (rtcPeerConnection) {
             const candidate = new RTCIceCandidate({
                 sdpMLineIndex: e.label, candidate: e.candidate,
@@ -149,6 +149,7 @@ function connectToSocketServer() {
                 // console.error("Error adding ICE candidate: ", error);
             };
 
+            let remoteDescriptionPromise = remoteDescriptionPromisesMap.get(e.candidateClientId);
             if (remoteDescriptionPromise) {
                 remoteDescriptionPromise
                     .then(() => {
@@ -176,8 +177,9 @@ function connectToSocketServer() {
         rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
 
         if (rtcPeerConnection.signalingState === "stable") {
-            remoteDescriptionPromise = rtcPeerConnection.setRemoteDescription(
-                new RTCSessionDescription(sdp));
+            let remoteDescriptionPromise = rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
+            remoteDescriptionPromisesMap.set(offerClientId, remoteDescriptionPromise);
+
             remoteDescriptionPromise
                 .then(() => {
                     return rtcPeerConnection.createAnswer();
@@ -203,11 +205,10 @@ function connectToSocketServer() {
         const {answerClientId, sdp} = e;
 
         // find the matching rtcPeerConnection by answerClientId
-        rtcPeerConnection = rtcPeerConnectionsMap.get(answerClientId);
+        let rtcPeerConnection = rtcPeerConnectionsMap.get(answerClientId);
 
         if (rtcPeerConnection.signalingState === "have-local-offer") {
-            remoteDescriptionPromise = rtcPeerConnection.setRemoteDescription(
-                new RTCSessionDescription(sdp));
+            let remoteDescriptionPromise = rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
             console.log("receive and add answer from " + answerClientId)
             remoteDescriptionPromise.catch(error => console.log(error));
         }
@@ -236,10 +237,8 @@ function connectToSocketServer() {
     const onAddStream = (e, clientId) => {
         console.log("Create new video screen");
         createRemoteVideoScreen(e.streams[0], clientId);
-
-        remoteStream = e.stream;
+        remoteStreamsMap.set(clientId, e.stream);
     }
-
 
     function createRemoteVideoScreen(stream, clientId) {
 
@@ -276,8 +275,7 @@ function connectToSocketServer() {
 }
 
 // Function to disconnect from the socket server when leaving the video call
-function disconnectFromSocketServer() {
-
+function disconnectAndRedirect(socket, roomName) {
     // Disable video track
     if (localStream) {
         const videoTrack = localStream.getVideoTracks()[0];
@@ -299,20 +297,53 @@ function disconnectFromSocketServer() {
 
     // remove all remoteStream videos
     $('.remoteStream').remove();
+
+    // Redirect to the workspace channel
+    window.location.href = "/user";
 }
 
-
+// Page entry point
 $(function () {
+    const channelId = getChannelIdInUrl();
+
+    let roomName = "channel_" + channelId;
+
+    // button control
+    $("#btnToggleVideo").click(() => toggleTrack("Video"));
+    $("#btnToggleAudio").click(() => toggleTrack("Audio"));
+
     console.log("start video call")
     // Establish connection to the socket server
-    let socket = connectToSocketServer();
+    let socket = connectToSocketServer(roomName);
 
     // Bind the disconnectFromSocketServer function to the "beforeunload" event
-    $(window).on('beforeunload', disconnectFromSocketServer);
-
-    $('#btnLeave').click(() => {
-        disconnectFromSocketServer();
+    $(window).on('beforeunload', function () {
+        disconnectAndRedirect(socket, roomName)
     });
 
-    // TODO: redirect to workspace channel
+    $('#btnLeave').click(() => {
+        disconnectAndRedirect(socket, roomName);
+    });
 });
+
+function getChannelIdInUrl() {
+    // Get the current URL path
+    const urlPath = window.location.pathname;
+
+    // Define the pattern for matching the channelId in the URL path
+    const pattern = /^\/channel\/(\w+)\/videoCall$/;
+
+    // Execute the regular expression pattern matching on the URL path
+    const match = urlPath.match(pattern);
+
+    // Extract the channelId from the matched result
+    const channelId = match ? parseInt(match[1], 10) : null;
+
+    if (channelId !== null) {
+        return channelId;
+    } else {
+        // Handle the case when the channelId is not found
+        console.error('ChannelId not found in URL');
+        window.location.href = '/user';
+    }
+}

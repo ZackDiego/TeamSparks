@@ -63,7 +63,7 @@ async function fetchMessageHistoryData(channel_id) {
 function renderChannelContent(channel, messageHistory, member_id) {
 
     // Select text-messaging-content container
-    const textMessagingContent = $('.text-messaging-content');
+    const textMessagingContent = $('#text-messaging-content');
     textMessagingContent.attr('data-channel-id', messageHistory.channel_id);
     textMessagingContent.attr('data-is-private', messageHistory.is_private);
 
@@ -176,7 +176,9 @@ function toggleSideBarChannel() {
 
 function videoCallButton() {
     $('.btn-video-call').click(function () {
-        window.location.replace("/channel/" + channelInf.id + "/videoCall");
+        const channelId = $('#text-messaging-content').data('channel-id');
+        console.log("redirect to videoCall in channel " + channelId);
+        window.location.replace("/channel/" + channelId + "/videoCall");
     });
 }
 
