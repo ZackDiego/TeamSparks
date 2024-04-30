@@ -11,21 +11,47 @@
     align-items: center;
     justify-content: flex-start;
     background-color: #5B0888;
-    width: 65px;
+    width: 90px;
     height: 100%;
+    padding: 10px 0 10px 0;
 }
 
 .workspace-card {
     margin: 10px;
     height: 45px;
     width: 45px;
-    border-radius: 5px;
+    border-radius: 50%;
     background-color: lightblue;
-    border: 2px solid whitesmoke;
     box-shadow: none;
     font-size: 0.8em;
     white-space: normal;
+    position: relative;
+    border: none;
 }
+
+.workspace-card.active {
+    border: 3px solid #FF9000;
+    border-radius: 5px;
+}
+
+.btn-add-workspace {
+    /*background-color: transparent;*/
+    /*background-image: url('/icons/add.png');*/
+    background: url("/icons/add.png") no-repeat;
+}
+
+/*.workspace-card.active::before {*/
+/*    content: '';*/
+/*    position: absolute;*/
+/*    top: 50%; !* Position it in the middle vertically *!*/
+/*    right: 100%; !* Position it just outside the workspace card *!*/
+/*    transform: translateY(-50%);*/
+/*    border-top: 10px solid transparent; !* Adjust the thickness and color of the border *!*/
+/*    border-bottom: 10px solid transparent; !* Adjust the thickness and color of the border *!*/
+/*    border-left: 10px solid transparent; !* Adjust the thickness and color of the border *!*/
+/*    border-top-right-radius: 5px; !* Make the top right corner round *!*/
+/*}*/
+
 
 #sidebar-container {
     background-color: #F8E3FF;
@@ -140,6 +166,7 @@
     border-radius: 50%; /* Make the avatar round */
     display: inline-block;
     object-fit: cover;
+    margin-right: 10px;
 }
 
 .channel-title-prefix {
@@ -168,15 +195,23 @@
     margin-right: auto;
     min-width: 100px;
     width: 40vw;
+    height: 40px;
 }
 
 .header-search-input {
     width: 100%; /* Adjust for icon size */
-    padding: 3px 10px 3px 10px;
+    padding: 3px 5px 3px 5px;
     border: solid 1px #979797;
     border-radius: 5px;
     font-size: 16px;
-    height: 30px;
+    height: 100%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+}
+
+.condition-tag, .header-search-input {
+    font-size: 14px;
 }
 
 .header-search-input:focus {
@@ -196,6 +231,40 @@
 .header-search-button img {
     width: 25px; /* Adjust icon size */
     height: auto;
+}
+
+/*search*/
+.header-search-container {
+    position: relative;
+    display: inline-block;
+}
+
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: none; /* Hide by default */
+    z-index: 99;
+}
+
+.search-dropdown-item {
+    padding: 5px;
+    cursor: pointer;
+    width: 100%;
+    border-bottom: 1px solid #b2b2b2;
+}
+
+.condition-tag {
+    background-color: #9f9f9f;
+    border-radius: 5px;
+    padding: 5px;
+    color: white;
+    margin: 1px 4px 1px 4px;
 }
 
 /* notification bell */
@@ -485,3 +554,12 @@ pre {
     border-top: 1px solid #ccc !important;
 }
 
+.ui-datepicker {
+    position: relative;
+    z-index: 99;
+}
+
+
+.workspace-dropdown {
+    position: static;
+}

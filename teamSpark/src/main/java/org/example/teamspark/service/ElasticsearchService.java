@@ -176,7 +176,7 @@ public class ElasticsearchService {
         }
     }
 
-    private ResponseEntity<String> getElasticsearchSearchResult(SearchCondition condition, String searchUrl) {
+    private ResponseEntity<String> getElasticsearchSearchResult(SearchCondition condition, String searchUrl) throws ElasticsearchFailedException {
         // Create HttpHeaders with authentication
         HttpHeaders headers = createHeaders(ESUserName, ESPassword);
 
@@ -230,6 +230,11 @@ public class ElasticsearchService {
                 }""";
 
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-        return restTemplate.exchange(searchUrl, HttpMethod.POST, requestEntity, String.class);
+
+        try {
+            return restTemplate.exchange(searchUrl, HttpMethod.POST, requestEntity, String.class);
+        } catch (Exception e) {
+            throw new ElasticsearchFailedException(e.getMessage());
+        }
     }
 }

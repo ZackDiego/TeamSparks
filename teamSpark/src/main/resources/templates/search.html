@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TeamSpark Search Page</title>
+    <meta charset="utf-8"/>
+    <script crossorigin="anonymous" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
+    <script
+            crossorigin="anonymous"
+            integrity="sha256-sw0iNNXmOJbQhYFuC9OF2kOlD5KQKe1y5lfBn4C9Sjg="
+            src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
+    <script crossorigin="anonymous"
+            src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <!-- jquery -->
+    <script crossorigin="anonymous"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <!-- bootstrap 4 -->
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" rel="stylesheet">
+    <script crossorigin="anonymous"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <!--  toasts  -->
+    <link crossorigin="anonymous"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-toaster/4.0.1/css/bootstrap-toaster.min.css"
+          integrity="sha512-RLiJ5uLcu8jWxsJBevOZWLU0zWv51vwpha0Gh4jRKOqkcWbVR7+U8kKaiGsMhSua3fIkviCHRClSH+XZYKIoZA=="
+          referrerpolicy="no-referrer" rel="stylesheet"/>
+    <script crossorigin="anonymous"
+            integrity="sha512-YmkrdAXo8RdHV1JFfepR7QWLDfF7vs8Mc/t+6qKIxrEFeWbi0u/lajryYSPK6GC5nupW5t6XfPdxQpIY79+USg=="
+            referrerpolicy="no-referrer"
+            src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-toaster/4.0.1/js/bootstrap-toaster.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/styles/Commons.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/styles/textMessaging.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/styles/searchPage.css}" type="text/css"/>
+</head>
+<body>
+<div class="header">
+    <div class="header-logo">
+        <a href="http://localhost:8080/user">TeamSpark</a>
+    </div>
+    <div class="header-search-container">
+        <div class="header-search-input" contenteditable="true">
+            <div class="header-search-keyword" contenteditable="true"></div>
+        </div>
+        <button class="header-search-button"><img alt="Search" src="/icons/search.png"></button>
+        <div class="search-dropdown"></div>
+        <div id="datepicker" style="display: none;"></div>
+    </div>
+    <div id="welcome-message"></div>
+    <button class="btn-notification position-relative" data-placement="bottom" data-toggle="popover">
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            99+
+        </span>
+    </button>
+    <div id="notification-content" style="display: none">
+        <ul class="list-group custom-popover notification-list">
+            <li class="list-group-item">Notification 1</li>
+            <li class="list-group-item">Notification 2</li>
+            <li class="list-group-item">Notification 3</li>
+        </ul>
+    </div>
+</div>
+<div class="main-content">
+    <div id="workspaces-tab">
+        <button class="workspace-card active">寬</button>
+        <button class="workspace-card">BE</button>
+        <button class="workspace-card btn-add-workspace"></button>
+    </div>
+    <div class="search-container">
+        <div class="search-condition-desc">
+            <div class="search-keyword-desc">Search Keyword: <span class="search-keyword"></span></div>
+            <div class="search-condition-container">
+                <span>Search conditions:  </span>
+                <div class="search-conditions">
+                </div>
+            </div>
+        </div>
+        <div class="search-result-desc">Number of results: <span class="result-number"></span></div>
+        <div class="search-result"></div>
+    </div>
+</div>
+<script>
+    const hostName = '[[${hostName}]]';
+</script>
+<!--include tam-emoji js-->
+<script th:src="@{/js/searchPageRender.js}"></script>
+<script th:src="@{/js/userNotificationAndStatus.js}"></script>
+</body>
+</html>

@@ -27,7 +27,8 @@ public class FrontController {
     }
 
     @GetMapping("/workspace/{workspaceId}")
-    public String workspacePage() {
+    public String workspacePage(Model model) {
+        model.addAttribute("hostName", hostName);
         return "textMessaging";
     }
 
@@ -35,5 +36,10 @@ public class FrontController {
     public String channelVideoCallPage(Model model) {
         model.addAttribute("hostName", hostName);
         return "videoCall";
+    }
+
+    @GetMapping("/workspace/{workspaceId}/search")
+    public String searchPage() {
+        return "search";
     }
 }

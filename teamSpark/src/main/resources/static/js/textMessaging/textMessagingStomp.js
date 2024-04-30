@@ -49,8 +49,16 @@ addMessagingStomp = function (channelIds) {
 
     function sendMessage($messageEditor) {
 
+        // const content = $messageEditor.summernote('code');
+        // const plainTextContent = $(content).text()
+        // Get the HTML content from the Summernote editor
         const content = $messageEditor.summernote('code');
-        const plainTextContent = $(content).text()
+        // Create a temporary div element using jQuery
+        const $tempDiv = $('<div>');
+        // Set the HTML content to the div
+        $tempDiv.html(content);
+        // Get the text content from the div, which will strip HTML tags but preserve line breaks
+        const plainTextContent = $tempDiv.text();
 
         const containsLink = /(?:http|https):\/\/\S+/i.test(content);
 
@@ -85,6 +93,7 @@ addMessagingStomp = function (channelIds) {
             // Add the messages into the messages container
             const messagesContainer = $('.message-history-container');
 
+            // TODO: avatar
             const avatarSrc = '/img/profile.png';
             const avatar = $('<img>').addClass('avatar').attr('src', avatarSrc);
             const fromName = $('<div>').addClass('from-name').text(data.from_name);
