@@ -48,10 +48,16 @@ function connectToSocketServer(roomName) {
     // Connect to video call socketIOServer
     let socket;
     if (hostName === 'localhost') {
-        socket = io.connect("http://localhost:8001");
+        socket = io.connect("http://localhost:8001",
+            {path: '/videoCallWebsocket', transports: ['websocket', 'xhr-polling', 'jsonp-polling']});
     } else {
-        socket = io.connect(`https://${hostName}:8001`, {secure: true});
+        socket = io.connect(`https://${hostName}/videoCallWebsocket`, {secure: true});
     }
+
+    // Error handling
+    socket.on("error", (error) => {
+        console.error("Socket connection error:", error);
+    });
 
     // Listen for the "connect" event
     socket.on("connect", () => {

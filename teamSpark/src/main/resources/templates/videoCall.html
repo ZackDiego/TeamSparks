@@ -22,17 +22,21 @@
 <body>
 <div class="header">
     <div class="header-logo">
-        <a href="http://localhost:8080/textMessaging/1">TeamSpark</a>
+        <a href="http://localhost:8080/user">TeamSpark</a>
     </div>
     <div class="header-search-container">
-        <input class="header-search-input" placeholder="" type="text">
+        <div class="header-search-input" contenteditable="true">
+            <div class="header-search-keyword" contenteditable="true"></div>
+        </div>
         <button class="header-search-button"><img alt="Search" src="/icons/search.png"></button>
+        <div class="search-dropdown"></div>
+        <div id="datepicker" style="display: none;"></div>
     </div>
     <div id="welcome-message"></div>
     <button class="btn-notification position-relative" data-placement="bottom" data-toggle="popover">
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            99+
-        </span>
+    <span class="translate-middle badge rounded-pill bg-danger">
+        3
+    </span>
     </button>
     <div id="notification-content" style="display: none">
         <ul class="list-group custom-popover notification-list">

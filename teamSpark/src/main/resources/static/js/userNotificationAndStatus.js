@@ -1,7 +1,14 @@
 (function () {
-    const stompClient = new StompJs.Client({
-        brokerURL: 'ws://localhost:8080/notificationWebsocket'
-    });
+    let stompClient;
+    if (hostName === 'localhost') {
+        stompClient = new StompJs.Client({
+            brokerURL: 'ws://' + hostName + ':8080/notificationWebsocket'
+        });
+    } else {
+        stompClient = new StompJs.Client({
+            brokerURL: 'ws://' + hostName + '/notificationWebsocket'
+        });
+    }
 
     const user = JSON.parse(localStorage.getItem('user'));
 
