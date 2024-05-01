@@ -125,12 +125,12 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    padding: 10px;
+    padding: 10px 0 10px 10px;
     width: 100%;
 }
 
 .details-container {
-    margin: 10px; /* Adjust the indentation by changing the value */
+    margin: 10px 0 10px 10px; /* Adjust the indentation by changing the value */
 }
 
 .channel::before {
@@ -142,6 +142,7 @@
     display: flex;
     align-items: center;
     border-radius: 5px;
+    position: relative;
 }
 
 .details-item.active {
@@ -149,12 +150,12 @@
 }
 
 .details-item.chat-partner {
-    padding: 5px 10px 5px 15px;
+    padding: 5px 0 5px 15px;
     margin: 5px;
 }
 
 .details-item.channel-item {
-    padding: 10px 10px 10px 15px;
+    padding: 10px 0 10px 15px;
 }
 
 .chat-partner-avatar {
@@ -548,16 +549,16 @@ pre {
     display: none !important;
 }
 
-/*@media (prefers-color-scheme: dark) {*/
-/*    .toast {*/
-/*        background-color: rgba(82, 196, 41, .8); !* Override the Bootstrap style *!*/
-/*    }*/
-/*}*/
+@media (prefers-color-scheme: dark) {
+    .toast {
+        background-color: rgba(255, 255, 255, 0.8); /* Override the Bootstrap style */
+    }
+}
 
 .toast {
     width: 300px;
-    background-color: rgba(101, 182, 0, 0.85); /* Override the Bootstrap style */
-    color: white;
+    /*background-color: rgba(101, 182, 0, 0.85); !* Override the Bootstrap style *!*/
+    /*color: white;*/
 }
 
 #welcome-message {
@@ -672,4 +673,15 @@ pre {
     top: 10%;
     left: 90%;
     transform: translate(-50%, -50%);
+}
+
+.notification-badge {
+    top: 50%;
+    right: 10%;
+    color: white;
+    text-align: center;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    line-height: 18px;
 }

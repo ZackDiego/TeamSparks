@@ -167,13 +167,10 @@ function scrollMessageContainerToBottom() {
 
 function toggleSideBarChannel() {
     $('.details-item').click(async function () {
-        // button display
-        $('.details-item').removeClass('active');
-        $(this).addClass('active');
-
-        // channel page render
         const channelId = $(this).data('channel-id');
-        console.log("channel-" + channelId + " rendering")
+
+        console.log("channel-" + channelId + " rendering");
+
         // render channel content
         try {
             // Fetch message history by channelId
@@ -186,6 +183,16 @@ function toggleSideBarChannel() {
         } catch (e) {
             console.error("Error when fetching message history from channel-" + channelId + ":", e);
         }
+
+        // remove badge
+        $(this).find('.notification-badge').remove();
+
+        // button display
+        $('.details-item').removeClass('active');
+        $(this).addClass('active');
+
+        // Remove the toasts of channelId
+        $('.toast[data-channel-id="' + channelId + '"]').remove();
     });
 }
 

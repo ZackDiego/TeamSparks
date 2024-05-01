@@ -101,13 +101,14 @@ addMessagingStomp = function (channelIds) {
 
 function subscribeChannel(stompClient, channelId) {
     stompClient.subscribe('/textMessagingChannel/' + channelId, (result) => {
-        console.log("receive message");
+        console.log("receive message from channel " + channelId);
         renderMessage(JSON.parse(result.body), channelId);
         scrollMessageContainerToBottom();
     });
 
     function renderMessage(data, channelId) {
-        const currentChannelId = $('#text-messaging-content').data('channel-id')
+        const currentChannelId = parseInt($('#text-messaging-content').attr('data-channel-id'));
+
         // check if user is on the page where receive message
         if (channelId === currentChannelId) {
             // Add the messages into the messages container
@@ -130,8 +131,11 @@ function subscribeChannel(stompClient, channelId) {
         } else {
             // if not add badge on corresponding channel sidebar avatar
             const channelReceive = $('.details-item').filter(function () {
-                return $(this).data('channel-id') === channelId;
+                console.log(parseInt($(this).attr('data-channel-id')));
+                console.log(channelId);
+                return parseInt($(this).attr('data-channel-id')) === channelId;
             });
+
 
             // Check if the badge already exists
             let badge = channelReceive.find('.notification-badge');
@@ -141,7 +145,7 @@ function subscribeChannel(stompClient, channelId) {
                 badge.text(badgeNumber);
             } else {
                 // Badge doesn't exist, create a new one with the number 1
-                channelReceive.append('<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">1</span>');
+                channelReceive.append('<span class="position-absolute translate-middle badge bg-danger notification-badge">1</span>');
             }
         }
     }
