@@ -35,6 +35,11 @@ $(document).ready(async function () {
 
     // open the details when entering
     $("details").attr("open", true);
+
+    // click on the first channel
+    if ($('#channel-container .details-item').length) {
+        $('#channel-container .details-item:first').click();
+    }
 });
 
 async function fetchMessageHistoryData(channel_id) {
@@ -66,7 +71,12 @@ async function fetchMessageHistoryData(channel_id) {
     }
 }
 
-function renderChannelContent(channel, messageHistory, member_id) {
+function findPrivateChatPartner(channel) {
+    const member_id = getMemberId();
+    return channel.members.find(member => member.id !== member_id);
+}
+
+function renderChannelContent(channel, messageHistory) {
 
     // Select text-messaging-content container
     const textMessagingContent = $('#text-messaging-content');
@@ -79,8 +89,9 @@ function renderChannelContent(channel, messageHistory, member_id) {
 
     if (messageHistory.is_private) {
         // Find the private chat partner
-        const chat_partner = channel.members.find(member => member.id !== member_id);
-        channelTitle.html('<img class="chat-partner-avatar" src="' + chat_partner.user.avatar + '">' + chat_partner.user.name); // TODO: replace fixd value
+        const chat_partner = findPrivateChatPartner(channel);
+        channelTitle.empty();
+        channelTitle.append($('<img>').addClass('chat-partner-avatar').attr('src', chat_partner.user.avatar), chat_partner.user.name);
     } else {
         // Use channel name
         channelTitle.text('# ' + channel.name);
@@ -130,8 +141,10 @@ function renderChannelContent(channel, messageHistory, member_id) {
     const messages = messageHistory.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
     $.each(messages, function (index, message) {
-        const avatarSrc = '/img/profile.png'; // Fixed avatar source for now, you can replace it with actual avatar source
-        const avatar = $('<img>').addClass('avatar').attr('src', avatarSrc);
+        const membersData = JSON.parse(sessionStorage.getItem('workspaceMembers'));
+        // Function to find the user object by ID
+        const from_user = membersData.find(user => user.id === message.from_id)?.user;
+        const avatar = $('<img>').addClass('avatar').attr('src', from_user.avatar);
         const fromName = $('<div>').addClass('from-name').text(message.from_name);
         const content = $('<div>').addClass('message-content').html(message.content)
         const timestamp = $('<div>').addClass('timestamp').text(new Date(message.created_at).toLocaleString());
@@ -169,7 +182,7 @@ function toggleSideBarChannel() {
             const channel = await fetchChannelById(channelId);
 
             // Render message history
-            renderChannelContent(channel, messageHistory, getMemberId());
+            renderChannelContent(channel, messageHistory);
         } catch (e) {
             console.error("Error when fetching message history from channel-" + channelId + ":", e);
         }
@@ -247,7 +260,6 @@ async function fetchChannelsByMemberId(member_id) {
 function addChannelsInSideBarAndModal(channels) {
 
     for (let channel of channels) {
-        const channelSideBar = $('<div class="chat-partner details-item"></div>');
         const channelModal = $('<div class="list-group-item d-flex justify-content-between align-items-center"></div>');
 
         const modalEditBtn = $('<div>')
@@ -256,16 +268,23 @@ function addChannelsInSideBarAndModal(channels) {
 
         // Check if the channel is private
         if (channel.is_private) {
-            const avatarImg = $('<img class="chat-partner-avatar channel-title-prefix">')
-                .attr('src', '/img/profile2.png');// TODO: replace fixed value
+            const channelSideBar = $('<div class="chat-partner details-item"></div>');
 
-            channelSideBar.attr('data-channel-id', channel.id).append(avatarImg, "Alice");
+            // Find the private chat partner
+            const chat_partner = findPrivateChatPartner(channel);
+
+            const avatarImg = $('<img>').addClass('chat-partner-avatar').attr('src', chat_partner.user.avatar);
+            channelSideBar.attr('data-channel-id', channel.id)
+                .append(avatarImg, chat_partner.user.name);
             $('#chat-container').append(channelSideBar);
 
-            channelModal.attr('data-channel-id', channel.id).append($('<div>').append(avatarImg.clone(), "Alice"), modalEditBtn);
+            channelModal.attr('data-channel-id', channel.id).append($('<div>')
+                .append(avatarImg.clone(), chat_partner.user.name), modalEditBtn);
             $('#private-chat-modal-list').append(channelModal);
         } else {
             // If it's not private
+            const channelSideBar = $('<div class="channel-item details-item"></div>');
+
             const hashSpan = $('<span class="channel-title-prefix">#</span>');
             channelSideBar.attr('data-channel-id', channel.id).append(hashSpan, channel.name);
             $('#channel-container').append(channelSideBar);
@@ -804,12 +823,10 @@ function handleCreateChannel(stompClient) {
                 let channelElement;
                 if (channelData.is_private) {
                     channelElement = $('<div class="chat-partner details-item"></div>');
-                    const avatarImg = $('<img class="chat-partner-avatar channel-title-prefix">')
-                        .attr('src', '/img/profile2.png'); // TODO: Replace with actual avatar URL
-                    channelElement.append(avatarImg);
-                    channelElement.append(channelData.name);
-
-                    channelElement.attr('data-channel-id', channelData.id);
+                    const chat_partner = findPrivateChatPartner(channelData);
+                    const avatarImg = $('<img>').addClass('chat-partner-avatar').attr('src', chat_partner.user.avatar);
+                    channelElement.attr('data-channel-id', channelData.id)
+                        .append(avatarImg, chat_partner.user.name);
                     $('#chat-container').append(channelElement);
                 } else {
                     channelElement = $('<div class="channel-title details-item"></div>');

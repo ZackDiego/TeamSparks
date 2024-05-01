@@ -113,9 +113,10 @@ function subscribeChannel(stompClient, channelId) {
             // Add the messages into the messages container
             const messagesContainer = $('.message-history-container');
 
-            // TODO: avatar
-            const avatarSrc = '/img/profile.png';
-            const avatar = $('<img>').addClass('avatar').attr('src', avatarSrc);
+            const membersData = JSON.parse(sessionStorage.getItem('workspaceMembers'));
+            // Function to find the user object by ID
+            const from_user = membersData.find(user => user.id === data.from_id)?.user;
+            const avatar = $('<img>').addClass('avatar').attr('src', from_user.avatar);
             const fromName = $('<div>').addClass('from-name').text(data.from_name);
             const content = $('<div>').addClass('message-content').html(data.content)
             const timestamp = $('<div>').addClass('timestamp').text(new Date(data.created_at).toLocaleString());
