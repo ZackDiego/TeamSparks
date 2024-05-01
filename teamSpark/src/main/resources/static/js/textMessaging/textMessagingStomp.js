@@ -7,11 +7,7 @@ addMessagingStomp = function (channelIds) {
         setConnected(true);
         console.log('Connected: ' + frame);
         for (let channelId of channelIds) {
-            stompClient.subscribe('/textMessagingChannel/' + channelId, (result) => {
-                console.log("receive message");
-                renderMessage(JSON.parse(result.body), channelId);
-                scrollMessageContainerToBottom();
-            });
+            subscribeChannel(stompClient, channelId);
         }
     };
 
@@ -86,6 +82,30 @@ addMessagingStomp = function (channelIds) {
         $messageEditor.summernote('code', '');
     }
 
+    connect();
+    $('.btn-send').click(function () {
+        console.log("send message");
+        const $messageEditor = $(this)
+            .closest('.bottom-toolbar')
+            .closest('.note-editor')
+            .siblings('.message-editor');
+        sendMessage($messageEditor);
+    });
+
+    $(window).on('beforeunload', function () {
+        disconnect();
+    });
+
+    return stompClient;
+}
+
+function subscribeChannel(stompClient, channelId) {
+    stompClient.subscribe('/textMessagingChannel/' + channelId, (result) => {
+        console.log("receive message");
+        renderMessage(JSON.parse(result.body), channelId);
+        scrollMessageContainerToBottom();
+    });
+
     function renderMessage(data, channelId) {
         const currentChannelId = $('#text-messaging-content').data('channel-id')
         // check if user is on the page where receive message
@@ -107,7 +127,7 @@ addMessagingStomp = function (channelIds) {
             // Append message container to the messages container
             messagesContainer.append(messageDiv);
         } else {
-            // if not add notification on corresponding channel sidebar avatar
+            // if not add badge on corresponding channel sidebar avatar
             const channelReceive = $('.details-item').filter(function () {
                 return $(this).data('channel-id') === channelId;
             });
@@ -124,18 +144,4 @@ addMessagingStomp = function (channelIds) {
             }
         }
     }
-
-    connect();
-    $('.btn-send').click(function () {
-        console.log("send message");
-        const $messageEditor = $(this)
-            .closest('.bottom-toolbar')
-            .closest('.note-editor')
-            .siblings('.message-editor');
-        sendMessage($messageEditor);
-    });
-
-    $(window).on('beforeunload', function () {
-        disconnect();
-    });
 }

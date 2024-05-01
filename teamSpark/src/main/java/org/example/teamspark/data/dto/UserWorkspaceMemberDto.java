@@ -17,6 +17,9 @@ public class UserWorkspaceMemberDto {
     @JsonProperty("workspace_name")
     private String workspaceName;
 
+    @JsonProperty("workspace_avatar")
+    private String workspaceAvatar;
+
     @JsonProperty("member_id")
     private Long memberId;
 

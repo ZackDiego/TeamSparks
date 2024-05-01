@@ -60,8 +60,8 @@
     </div>
     <div id="welcome-message"></div>
     <button class="btn-notification position-relative" data-placement="bottom" data-toggle="popover">
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            99+
+        <span class="position-absolute top-0 right-3 start-100 translate-middle badge rounded-pill bg-danger">
+            3
         </span>
     </button>
     <div id="notification-content" style="display: none">
@@ -74,8 +74,6 @@
 </div>
 <div class="main-content">
     <div id="workspaces-tab">
-        <button class="workspace-card active">寬</button>
-        <button class="workspace-card">BE</button>
         <button class="workspace-card btn-add-workspace"></button>
     </div>
     <div id="sidebar-container">
@@ -83,31 +81,36 @@
             <div class="workspace-dropdown">
                 <button aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" data-toggle="dropdown"
                         id="workspace-name" type="button">
-                    阿寬公司
                 </button>
                 <div aria-labelledby="dropdownMenuButton" class="dropdown-menu">
-                    <a class="dropdown-item" href="#">Create channel/private chat</a>
-                    <a class="dropdown-item" href="#">Manage channel/private chat</a>
-                    <a class="dropdown-item" href="#">Delete channel/private chat</a>
-                    <a class="dropdown-item" data-target="#exampleModalCenter" data-toggle="modal">
+                    <a class="dropdown-item" data-target="#manageChannelModal" data-toggle="modal">
+                        Manage channel/private chat
+                    </a>
+                    <a class="dropdown-item" data-target="#workspaceMemberSetting" data-toggle="modal">
                         Workspace Members
                     </a>
                 </div>
             </div>
-            <!--            <div id="btn-container">-->
-            <!--                <button class="sidebar-btn active" id="btn-text-message"></button>-->
-            <!--                <button class="sidebar-btn" id="btn-label"></button>-->
-            <!--                <button class="sidebar-btn" id="btn-event"></button>-->
-            <!--                <button class="sidebar-btn" id="btn-meeting"></button>-->
-            <!--            </div>-->
             <div class="divider"></div>
             <div id="list-container">
                 <details class="details-container" id="channel-container" open="true">
-                    <summary>Channels</summary>
+                    <summary>Channels
+                        <!--                        <button class="btn btn-sm ml-auto create-channel font-weight-bold"-->
+                        <!--                                data-target="#createChannelModal"-->
+                        <!--                                data-toggle="modal"-->
+                        <!--                                type="button">+-->
+                        <!--                        </button>-->
+                    </summary>
                     <!--                    <div class="channel-title details-item active">Channel 1</div>-->
                 </details>
                 <details class="details-container" id="chat-container" open="true">
-                    <summary>Private Chat</summary>
+                    <summary>Private Chats
+                        <!--                        <button class="btn btn-sm ml-auto create-channel font-weight-bold"-->
+                        <!--                                data-target="#createChannelModal"-->
+                        <!--                                data-toggle="modal"-->
+                        <!--                                type="button">+-->
+                        <!--                        </button>-->
+                    </summary>
                     <div class="chat-partner details-item">
                         <img class="chat-partner-avatar chat-partner-demo" src="/img/profile2.png">
                         Alice
@@ -125,11 +128,11 @@
         </div>
         <div id="user-status-container">
             <div class="user-avatar">
-                <img alt="User Avatar" src="/img/profile.png">
+                <!--                <img alt="User Avatar" src="/img/profile.png">-->
             </div>
             <div class="user-info">
                 <div class="username"></div>
-                <div class="status">Online</div>
+                <div class="user-status">Online</div>
             </div>
             <div class="user-settings">
                 <button></button>
@@ -145,7 +148,8 @@
                     # Channel 1
                 </div>
                 <div class="content-header-btn-container">
-                    <button class="content-header-btn btn-channel-member"></button>
+                    <button class="content-header-btn btn-channel-member" data-target="#channelMembersModal"
+                            data-toggle="modal"></button>
                     <button class="content-header-btn btn-phone-call"></button>
                     <button class="content-header-btn btn-video-call"></button>
                 </div>
@@ -154,31 +158,207 @@
             </div>
             <div class="message-editor"></div>
         </div>
-        <div>
-            <div class="channel-member-container collapse">
-                <button aria-label="Close" class="btn-close" id="collapse-channel-member" type="button"></button>
-            </div>
-        </div>
     </div>
     <div class="toast-container"></div>
 
-    <!-- Modal -->
-    <div aria-hidden="true" aria-labelledby="exampleModalCenterTitle" class="modal fade" id="exampleModalCenter"
+    <!-- Modals -->
+    <!-- Workspace members -->
+    <div aria-hidden="true" aria-labelledby="workspaceMemberSetting" class="modal fade" id="workspaceMemberSetting"
          role="dialog" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Workspace member</h5>
+                    <h5 class="modal-title">Workspace member</h5>
                     <button aria-label="Close" class="close" data-dismiss="modal" type="button">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-
+                    <div class="workspace-member-invite">
+                        <h6 class="workspace-member-invite-title modal-subtitle">Invite user</h6>
+                        <div class="input-group mb-3">
+                            <input aria-describedby="inviteButton" aria-label="Email" class="form-control"
+                                   placeholder="Email" type="email">
+                            <div class="input-group-append">
+                                <button class="btn btn-success" id="inviteButton" type="button">Invite</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="workspace-member-container">
+                        <h6 class="workspace-member-list-title modal-subtitle">Workspace members</h6>
+                        <div class="workspace-member-list list-group"></div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
-                    <button class="btn btn-primary" type="button">Save changes</button>
+                    <button class="btn btn-primary" type="button">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  create workspace  -->
+    <div aria-hidden="true" aria-labelledby="addWorkspaceModalLabel" class="modal fade" id="addWorkspaceModal"
+         role="dialog"
+         tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addWorkspaceModalLabel">Add New Workspace</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for adding new workspace -->
+                    <form id="addWorkspaceForm">
+                        <div class="form-group">
+                            <label for="workspaceName">Workspace Name:</label>
+                            <input class="form-control" id="workspaceName" name="workspaceName" required type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="workspaceAvatar">Workspace Avatar:</label>
+                            <input class="form-control-file" id="workspaceAvatar" name="workspaceAvatar"
+                                   placeholder="Choose file"
+                                   type="file">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-primary" id="saveWorkspaceBtn" type="button">Save Workspace</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  channel management  -->
+    <!-- Manage Channel / Private Chat Modal -->
+    <div aria-hidden="true" aria-labelledby="manageChannelModalLabel" class="modal fade" id="manageChannelModal"
+         role="dialog" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manageChannelModalLabel">Manage Channel / Private Chat</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Channel List -->
+                    <h6 class="d-flex justify-content-between align-items-center font-weight-bold">
+                        Channels
+                        <button class="btn btn-success mr-2" data-target="#createChannelModal" data-toggle="modal"
+                                id="btn-create-channel" type="button">Create
+                        </button>
+                    </h6>
+                    <div class="list-group" id="channel-modal-list">
+                        <!-- Channel item -->
+                        <!--                        <a class="list-group-item d-flex justify-content-between align-items-center" href="#">-->
+                        <!--                            Channel 1-->
+                        <!--                            <div>-->
+                        <!--                                <button class="btn btn-sm btn-secondary mr-2" type="button">Edit</button>-->
+                        <!--                                <button class="btn btn-sm btn-danger" type="button">Delete</button>-->
+                        <!--                            </div>-->
+                        <!--                        </a>-->
+                    </div>
+
+                    <!-- Private Chat List -->
+                    <h6 class="mt-4 d-flex justify-content-between align-items-center font-weight-bold">
+                        Private Chats
+                        <button class="btn btn-success mr-2" data-target="#createChannelModal" data-toggle="modal"
+                                id="btn-create-private-chat" type="button">Create
+                        </button>
+                    </h6>
+                    <div class="list-group" id="private-chat-modal-list">
+                        <!-- Private chat item with separate edit and delete buttons -->
+                        <!--                        <a class="list-group-item d-flex justify-content-between align-items-center" href="#">-->
+                        <!--                            Private Chat 1-->
+                        <!--                            <div>-->
+                        <!--                                <button class="btn btn-sm btn-secondary mr-2" type="button">Edit</button>-->
+                        <!--                                <button class="btn btn-sm btn-danger" type="button">Delete</button>-->
+                        <!--                            </div>-->
+                        <!--                        </a>-->
+                    </div>
+                    <div class="text-right mt-4">
+                        <button class="btn btn-secondary mr-2" data-dismiss="modal" type="button">Cancel</button>
+                        <button class="btn btn-primary mr-2" type="button">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Create Channel / Private Chat Modal -->
+    <div aria-hidden="true" aria-labelledby="createChannelModalLabel" class="modal fade" id="createChannelModal"
+         role="dialog" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createChannelModalLabel">Create Channel / Private Chat</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="createChannelForm">
+                        <div class="form-group">
+                            <label for="channelName">Name:</label>
+                            <input class="form-control" id="channelName" name="channelName" required type="text">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Cancel</button>
+                    <button class="btn btn-primary" form="createChannelForm" type="submit" value="submit">Create
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Create Private Chat Modal -->
+    <div aria-hidden="true" aria-labelledby="createPrivateChatModelLabel" class="modal fade" id="createPrivateChatModel"
+         role="dialog" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createPrivateChatModelLabel">Create Channel / Private Chat</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="createPrivateForm">
+                        <!--                        <div class="form-group">-->
+                        <!--                            <label for="channelName">Name:</label>-->
+                        <!--                            <input class="form-control" id="channelName" name="channelName" required type="text">-->
+                        <!--                        </div>-->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Cancel</button>
+                    <button class="btn btn-primary" form="createChannelForm" type="submit" value="submit">Create
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for displaying channel members -->
+    <div aria-hidden="true" aria-labelledby="channelMembersModalLabel" class="modal fade" id="channelMembersModal"
+         role="dialog" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="channelMembersModalLabel">Channel Members</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- List group for displaying channel members -->
+                    <div class="list-group" id="channelMembersList">
+                        <!-- Member items will be populated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
                 </div>
             </div>
         </div>

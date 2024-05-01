@@ -109,6 +109,7 @@ public class UserService {
 
                     dto.setWorkspaceId(workspaceMember.getWorkspace().getId());
                     dto.setWorkspaceName(workspaceMember.getWorkspace().getName());
+                    dto.setWorkspaceAvatar(workspaceMember.getWorkspace().getAvatar());
 
                     dto.setMemberId(workspaceMember.getId());
                     dto.setJoinedAt(workspaceMember.getJoinedAt());

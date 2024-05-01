@@ -245,7 +245,7 @@ function searchDropDown() {
                     return this.nodeType !== 1 || this.nodeName !== 'SPAN';
                 }).remove();
 
-                let span = $('<span class="condition-tag" contenteditable="false">' + condition + '</span>').addClass(condition + "-tag");
+                let span = $('<span class="condition-tag" contenteditable="true">' + condition + '</span>').addClass(condition + "-tag");
 
                 // Create a contenteditable div
                 let contentEditableDiv = $('<div class="search-keyword" contenteditable="true"><br /></div>');
@@ -313,10 +313,6 @@ function searchDropDown() {
         let containLink = null;
         let containImage = null;
         let containFile = null;
-
-        // Wrap dates with single quotes
-        const formattedBeforeDate = beforeDate ? "'" + beforeDate + "'" : '';
-        const formattedAfterDate = afterDate ? "'" + afterDate + "'" : '';
 
         // Extract contain condition
         $('.contain-tag').each(function () {

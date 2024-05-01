@@ -29,7 +29,7 @@ public class WorkspaceController {
         this.workspaceService = workspaceService;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<?> getUserWorkspaces() {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -51,7 +51,7 @@ public class WorkspaceController {
                 .body(new DataResponse<>(workspaceDto));
     }
 
-    @PostMapping(value = "/", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> createWorkspace(@ModelAttribute WorkspaceForm workspaceForm) throws IOException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

@@ -2,27 +2,33 @@ $(document).ready(async function () {
 
     const channels = await fetchChannelsByMemberId(getMemberId());
     sessionStorage.setItem("channels", JSON.stringify(channels));
-    addChannelsInSideBar(channels);
-    
+    addChannelsInSideBarAndModal(channels);
+
     renderMessageEditor();
 
     // display user inf
     const user = JSON.parse(localStorage.getItem('user'));
     $('#welcome-message').text('Welcome, ' + user.name);
-    $('.username').text(user.name);
+
+    // render user status (at left bottom)
+    renderUserStatus(user);
 
     const workspace_id = getWorkspaceIdInUrl();
+
+    renderWorkspaceTab(workspace_id);
     // workspace Inf
-    await getWorkspaceInf(workspace_id);
+    await fetchAndRenderWorkspaceInf(workspace_id);
 
     scrollMessageContainerToBottom();
 
     const channelIds = channels.map(channel => channel.id);
-    addMessagingStomp(channelIds);
+    const stompClient = addMessagingStomp(channelIds);
     // Button setting
     toggleSideBarChannel();
     videoCallButton();
     toggleChannelMember();
+    workspaceSetting();
+    handleCreateChannel(stompClient);
 
     // searchbar
     searchDropDown();
@@ -84,18 +90,13 @@ function renderChannelContent(channel, messageHistory, member_id) {
     if (!messageHistory.is_private) {
         $('.btn-channel-member').show();
 
-        const channelMemberContainer = $('.channel-member-container');
-        // Remove all channel members in container
-        $('.channel-member').remove();
-        // Populate the channel member container
+        const channelMembersList = $('#channelMembersList');
+        channelMembersList.empty(); // Clear existing members
+
         for (const member of channel.members) {
-            // member
-            const memberDiv = $('<div class="channel-member"></div>').attr('data-id', member.id);
-            // member avatar
-            const avatarImg = $('<img>').addClass('channel-member-avatar').attr('src', member.user.avatar);
-            // member name
-            const nameSpan = $('<span></span>').text(member.user.name);
-            // member status
+            const listItem = $('<a class="list-group-item d-flex justify-content-between align-items-center"></a>');
+
+            const avatarImg = $('<img>').addClass('chat-partner-avatar').attr('src', member.user.avatar);
             switch (member.user.status) {
                 case "ONLINE":
                     avatarImg.addClass('online');
@@ -112,9 +113,10 @@ function renderChannelContent(channel, messageHistory, member_id) {
                 default:
                     break;
             }
-            memberDiv.append(avatarImg, nameSpan);
-            // Append the member
-            channelMemberContainer.append(memberDiv);
+            const nameSpan = $('<span></span>').text(member.user.name);
+            const deleteBtn = $('<button class="btn btn-sm btn-danger">Delete</button>');
+
+            listItem.append($('<div>').append(avatarImg, nameSpan), deleteBtn).appendTo(channelMembersList);
         }
     } else {
         $('.btn-channel-member').hide();
@@ -242,27 +244,35 @@ async function fetchChannelsByMemberId(member_id) {
     }
 }
 
-function addChannelsInSideBar(channels) {
+function addChannelsInSideBarAndModal(channels) {
+
     for (let channel of channels) {
+        const channelSideBar = $('<div class="chat-partner details-item"></div>');
+        const channelModal = $('<div class="list-group-item d-flex justify-content-between align-items-center"></div>');
+
+        const modalEditBtn = $('<div>')
+            .append($('<button>', {class: 'btn btn-sm btn-secondary mr-2', type: 'button', text: 'Edit'}))
+            .append($('<button>', {class: 'btn btn-sm btn-danger', type: 'button', text: 'Delete'}));
+
         // Check if the channel is private
         if (channel.is_private) {
-            // Create a new channel element
-            const channelElement = $('<div class="chat-partner details-item"></div>');
-            const avatarImg = $('<img class="chat-partner-avatar channel-title-prefix">').attr('src', '/img/profile2.png');// TODO: replace fixed value
-            channelElement.append(avatarImg);
-            channelElement.append("Alice");  // TODO: replace fixed value
+            const avatarImg = $('<img class="chat-partner-avatar channel-title-prefix">')
+                .attr('src', '/img/profile2.png');// TODO: replace fixed value
 
-            channelElement.attr('data-channel-id', channel.id);
-            $('#chat-container').append(channelElement);
+            channelSideBar.attr('data-channel-id', channel.id).append(avatarImg, "Alice");
+            $('#chat-container').append(channelSideBar);
+
+            channelModal.attr('data-channel-id', channel.id).append($('<div>').append(avatarImg.clone(), "Alice"), modalEditBtn);
+            $('#private-chat-modal-list').append(channelModal);
         } else {
             // If it's not private
-            const channelElement = $('<div class="channel-title details-item"></div>');
-            channelElement.attr('data-channel-id', channel.id);
             const hashSpan = $('<span class="channel-title-prefix">#</span>');
-            channelElement.append(hashSpan);
-            channelElement.append(channel.name);
+            channelSideBar.attr('data-channel-id', channel.id).append(hashSpan, channel.name);
+            $('#channel-container').append(channelSideBar);
 
-            $('#channel-container').append(channelElement);
+
+            channelModal.attr('data-channel-id', channel.id).append($('<div>').append(hashSpan.clone(), channel.name), modalEditBtn);
+            $('#channel-modal-list').append(channelModal);
         }
     }
 }
@@ -278,7 +288,7 @@ function toggleChannelMember() {
     });
 }
 
-async function getWorkspaceInf(workspaceId) {
+async function fetchAndRenderWorkspaceInf(workspaceId) {
 
     async function fetchWorkspace() {
         const url = `/api/v1/workspace/${workspaceId}`;
@@ -314,42 +324,46 @@ async function getWorkspaceInf(workspaceId) {
     // name
     $('#workspace-name').text(workspace.name).attr('data-workspace-id', workspace.id);
 
-    // TODO: avatar
-
     // members
     workspace.members.forEach(function (member) {
-        // Create a div element for the member
-        var memberDiv = $('<div>', {
-            'class': 'member',
-            'data-member-id': member.id
-        });
-
-        // Add avatar to the div
-        var avatarImg = $('<img>', {
-            'class': 'avatar',
-            'src': member.user.avatar,
-            'alt': member.user.name + ' Avatar'
-        });
-        memberDiv.append(avatarImg);
-
-        // Add member name to the div
-        var nameSpan = $('<span>', {
-            'class': 'name',
-            'text': member.user.name
-        });
-        memberDiv.append(nameSpan);
-
-        // Add label if member is the creator
-        if (member.is_creator) {
-            var labelSpan = $('<span>', {
-                'class': 'label',
-                'text': 'Creator'
+        // Create list item
+        const listItem = $('<a>')
+            .addClass('list-group-item list-group-item-action d-flex align-items-center')
+            .attr({
+                'href': '#',
+                'data-member-id': member.id
             });
-            memberDiv.append(labelSpan);
+
+        // Create avatar image
+        const avatarImg = $('<img>').addClass('avatar mr-3')
+            .attr({
+                'src': member.user.avatar
+            });
+
+        // Create member details container
+        const memberDetails = $('<div>').addClass('member-details d-flex align-items-center justify-content-between');
+
+        // Create name span
+        const nameSpan = $('<span>').addClass('name')
+            .text(member.user.name);
+
+        // Append name span to member details container
+        memberDetails.append(nameSpan);
+
+        // Check if member is the creator and add label image
+        if (member.is_creator) {
+            const labelImg = $('<img>').addClass('creator-label')
+                .attr({
+                    'src': '/icons/crown.png'
+                });
+            memberDetails.append(labelImg);
         }
 
-        // Append the member div to the modal body
-        $('.modal-body').append(memberDiv);
+        // Append avatar image and member details container to list item
+        listItem.append(avatarImg, memberDetails);
+
+        // Append list item to list group
+        $('.workspace-member-list').append(listItem);
     });
 
     $('[data-toggle="popover"]').popover({
@@ -413,7 +427,6 @@ function searchDropDown() {
 
         // Create dropdown items for each workspace member
         workspaceMembers.forEach(member => {
-            console.log(member);
             const $item = $('<div>').addClass('search-dropdown-item').addClass('workspace-member').data('member-id', member.id);
             const $avatar = $('<img>').addClass('avatar').attr('src', member.user.avatar);
             const $name = $('<span>').addClass('member-name').text(member.user.name);
@@ -584,4 +597,243 @@ function searchDropDown() {
         window.location.href = `${window.location.href}/search`;
     });
 
+}
+
+// Handle click event for btn-add-workspace
+function workspaceSetting() {
+    $('.btn-add-workspace').click(function () {
+        // Show the modal when the button is clicked
+        $('#addWorkspaceModal').modal('show');
+    });
+
+    // saveWorkspaceBtn
+    $('#saveWorkspaceBtn').click(async function () {
+        const access_token = localStorage.getItem('access_token');
+
+        // Create FormData
+        const formData = new FormData();
+        formData.append('name', $('#workspaceName').val());
+        formData.append('avatarImageFile', $('#workspaceAvatar')[0].files[0]);
+
+        try {
+            const response = await fetch(`/api/v1/workspace`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                body: formData
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok) {
+                // Close the modal after saving
+                $('#addWorkspaceModal').modal('hide');
+
+                // update the user workspace member
+                await getUserWorkspaceInf();
+
+                // Redirect to created workspace
+                window.location.href = `/workspace/${responseData.data.id}`;
+            } else {
+                console.error(responseData.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+}
+
+
+async function getUserWorkspaceInf() {
+
+    const access_token = localStorage.getItem('access_token');
+    try {
+        // Function to fetch the first workspace ID associated with the user
+
+        const response = await fetch('/api/v1/user/workspaceMembers', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + access_token
+            }
+        });
+
+        const responseBody = await response.json();
+
+        if (response.ok) {
+            const first_workspace_id = responseBody.data[0].workspace_id;
+
+            if (first_workspace_id) {
+                sessionStorage.setItem('user_workspace_members', JSON.stringify(responseBody.data));
+                window.location.href = '/workspace/' + first_workspace_id;
+            } else {
+                // TODO: show user page for creating workspace
+                alert("User doesn't have any workspace")
+            }
+
+        } else {
+            // Handle login error
+            alert(responseBody.message)
+        }
+    } catch (error) {
+        alert(error.message + ', please try again.');
+    }
+}
+
+function renderUserStatus(user) {
+    // Create an image element for the user avatar
+    const avatarImg = $('<img>').addClass('avatar-image').attr('src', user.avatar).attr('alt', 'User Avatar');
+
+    // Avatar
+    let status = user.status ? user.status.toLowerCase() : 'online';
+    $('.user-avatar').addClass(status).append(avatarImg);
+
+    $('.username').text(user.name);
+
+    $('.user-status').text(status[0].toUpperCase() + status.substring(1));
+}
+
+function renderWorkspaceTab(workspace_id) {
+
+    const workspaces = JSON.parse(sessionStorage.getItem("user_workspace_members"));
+    console.log(workspaces);
+
+    for (let workspace of workspaces) {
+        // Create a button element for the workspace
+        const button = $('<button>')
+            .addClass('workspace-card')
+            .attr('data-workspace-id', workspace.workspace_id)
+            .attr('data-member-id', workspace.member_id)
+            .css('background-image', 'url(' + workspace.workspace_avatar + ')')
+            .on('click', function () {
+                window.location.href = '/workspace/' + workspace.workspace_id; // Redirect to workspace
+            });
+        // Check if the workspace_id matches the input workspace_id
+        if (workspace.workspace_id === workspace_id) {
+            button.addClass('active'); // Add 'active' class to the button
+        }
+        // Prepend the button to the workspaceTab
+        button.prependTo('#workspaces-tab');
+    }
+}
+
+$('#btn-create-channel, #btn-create-private-chat').click(function () {
+    // Clear the form
+    $('#createChannelForm')[0].reset();
+    // Open the modal
+    // $('#manageChannelModal').modal('show');
+    $('#manageChannelModal').modal('hide');
+});
+
+function handleCreateChannel(stompClient) {
+    $('#createChannelForm').submit(async function (event) {
+        // Prevent the default form submission
+        event.preventDefault();
+
+        async function fetchCreateChannel(is_private) {
+            try {
+                // Get the form data
+                const formData = {
+                    workspace_id: getWorkspaceIdInUrl(),
+                    name: $('#channelName').val(),
+                    is_private: false
+                };
+
+                const accessToken = localStorage.getItem('access_token');
+
+                if (!accessToken) {
+                    console.error("Access token not found in local storage. Redirecting to login page.");
+                    // window.location.href = '/login'; // Redirect to profile page
+                    alert("please add access token!")
+                    return;
+                }
+
+                // Fetch options
+                let options = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify(formData)
+                };
+
+                // Send the fetch request to create the channel
+                const response = await fetch('/api/v1/channel', options);
+
+                if (!response.ok) {
+                    throw new Error('Create channel failed');
+                }
+
+                // Parse the response JSON data
+                const responseBody = await response.json();
+                return responseBody.data.id;
+            } catch (error) {
+                // Handle any errors
+                console.error('Error creating channel: ', error);
+                alert('Error creating channel: ' + error);
+            }
+        }
+
+        const create_channel_id = await fetchCreateChannel(false);
+
+        async function fetchAndRenderChannelById(id) {
+            try {
+                const accessToken = localStorage.getItem('access_token');
+
+                // Fetch the channel data by its ID
+                options = {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                };
+
+                const response = await fetch(`/api/v1/channel/${id}`, options);
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch channel data');
+                }
+
+                // Parse the channel data
+                const requestBody = await response.json();
+
+                const channelData = requestBody.data;
+
+                // Add the channel to the sidebar
+                let channelElement;
+                if (channelData.is_private) {
+                    channelElement = $('<div class="chat-partner details-item"></div>');
+                    const avatarImg = $('<img class="chat-partner-avatar channel-title-prefix">')
+                        .attr('src', '/img/profile2.png'); // TODO: Replace with actual avatar URL
+                    channelElement.append(avatarImg);
+                    channelElement.append(channelData.name);
+
+                    channelElement.attr('data-channel-id', channelData.id);
+                    $('#chat-container').append(channelElement);
+                } else {
+                    channelElement = $('<div class="channel-title details-item"></div>');
+                    channelElement.attr('data-channel-id', channelData.id);
+                    const hashSpan = $('<span class="channel-title-prefix">#</span>');
+                    channelElement.append(hashSpan);
+                    channelElement.append(channelData.name);
+
+                    $('#channel-container').append(channelElement);
+                }
+                toggleSideBarChannel();
+                channelElement.click();
+                subscribeChannel(stompClient, channelData.id);
+                // close the modal
+                $('#createChannelModal').modal('hide');
+            } catch (error) {
+                // Handle any errors
+                console.error('Error fetching channel by id: ', error);
+                alert('Error fetching channel by id: ' + error);
+            }
+        }
+
+        if (create_channel_id) {
+            await fetchAndRenderChannelById(create_channel_id);
+        }
+    });
 }
