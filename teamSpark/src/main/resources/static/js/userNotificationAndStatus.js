@@ -6,7 +6,7 @@
         });
     } else {
         stompClient = new StompJs.Client({
-            brokerURL: 'ws://' + hostName + '/notificationWebsocket'
+            brokerURL: 'wss://' + hostName + '/notificationWebsocket'
         });
     }
 

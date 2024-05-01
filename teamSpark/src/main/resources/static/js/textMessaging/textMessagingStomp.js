@@ -1,7 +1,14 @@
 addMessagingStomp = function (channelIds) {
-    const stompClient = new StompJs.Client({
-        brokerURL: 'ws://' + hostName + ':8080/textMessagingWebsocket'
-    });
+    let stompClient;
+    if (hostName === 'localhost') {
+        stompClient = new StompJs.Client({
+            brokerURL: 'ws://' + hostName + ':8080/textMessagingWebsocket'
+        });
+    } else {
+        stompClient = new StompJs.Client({
+            brokerURL: 'wss://' + hostName + '/textMessagingWebsocket'
+        });
+    }
 
     stompClient.onConnect = (frame) => {
         setConnected(true);

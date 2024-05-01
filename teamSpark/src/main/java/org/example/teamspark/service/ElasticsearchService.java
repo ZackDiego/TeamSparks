@@ -115,7 +115,7 @@ public class ElasticsearchService {
         }
     }
 
-    public String getDocumentsByIndexName(String indexName) throws JsonProcessingException {
+    public String getDocumentsByIndexName(String indexName) throws ElasticsearchFailedException {
 
         // Create HttpHeaders with authentication
         HttpHeaders headers = createHeaders(ESUserName, ESPassword);
@@ -129,8 +129,7 @@ public class ElasticsearchService {
             ResponseEntity<String> response = restTemplate.exchange(searchUrl, HttpMethod.GET, requestEntity, String.class);
             return response.getBody();
         } catch (Exception e) {
-            log.error("Index already exists in Elasticsearch: " + indexName);
-            throw new RuntimeException("Failed to get data from index: " + indexName);
+            throw new ElasticsearchFailedException("Failed to get data from index: " + indexName + " becuase of " + e.getMessage());
         }
     }
 

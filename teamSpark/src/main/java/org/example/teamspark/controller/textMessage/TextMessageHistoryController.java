@@ -3,6 +3,7 @@ package org.example.teamspark.controller.textMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.example.teamspark.data.DataResponse;
 import org.example.teamspark.data.dto.message.MessageHistoryDto;
+import org.example.teamspark.exception.ElasticsearchFailedException;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.service.MessageHistoryService;
@@ -28,7 +29,7 @@ public class TextMessageHistoryController {
 
     // get message history by channel id
     @GetMapping("")
-    public ResponseEntity<?> getMessagesByChannelId(@PathVariable Long channelId) throws ResourceAccessDeniedException, JsonProcessingException {
+    public ResponseEntity<?> getMessagesByChannelId(@PathVariable Long channelId) throws ResourceAccessDeniedException, JsonProcessingException, ElasticsearchFailedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 

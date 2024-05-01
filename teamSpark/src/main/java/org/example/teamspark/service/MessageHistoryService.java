@@ -33,7 +33,7 @@ public class MessageHistoryService {
         this.channelMemberRepository = channelMemberRepository;
     }
 
-    public MessageHistoryDto getMessagesByChannelId(Long channelId, User user) throws ResourceAccessDeniedException, JsonProcessingException {
+    public MessageHistoryDto getMessagesByChannelId(Long channelId, User user) throws ResourceAccessDeniedException, JsonProcessingException, ElasticsearchFailedException {
 
         if (!isUserMemberOfChannel(user.getId(), channelId)) {
             throw new ResourceAccessDeniedException("User Id " + user.getId() + " does not belong to the channel Id " + channelId);
