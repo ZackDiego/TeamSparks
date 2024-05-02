@@ -37,9 +37,22 @@
 }
 
 .btn-add-workspace {
-    /*background-color: transparent;*/
-    /*background-image: url('/icons/add.png');*/
-    background: url("/icons/add.png") no-repeat;
+    margin: 12px;
+    height: 50px;
+    width: 50px;
+    background-color: #F8E3FF;
+    color: #3F0E41;
+    background-size: cover;
+    box-shadow: none;
+    border: none;
+    font-size: 30px;
+    border-radius: 50%;
+    line-height: 0;
+    transition: border-radius 0.3s ease;
+}
+
+.btn-add-workspace:hover {
+    border-radius: 5px;
 }
 
 #sidebar-container {
@@ -59,7 +72,7 @@
 }
 
 #workspace-name {
-    font-size: 24px;
+    font-size: 20px;
     padding: 10px;
     word-spacing: 0.2em;
     width: 100%;
@@ -147,6 +160,7 @@
 
 .details-item.active {
     background-color: lightgray;
+    font-weight: bold;
 }
 
 .details-item.chat-partner {
@@ -323,11 +337,11 @@
 }
 
 .user-info {
-    flex-grow: 1; /* Allow user info to take up remaining space */
+    flex-grow: 1;
 }
 
 .user-info > div {
-    color: white; /* Allow user info to take up remaining space */
+    color: white;
 }
 
 .username {
@@ -341,14 +355,14 @@
 /* user avatar */
 .user-avatar {
     position: relative;
-    border-radius: 50%; /* Make the avatar round */
-    overflow: hidden; /* Ensure the image stays within the round border */
-    margin-right: 10px; /* Add some spacing between avatar and user info */
+    overflow: hidden;
+    margin-right: 10px;
 }
 
 .user-avatar img {
-    width: 50px; /* Set the width of the avatar image */
-    height: 50px; /* Set the height of the avatar image */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
 }
 
 /* Status indicator dots */
@@ -357,9 +371,11 @@
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 10px;
-    height: 10px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
+    z-index: 1;
+    border: 2px solid #9A929E;
 }
 
 /* Different status indicator dot colors */
@@ -425,6 +441,7 @@
 .content-header-btn {
     width: 25px;
     height: 25px;
+    margin: 0 10px 0 10px;
     background-size: contain;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -434,8 +451,7 @@
 
 .content-header-btn-container {
     display: flex;
-    width: 100px;
-    justify-content: space-around;
+    justify-content: flex-end;
 }
 
 .btn-channel-member {
@@ -456,41 +472,52 @@
     flex-grow: 1;
     overflow-y: auto; /* Add scrollbar when messages overflow */
     display: flex;
-    flex-direction: column; /* Stack messages from bottom to top */
+    flex-direction: column;
     padding: 10px;
 }
 
 .message-container {
-    display: flex; /* Use flexbox to arrange elements in the same row */
-    align-items: center; /* Align items vertically in the center */
-    padding: 10px; /* Add padding for spacing between messages */
-    margin-bottom: 10px; /* Add margin-bottom to separate messages */
-    background-color: #f0f0f0; /* Add background color for messages */
-    border-radius: 8px; /* Add border radius for rounded corners */
-    overflow-wrap: break-word; /* Allow long messages to break into multiple lines */
+    display: flex;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
 }
 
+.message-right {
+    display: flex;
+    flex-direction: column;
+    overflow-wrap: break-word;
+    margin: 0 0 10px 10px;
+}
+
+
 .avatar {
-    width: 30px; /* Set width of the avatar */
-    height: 30px; /* Set height of the avatar */
-    border-radius: 50%; /* Make the avatar round */
-    margin-right: 10px; /* Add margin to separate avatar from other elements */
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    margin: 5px;
 }
 
 .from-name {
-    font-weight: bold; /* Make the name bold */
-    margin-right: 20px;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.message-header {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 5px;
 }
 
 .timestamp {
-    font-size: 0.8em; /* Decrease font size for timestamp */
-    color: #888; /* Set color for timestamp */
-    margin-left: auto; /* Push the timestamp to the rightmost */
+    font-size: 0.7em;
+    color: #888;
+    margin-bottom: 1px;
 }
 
 .message-content {
-    flex-grow: 1; /* Allow message content to grow to fill remaining space */
-    font-size: 0.8em;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -684,4 +711,9 @@ pre {
     width: 25px;
     height: 25px;
     line-height: 18px;
+}
+
+.btn-send {
+    background-color: #6743aa;
+    color: white;
 }

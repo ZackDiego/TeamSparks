@@ -1,5 +1,5 @@
 // specify emoji img source
-document.emojiSource = 'tam-emoji/img';
+// document.emojiSource = 'tam-emoji/img';
 
 // custom button
 var BtnCodeBlock = function (context) {
@@ -22,17 +22,14 @@ renderMessageEditor = function () {
         $messageEditor.summernote({
             height: 100,
             toolbar: [
-                // [groupName, [list of button]]
                 ['style', ['bold', 'italic', 'strikethrough']],
                 ['para', ['ul', 'ol']],
-                ['insert', ['link', 'picture', 'video', 'emoji']],
+                // ['insert', ['link', 'picture', 'video', 'emoji']],
                 ['mybutton', ['codeBlock']],
-                ['view', ['undo', 'redo', 'codeview', 'help']],
+                ['view', ['undo', 'redo']],
             ],
             popover: {
                 image: [
-                    // ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
-                    // ['float', ['floatLeft', 'floatRight', 'floatNone']],
                     ['remove', ['removeMedia']]
                 ],
             },
@@ -44,15 +41,15 @@ renderMessageEditor = function () {
             callbacks: {
                 onInit: function () {
                     // Move the emoji button to the bottom of the toolbar
-                    var toolbar = $messageEditor.siblings('.note-editor').children('.note-toolbar');
-                    var insertToolBox = toolbar.find('.note-insert');
-                    // Create a new div element with the desired class
-                    var customToolbar = $('<div class="note-toolbar card-header bottom-toolbar p-2 d-flex justify-content-between align-items-center" role="toolbar"></div>');
-                    // Append the insertToolBox to the customToolbar
-                    customToolbar.append(insertToolBox);
+                    // var toolbar = $messageEditor.siblings('.note-editor').children('.note-toolbar');
+                    // var insertToolBox = toolbar.find('.note-insert');
+                    // // Create a new div element with the desired class
+                    const customToolbar = $('<div class="note-toolbar card-header bottom-toolbar p-2 d-flex justify-content-end align-items-center" role="toolbar"></div>');
+                    // // Append the insertToolBox to the customToolbar
+                    // customToolbar.append(insertToolBox);
 
                     // Add send button
-                    var sendButton = $('<button type="button" class="note-btn btn btn-sm btn-primary btn-send mr-2">Send</button>');
+                    const sendButton = $('<button type="button" class="note-btn btn btn-sm btn-send mr-2">Send</button>');
                     customToolbar.append(sendButton);
 
                     // Append the customToolbar after the original toolbar
@@ -63,6 +60,8 @@ renderMessageEditor = function () {
 
         $messageEditor.summernote('lineHeight', 1);
         $messageEditor.summernote('fontSize', 14);
+        // clear the message editor
+        $messageEditor.summernote('code', '');
         $('.note-statusbar').hide();
     });
 }

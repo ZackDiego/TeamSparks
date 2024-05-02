@@ -3,16 +3,15 @@ $(document).ready(async function () {
     // display user inf
     const user = JSON.parse(localStorage.getItem('user'));
     $('#welcome-message').text('Welcome, ' + user.name);
-    $('.username').text(user.name);
 
     const workspace_id = getWorkspaceIdInSearchUrl();
-    console.log(workspace_id);
+    renderWorkspaceTab(workspace_id);
 
     const channels = await fetchChannelsByMemberId(getMemberId());
     sessionStorage.setItem("channels", JSON.stringify(channels));
 
     const searchResultMessages = await fetchSearchResult();
-    console.log(searchResultMessages);
+
     renderSearchResult(searchResultMessages);
     renderSearchConditions();
 
@@ -92,7 +91,8 @@ function renderSearchResult(messagesData) {
     $('.message-container').remove();
     // Sort messages by date
     const messages = messagesData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    console.log(messages);
+
+    const membersData = JSON.parse(sessionStorage.getItem('workspaceMembers'));
 
     // Display total number of results
     $('.result-number').text(messages.length);
@@ -101,23 +101,32 @@ function renderSearchResult(messagesData) {
         const channelIdString = message.message_id.indexName.replace('channel-', ''); // Remove 'channel-' prefix
         const channelId = parseInt(channelIdString, 10);
 
-        const channelName = getChannelNameById(channelId);
         // message channel tag
+        const channelName = getChannelNameById(channelId);
+
         const channelTag = $('<span>').addClass('in-channel').text('# ' + channelName);
+
         // message
-        const membersData = JSON.parse(sessionStorage.getItem('workspaceMembers'));
-        // Function to find the user object by ID
-        const from_user = membersData.find(user => user.id === message.from_id)?.user;
-        const avatar = $('<img>').addClass('avatar').attr('src', from_user.avatar);
-        const fromName = $('<div>').addClass('from-name').text(message.from_name);
-        const content = $('<div>').addClass('message-content').html(message.content)
-        const timestamp = $('<div>').addClass('timestamp').text(new Date(message.created_at).toLocaleString());
+        function createMessageElement(message) {
+            // Function to find the user object by ID
+            const from_user = membersData.find(user => user.id === message.from_id)?.user;
+            const avatar = $('<img>').addClass('avatar').attr('src', from_user.avatar);
+
+            const fromName = $('<div>').addClass('from-name').text(message.from_name);
+            const timestamp = $('<div>').addClass('timestamp').text(new Date(message.created_at).toLocaleString());
+            const messageHeader = $('<div>').addClass('message-header').append(fromName, timestamp);
+
+            const content = $('<div>').addClass('message-content').html(message.content);
+
+            // Create message container
+            return $('<div>').addClass('message-container')
+                .attr('data-channel-id', channelId)
+                .attr('data-message-id', message.message_id.documentId)
+                .append(avatar, $('<div>').addClass('message-right').append(messageHeader, content));
+        }
 
         // Create message container
-        const messageDiv = $('<div>').addClass('message-container')
-            .attr('data-channel-id', channelId)
-            .attr('data-message-id', message.message_id.documentId)
-            .append(avatar, fromName, content, timestamp);
+        const messageDiv = createMessageElement(message);
 
         // Create wrapper for channel tag and message
         const messageWrapper = $('<div>').addClass('message-wrapper');
@@ -367,5 +376,29 @@ async function fetchChannelsByMemberId(member_id) {
         return responseData.data;
     } else {
         console.error(responseData.message);
+    }
+}
+
+function renderWorkspaceTab(workspace_id) {
+
+    const workspaces = JSON.parse(sessionStorage.getItem("user_workspace_members"));
+    console.log(workspaces);
+
+    for (let workspace of workspaces) {
+        // Create a button element for the workspace
+        const button = $('<button>')
+            .addClass('workspace-card')
+            .attr('data-workspace-id', workspace.workspace_id)
+            .attr('data-member-id', workspace.member_id)
+            .css('background-image', 'url(' + workspace.workspace_avatar + ')')
+            .on('click', function () {
+                window.location.href = '/workspace/' + workspace.workspace_id; // Redirect to workspace
+            });
+        // Check if the workspace_id matches the input workspace_id
+        if (workspace.workspace_id === workspace_id) {
+            button.addClass('active'); // Add 'active' class to the button
+        }
+        // Prepend the button to the workspaceTab
+        button.prependTo('#workspaces-tab');
     }
 }

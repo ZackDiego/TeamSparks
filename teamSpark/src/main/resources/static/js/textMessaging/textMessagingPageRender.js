@@ -10,12 +10,12 @@ $(document).ready(async function () {
     const user = JSON.parse(localStorage.getItem('user'));
     $('#welcome-message').text('Welcome, ' + user.name);
 
+    const workspace_id = getWorkspaceIdInUrl();
+    renderWorkspaceTab(workspace_id);
+
     // render user status (at left bottom)
     renderUserStatus(user);
 
-    const workspace_id = getWorkspaceIdInUrl();
-
-    renderWorkspaceTab(workspace_id);
     // workspace Inf
     await fetchAndRenderWorkspaceInf(workspace_id);
 
@@ -135,26 +135,57 @@ function renderChannelContent(channel, messageHistory) {
 
     // --- Message history container
     const messagesContainer = $('.message-history-container');
-    // Remove all message container
+// Remove all message container
     $('.message-container').remove();
-    // Sort messages by date
-    const messages = messageHistory.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-    $.each(messages, function (index, message) {
-        const membersData = JSON.parse(sessionStorage.getItem('workspaceMembers'));
+// Sort messages by date
+    const messages = messageHistory.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    const membersData = JSON.parse(sessionStorage.getItem('workspaceMembers'));
+
+// Function to create message element
+    function createMessageElement(message) {
         // Function to find the user object by ID
         const from_user = membersData.find(user => user.id === message.from_id)?.user;
         const avatar = $('<img>').addClass('avatar').attr('src', from_user.avatar);
+
         const fromName = $('<div>').addClass('from-name').text(message.from_name);
-        const content = $('<div>').addClass('message-content').html(message.content)
         const timestamp = $('<div>').addClass('timestamp').text(new Date(message.created_at).toLocaleString());
+        const messageHeader = $('<div>').addClass('message-header').append(fromName, timestamp);
+
+        const content = $('<div>').addClass('message-content').html(message.content);
 
         // Create message container
-        const messageDiv = $('<div>').addClass('message-container')
-            .append(avatar, fromName, content, timestamp);
+        return $('<div>').addClass('message-container')
+            .append(avatar, $('<div>').addClass('message-right').append(messageHeader, content));
+    }
+
+// Function to check if dates are different
+    function datesAreDifferent(date1, date2) {
+        return new Date(date1).toDateString() !== new Date(date2).toDateString();
+    }
+
+// Initialize previous date
+    let prevDate = null;
+
+    $.each(messages, function (index, message) {
+        const currentDate = new Date(message.created_at).toLocaleDateString();
+
+        // Check if dates are different and insert date divider
+        if (prevDate && datesAreDifferent(currentDate, prevDate)) {
+            // Create date divider with date text
+            const dateDivider = $('<div>').addClass('date-divider').attr('data-date', currentDate)
+                .append($('<hr>'), $('<div>').addClass('date-text').text(currentDate));
+            messagesContainer.append(dateDivider);
+        }
+
+        // Create message element
+        const messageElement = createMessageElement(message);
 
         // Append message container to the messages container
-        messagesContainer.append(messageDiv);
+        messagesContainer.append(messageElement);
+
+        // Update previous date
+        prevDate = currentDate;
     });
     scrollMessageContainerToBottom();
 }
@@ -199,7 +230,6 @@ function toggleSideBarChannel() {
 function videoCallButton() {
     $('.btn-video-call').click(function () {
         const channelId = $('#text-messaging-content').data('channel-id');
-        console.log("redirect to videoCall in channel " + channelId);
         window.location.replace("/channel/" + channelId + "/videoCall");
     });
 }
