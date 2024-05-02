@@ -248,6 +248,8 @@
     min-width: 100px;
     width: 40vw;
     height: 40px;
+    display: flex;
+    align-items: center;
 }
 
 .header-search-input {
@@ -286,10 +288,6 @@
 }
 
 /*search*/
-.header-search-container {
-    position: relative;
-    display: inline-block;
-}
 
 .search-dropdown {
     position: absolute;
@@ -717,3 +715,12 @@ pre {
     background-color: #6743aa;
     color: white;
 }
+
+.placeholder {
+    position: absolute;
+    color: #999;
+    left: 10px;
+    pointer-events: none;
+}
+
+

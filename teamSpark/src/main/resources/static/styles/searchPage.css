@@ -19,7 +19,7 @@
 }
 
 .search-result {
-
+    overflow-y: auto;
 }
 
 .search-condition-desc {
