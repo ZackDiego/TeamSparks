@@ -105,8 +105,10 @@ function renderSearchResult(messagesData) {
         // message channel tag
         const channelTag = $('<span>').addClass('in-channel').text('# ' + channelName);
         // message
-        const avatarSrc = '/img/profile.png'; // Fixed avatar source for now, you can replace it with actual avatar source
-        const avatar = $('<img>').addClass('avatar').attr('src', avatarSrc);
+        const membersData = JSON.parse(sessionStorage.getItem('workspaceMembers'));
+        // Function to find the user object by ID
+        const from_user = membersData.find(user => user.id === message.from_id)?.user;
+        const avatar = $('<img>').addClass('avatar').attr('src', from_user.avatar);
         const fromName = $('<div>').addClass('from-name').text(message.from_name);
         const content = $('<div>').addClass('message-content').html(message.content)
         const timestamp = $('<div>').addClass('timestamp').text(new Date(message.created_at).toLocaleString());

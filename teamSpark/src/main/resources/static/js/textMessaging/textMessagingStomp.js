@@ -65,7 +65,8 @@ addMessagingStomp = function (channelIds) {
 
         const containsLink = /(?:http|https):\/\/\S+/i.test(content);
 
-        const channelId = $messageEditor.closest('#text-messaging-content').data('channel-id')
+        const channelId = parseInt($('#text-messaging-content').attr('data-channel-id'));
+        console.log("send message to channel " + channelId);
 
         const user = JSON.parse(localStorage.getItem('user'))
         // send message to websocket endpoint
