@@ -475,11 +475,11 @@ function findPrivateChatPartner(channel) {
 function messageRedirect() {
     $('.message-wrapper').click(function () {
         // Get channel ID and message ID
-        var channelId = $(this).find('.message-container').data('channel-id');
-        var messageId = $(this).find('.message-container').data('message-id');
+        const channelId = $(this).find('.message-container').data('channel-id');
+        const messageId = $(this).find('.message-container').data('message-id');
 
         // Create an object to store channel ID and message ID
-        var messageData = {
+        const messageData = {
             channelId: channelId,
             messageId: messageId
         };
