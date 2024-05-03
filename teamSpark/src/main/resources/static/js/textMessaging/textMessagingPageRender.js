@@ -10,12 +10,12 @@ $(document).ready(async function () {
     const user = JSON.parse(localStorage.getItem('user'));
     $('#welcome-message').text('Welcome, ' + user.name);
 
+    const workspace_id = getWorkspaceIdInUrl();
+    renderWorkspaceTab(workspace_id);
+
     // render user status (at left bottom)
     renderUserStatus(user);
 
-    const workspace_id = getWorkspaceIdInUrl();
-
-    renderWorkspaceTab(workspace_id);
     // workspace Inf
     await fetchAndRenderWorkspaceInf(workspace_id);
 
@@ -135,26 +135,58 @@ function renderChannelContent(channel, messageHistory) {
 
     // --- Message history container
     const messagesContainer = $('.message-history-container');
+
     // Remove all message container
     $('.message-container').remove();
+
     // Sort messages by date
     const messages = messageHistory.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    const membersData = JSON.parse(sessionStorage.getItem('workspaceMembers'));
 
-    $.each(messages, function (index, message) {
-        const membersData = JSON.parse(sessionStorage.getItem('workspaceMembers'));
+    // Function to create message element
+    function createMessageElement(message) {
         // Function to find the user object by ID
         const from_user = membersData.find(user => user.id === message.from_id)?.user;
         const avatar = $('<img>').addClass('avatar').attr('src', from_user.avatar);
+
         const fromName = $('<div>').addClass('from-name').text(message.from_name);
-        const content = $('<div>').addClass('message-content').html(message.content)
         const timestamp = $('<div>').addClass('timestamp').text(new Date(message.created_at).toLocaleString());
+        const messageHeader = $('<div>').addClass('message-header').append(fromName, timestamp);
+
+        const content = $('<div>').addClass('message-content').html(message.content);
 
         // Create message container
-        const messageDiv = $('<div>').addClass('message-container')
-            .append(avatar, fromName, content, timestamp);
+        return $('<div>').addClass('message-container')
+            .append(avatar, $('<div>').addClass('message-right').append(messageHeader, content));
+    }
+
+// Function to check if dates are different
+    function datesAreDifferent(date1, date2) {
+        return new Date(date1).toDateString() !== new Date(date2).toDateString();
+    }
+
+// Initialize previous date
+    let prevDate = null;
+
+    $.each(messages, function (index, message) {
+        const currentDate = new Date(message.created_at).toLocaleDateString();
+
+        // Check if dates are different and insert date divider
+        if (prevDate && datesAreDifferent(currentDate, prevDate)) {
+            // Create date divider with date text
+            const dateDivider = $('<div>').addClass('date-divider').attr('data-date', currentDate)
+                .append($('<hr>'), $('<div>').addClass('date-text').text(currentDate));
+            messagesContainer.append(dateDivider);
+        }
+
+        // Create message element
+        const messageElement = createMessageElement(message);
 
         // Append message container to the messages container
-        messagesContainer.append(messageDiv);
+        messagesContainer.append(messageElement);
+
+        // Update previous date
+        prevDate = currentDate;
     });
     scrollMessageContainerToBottom();
 }
@@ -199,7 +231,6 @@ function toggleSideBarChannel() {
 function videoCallButton() {
     $('.btn-video-call').click(function () {
         const channelId = $('#text-messaging-content').data('channel-id');
-        console.log("redirect to videoCall in channel " + channelId);
         window.location.replace("/channel/" + channelId + "/videoCall");
     });
 }
@@ -424,25 +455,39 @@ fetchChannelById = async function (channelId) {
 
 
 function searchDropDown() {
-    const conditions = ['from', 'in', 'before', 'after', 'during', 'contains'];
+    const conditions = ['from', 'in', 'before', 'after'];
 
     // Get suggestion list container
     const $searchInput = $('.header-search-input');
     const $searchDropdown = $('.search-dropdown');
+
+    function removeHash() {
+        let text = $searchInput.html();
+        text = text.replace(/<span>(.*?)<\/span>/g, function (match) {
+            return match.replace(/#/g, '');
+        });
+        $searchInput.html(text);
+    }
 
     // Loop through suggestions array and create HTML elements
     const populateConditions = function (conditions) {
         $searchDropdown.empty();
         conditions.forEach(condition => {
             $('<div>').addClass('search-dropdown-item')
+                .click(function () {
+                    removeHash();
+
+                    let contentEditableDiv = $('<div class="search-keyword" contenteditable="true"><br /></div>');
+
+                    $searchInput.append($(this).html(), contentEditableDiv);
+                })
                 .append(
                     $('<span>').addClass('condition-tag')
                         .addClass(condition + '-tag')
-                        .text(condition))
+                        .text("#" + condition))
                 .appendTo($searchDropdown);
         })
     }
-    populateConditions(conditions);
 
     // Function to populate dropdown with workspace members
     function populateWorkspaceMembers() {
@@ -457,25 +502,36 @@ function searchDropDown() {
             const $avatar = $('<img>').addClass('avatar').attr('src', member.user.avatar);
             const $name = $('<span>').addClass('member-name').text(member.user.name);
             $item.append($avatar, $name).appendTo($searchDropdown);
+
+            // Event listener for clicking on workspace members
+            $item.on('click', function () {
+                console.log('pick member');
+                // Get the name of the clicked workspace member
+                const memberId = $(this).data('member-id');
+                const memberName = $(this).find('.member-name').text();
+                // Find the 'from' tag and insert the member name
+                $searchInput.find('.from-tag').text('#from: ' + memberName).data('from-id', memberId);
+            });
         });
 
         $searchDropdown.css('display', 'block');
+        console.log('load finish');
     }
 
-    // dropdown item
-    $('.search-dropdown-item').on('click', function () {
-        console.log("add dropdown item");
-        // Create a contenteditable div
-        let contentEditableDiv = $('<div class="search-keyword" contenteditable="true"><br /></div>');
-
-        // Set the HTML content of the input field
-        $searchInput.append($(this).html(), contentEditableDiv);
-    });
-
     // Function to show suggestion list when input is focused
-    $searchInput.on('focus', function () {
-        if ($(this).text().trim() === '') {
+    $searchInput.on('keyup', function () {
+        // Get the text content of the search input excluding the content within span elements
+        let text = $searchInput.clone()
+            .find('span').remove().end().text().trim();
+        console.log(text);
+        // Count the occurrences of '#' outside the span
+        let hashCount = text.split('#').length - 1;
+
+        if (hashCount === 1) {
+            populateConditions(conditions);
             $('.search-dropdown').css('display', 'block');
+        } else {
+            $('.search-dropdown').css('display', 'none');
         }
     });
 
@@ -487,20 +543,32 @@ function searchDropDown() {
         }, 100); // Adjust the delay time as needed
     });
 
+    // placeholder
+    const $placeholder = $('.placeholder');
+    $searchInput.on('focus input', function () {
+        if ($(this).text().trim() === '') {
+            // Show the placeholder
+            $placeholder.show();
+        } else {
+            // Hide the placeholder
+            $placeholder.hide();
+        }
+    });
+
     $searchInput.on('input', function () {
+        
         const searchKeyWord = $(this).clone().find('.condition-tag').remove().end().text().trim();
 
         conditions.forEach(condition => {
             // if match the condition
-            if (searchKeyWord.startsWith(condition)) {
-                console.log('turn to tag');
+            if (searchKeyWord.startsWith("#" + condition)) {
 
                 // remove anything except span
                 $(this).contents().filter(function () {
                     return this.nodeType !== 1 || this.nodeName !== 'SPAN';
                 }).remove();
 
-                let span = $('<span class="condition-tag" contenteditable="false">' + condition + '</span>').addClass(condition + "-tag");
+                let span = $('<span class="condition-tag" contenteditable="true">' + '#' + condition + '</span>').addClass(condition + "-tag");
 
                 // Create a contenteditable div
                 let contentEditableDiv = $('<div class="search-keyword" contenteditable="true"><br /></div>');
@@ -515,40 +583,30 @@ function searchDropDown() {
         });
     });
 
-    $searchInput.add($searchDropdown).on('click', '.from-tag', function () {
+    $searchInput.on('click', '.from-tag', function () {
+        console.log('click on from tag');
         // Populate dropdown with workspace members
         populateWorkspaceMembers();
-        console.log("click from tag");
+
     });
 
-    // Event listener for clicking on workspace members
-    $searchDropdown.on('click', '.workspace-member', function () {
-        // Get the name of the clicked workspace member
-        const memberId = $(this).data('member-id');
-        const memberName = $(this).find('.member-name').text();
-        // Find the 'from' tag and insert the member name
-        $searchInput.find('.from-tag').text('from: ' + memberName).data('from-id', memberId);
-    });
 
-    $searchInput.on('click', '.before-tag, .after-tag, .during-tag', function () {
+    $searchInput.on('click', '.before-tag, .after-tag', function () {
         const selectTag = $(this);
 
         // Show the datepicker
         $('#datepicker').datepicker({
             onSelect: function (selectedDate) {
                 // Determine whether it's a "before" or "after" tag
-                // Determine whether it's a "before", "after", or "during" tag
                 let tagType;
                 if (selectTag.hasClass('before-tag')) {
                     tagType = 'before';
                 } else if (selectTag.hasClass('after-tag')) {
                     tagType = 'after';
-                } else if (selectTag.hasClass('during-tag')) {
-                    tagType = 'during';
                 }
 
                 // Insert the selected date inside the corresponding tag
-                $searchInput.find(`.${tagType}-tag`).text(tagType + ': ' + selectedDate);
+                $searchInput.find(`.${tagType}-tag`).text('#' + tagType + ': ' + selectedDate);
 
                 // Hide the datepicker
                 $('#datepicker').datepicker('destroy');
@@ -560,12 +618,13 @@ function searchDropDown() {
         // Extract search keyword
         const searchKeyword = $('.search-keyword').text().trim();
 
+        const headerSearchInput = $('.header-search-input');
         // Extract other search criteria
-        const fromName = $('.from-tag').text().split(': ')[1] || null;
-        const fromId = $('.from-tag').data('from-id') || null;
-        const channelId = $('.in-tag').data('channel-id') || null;
-        const beforeDate = $('.before-tag').text().split(': ')[1];
-        const afterDate = $('.after-tag').text().split(': ')[1];
+        const fromName = headerSearchInput.find('.from-tag').text().split(': ')[1] || null;
+        const fromId = headerSearchInput.find('.from-tag').data('from-id') || null;
+        const channelId = headerSearchInput.find('.in-tag').data('channel-id') || null;
+        const beforeDate = headerSearchInput.find('.before-tag').text().trim().split(': ')[1];
+        const afterDate = headerSearchInput.find('.after-tag').text().trim().split(': ')[1];
         let containLink = null;
         let containImage = null;
         let containFile = null;
@@ -622,7 +681,6 @@ function searchDropDown() {
         // Redirect to the search results page
         window.location.href = `${window.location.href}/search`;
     });
-
 }
 
 // Handle click event for btn-add-workspace

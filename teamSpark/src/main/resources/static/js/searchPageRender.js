@@ -3,18 +3,18 @@ $(document).ready(async function () {
     // display user inf
     const user = JSON.parse(localStorage.getItem('user'));
     $('#welcome-message').text('Welcome, ' + user.name);
-    $('.username').text(user.name);
 
     const workspace_id = getWorkspaceIdInSearchUrl();
-    console.log(workspace_id);
+    renderWorkspaceTab(workspace_id);
 
     const channels = await fetchChannelsByMemberId(getMemberId());
     sessionStorage.setItem("channels", JSON.stringify(channels));
 
     const searchResultMessages = await fetchSearchResult();
-    console.log(searchResultMessages);
-    renderSearchResult(searchResultMessages);
-    renderSearchConditions();
+
+    const keyword = renderSearchConditions();
+    // render and highlight keyword
+    renderSearchResult(searchResultMessages, keyword);
 
     // searchbar
     searchDropDown();
@@ -59,8 +59,6 @@ async function fetchSearchResult() {
     const access_token = localStorage.getItem('access_token');
     const search = JSON.parse(sessionStorage.getItem('searchBody'));
 
-    console.log(search);
-    console.log(JSON.stringify(search));
     try {
         const response = await fetch(`/api/v1/message/search`, {
             method: 'POST',
@@ -85,14 +83,15 @@ async function fetchSearchResult() {
 }
 
 
-function renderSearchResult(messagesData) {
+function renderSearchResult(messagesData, keyword) {
     // --- Message history container
     const messagesContainer = $('.search-result');
     // Remove all message container
     $('.message-container').remove();
     // Sort messages by date
     const messages = messagesData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    console.log(messages);
+
+    const membersData = JSON.parse(sessionStorage.getItem('workspaceMembers'));
 
     // Display total number of results
     $('.result-number').text(messages.length);
@@ -101,23 +100,45 @@ function renderSearchResult(messagesData) {
         const channelIdString = message.message_id.indexName.replace('channel-', ''); // Remove 'channel-' prefix
         const channelId = parseInt(channelIdString, 10);
 
-        const channelName = getChannelNameById(channelId);
         // message channel tag
-        const channelTag = $('<span>').addClass('in-channel').text('# ' + channelName);
+        const channel = getChannelById(channelId);
+
+        let channelTag;
+        if (channel.is_private) {
+            const chat_partner = findPrivateChatPartner(channel);
+            channelTag = $('<span>').addClass('in-channel').text('# Private chat with ' + chat_partner.user.name);
+        } else {
+            channelTag = $('<span>').addClass('in-channel').text('# ' + channel.name);
+        }
+
+
         // message
-        const membersData = JSON.parse(sessionStorage.getItem('workspaceMembers'));
-        // Function to find the user object by ID
-        const from_user = membersData.find(user => user.id === message.from_id)?.user;
-        const avatar = $('<img>').addClass('avatar').attr('src', from_user.avatar);
-        const fromName = $('<div>').addClass('from-name').text(message.from_name);
-        const content = $('<div>').addClass('message-content').html(message.content)
-        const timestamp = $('<div>').addClass('timestamp').text(new Date(message.created_at).toLocaleString());
+        function createMessageElement(message) {
+            // Function to find the user object by ID
+            const from_user = membersData.find(user => user.id === message.from_id)?.user;
+            const avatar = $('<img>').addClass('avatar').attr('src', from_user.avatar);
+
+            const fromName = $('<div>').addClass('from-name').text(message.from_name);
+            const timestamp = $('<div>').addClass('timestamp').text(new Date(message.created_at).toLocaleString());
+            const messageHeader = $('<div>').addClass('message-header').append(fromName, timestamp);
+
+            let content;
+            console.log(keyword);
+            if (keyword !== null) {
+                content = $('<div>').addClass('message-content').html(message.content.replace(new RegExp(keyword, 'gi'), match => `<em>${match}</em>`));
+            } else {
+                content = $('<div>').addClass('message-content').html(message.content);
+            }
+
+            // Create message container
+            return $('<div>').addClass('message-container')
+                .attr('data-channel-id', channelId)
+                .attr('data-message-id', message.message_id.documentId)
+                .append(avatar, $('<div>').addClass('message-right').append(messageHeader, content));
+        }
 
         // Create message container
-        const messageDiv = $('<div>').addClass('message-container')
-            .attr('data-channel-id', channelId)
-            .attr('data-message-id', message.message_id.documentId)
-            .append(avatar, fromName, content, timestamp);
+        const messageDiv = createMessageElement(message);
 
         // Create wrapper for channel tag and message
         const messageWrapper = $('<div>').addClass('message-wrapper');
@@ -128,12 +149,12 @@ function renderSearchResult(messagesData) {
     });
 }
 
-function getChannelNameById(id) {
+function getChannelById(id) {
     const channels = JSON.parse(sessionStorage.getItem('channels'));
     // Loop through the channels array to find the channel with the matching ID
     for (const channel of channels) {
         if (channel.id === id) {
-            return channel.name; // Return the name of the channel
+            return channel; // Return the name of the channel
         }
     }
     // Return null if the channel with the given ID is not found
@@ -149,11 +170,11 @@ function renderSearchConditions() {
         const $searchConditionsContainer = $('.search-conditions');
 
         // Clear existing content
-        $('.search-keyword').empty();
+        $('.search-keyword-placeholder').empty();
         $searchConditionsContainer.empty();
 
         // Fill in the search keyword
-        $('.search-keyword').text(condition.search_keyword);
+        $('.search-keyword-placeholder').text(condition.search_keyword);
 
         // Display other conditions if not null
         if (condition.from_name) $('<span>').addClass('condition-tag').text(`From: ${condition.from_name}`).appendTo($searchConditionsContainer);
@@ -166,29 +187,44 @@ function renderSearchConditions() {
     }
 
     displaySearchConditions(condition);
+    return condition.search_keyword;
 }
 
 
 function searchDropDown() {
-    const conditions = ['from', 'in', 'before', 'after', 'during', 'contains'];
+    const conditions = ['from', 'in', 'before', 'after'];
 
     // Get suggestion list container
     const $searchInput = $('.header-search-input');
     const $searchDropdown = $('.search-dropdown');
+
+    function removeHash() {
+        let text = $searchInput.html();
+        text = text.replace(/<span>(.*?)<\/span>/g, function (match) {
+            return match.replace(/#/g, '');
+        });
+        $searchInput.html(text);
+    }
 
     // Loop through suggestions array and create HTML elements
     const populateConditions = function (conditions) {
         $searchDropdown.empty();
         conditions.forEach(condition => {
             $('<div>').addClass('search-dropdown-item')
+                .click(function () {
+                    removeHash();
+
+                    let contentEditableDiv = $('<div class="search-keyword" contenteditable="true"><br /></div>');
+
+                    $searchInput.append($(this).html(), contentEditableDiv);
+                })
                 .append(
                     $('<span>').addClass('condition-tag')
                         .addClass(condition + '-tag')
-                        .text(condition))
+                        .text("#" + condition))
                 .appendTo($searchDropdown);
         })
     }
-    populateConditions(conditions);
 
     // Function to populate dropdown with workspace members
     function populateWorkspaceMembers() {
@@ -199,30 +235,40 @@ function searchDropDown() {
 
         // Create dropdown items for each workspace member
         workspaceMembers.forEach(member => {
-            console.log(member);
             const $item = $('<div>').addClass('search-dropdown-item').addClass('workspace-member').data('member-id', member.id);
             const $avatar = $('<img>').addClass('avatar').attr('src', member.user.avatar);
             const $name = $('<span>').addClass('member-name').text(member.user.name);
             $item.append($avatar, $name).appendTo($searchDropdown);
+
+            // Event listener for clicking on workspace members
+            $item.on('click', function () {
+                console.log('pick member');
+                // Get the name of the clicked workspace member
+                const memberId = $(this).data('member-id');
+                const memberName = $(this).find('.member-name').text();
+                // Find the 'from' tag and insert the member name
+                $searchInput.find('.from-tag').text('#from: ' + memberName).data('from-id', memberId);
+            });
         });
 
         $searchDropdown.css('display', 'block');
+        console.log('load finish');
     }
 
-    // dropdown item
-    $('.search-dropdown-item').on('click', function () {
-        console.log("add dropdown item");
-        // Create a contenteditable div
-        let contentEditableDiv = $('<div class="search-keyword" contenteditable="true"><br /></div>');
-
-        // Set the HTML content of the input field
-        $searchInput.append($(this).html(), contentEditableDiv);
-    });
-
     // Function to show suggestion list when input is focused
-    $searchInput.on('focus', function () {
-        if ($(this).text().trim() === '') {
+    $searchInput.on('keyup', function () {
+        // Get the text content of the search input excluding the content within span elements
+        let text = $searchInput.clone()
+            .find('span').remove().end().text().trim();
+        console.log(text);
+        // Count the occurrences of '#' outside the span
+        let hashCount = text.split('#').length - 1;
+
+        if (hashCount === 1) {
+            populateConditions(conditions);
             $('.search-dropdown').css('display', 'block');
+        } else {
+            $('.search-dropdown').css('display', 'none');
         }
     });
 
@@ -234,20 +280,32 @@ function searchDropDown() {
         }, 100); // Adjust the delay time as needed
     });
 
+    // placeholder
+    const $placeholder = $('.placeholder');
+    $searchInput.on('focus input', function () {
+        if ($(this).text().trim() === '') {
+            // Show the placeholder
+            $placeholder.show();
+        } else {
+            // Hide the placeholder
+            $placeholder.hide();
+        }
+    });
+
     $searchInput.on('input', function () {
+
         const searchKeyWord = $(this).clone().find('.condition-tag').remove().end().text().trim();
 
         conditions.forEach(condition => {
             // if match the condition
-            if (searchKeyWord.startsWith(condition)) {
-                console.log('turn to tag');
+            if (searchKeyWord.startsWith("#" + condition)) {
 
                 // remove anything except span
                 $(this).contents().filter(function () {
                     return this.nodeType !== 1 || this.nodeName !== 'SPAN';
                 }).remove();
 
-                let span = $('<span class="condition-tag" contenteditable="true">' + condition + '</span>').addClass(condition + "-tag");
+                let span = $('<span class="condition-tag" contenteditable="true">' + '#' + condition + '</span>').addClass(condition + "-tag");
 
                 // Create a contenteditable div
                 let contentEditableDiv = $('<div class="search-keyword" contenteditable="true"><br /></div>');
@@ -262,40 +320,30 @@ function searchDropDown() {
         });
     });
 
-    $searchInput.add($searchDropdown).on('click', '.from-tag', function () {
+    $searchInput.on('click', '.from-tag', function () {
+        console.log('click on from tag');
         // Populate dropdown with workspace members
         populateWorkspaceMembers();
-        console.log("click from tag");
+
     });
 
-    // Event listener for clicking on workspace members
-    $searchDropdown.on('click', '.workspace-member', function () {
-        // Get the name of the clicked workspace member
-        const memberId = $(this).data('member-id');
-        const memberName = $(this).find('.member-name').text();
-        // Find the 'from' tag and insert the member name
-        $searchInput.find('.from-tag').text('from: ' + memberName).data('from-id', memberId);
-    });
 
-    $searchInput.on('click', '.before-tag, .after-tag, .during-tag', function () {
+    $searchInput.on('click', '.before-tag, .after-tag', function () {
         const selectTag = $(this);
 
         // Show the datepicker
         $('#datepicker').datepicker({
             onSelect: function (selectedDate) {
                 // Determine whether it's a "before" or "after" tag
-                // Determine whether it's a "before", "after", or "during" tag
                 let tagType;
                 if (selectTag.hasClass('before-tag')) {
                     tagType = 'before';
                 } else if (selectTag.hasClass('after-tag')) {
                     tagType = 'after';
-                } else if (selectTag.hasClass('during-tag')) {
-                    tagType = 'during';
                 }
 
                 // Insert the selected date inside the corresponding tag
-                $searchInput.find(`.${tagType}-tag`).text(tagType + ': ' + selectedDate);
+                $searchInput.find(`.${tagType}-tag`).text('#' + tagType + ': ' + selectedDate);
 
                 // Hide the datepicker
                 $('#datepicker').datepicker('destroy');
@@ -307,14 +355,26 @@ function searchDropDown() {
         // Extract search keyword
         const searchKeyword = $('.search-keyword').text().trim();
 
+        const headerSearchInput = $('.header-search-input');
         // Extract other search criteria
-        const fromId = $('.from-tag').data('from-id');
-        const channelId = $('.in-tag').data('channel-id');
-        const beforeDate = $('.before-tag').text().split(': ')[1];
-        const afterDate = $('.after-tag').text().split(': ')[1];
+        const fromName = headerSearchInput.find('.from-tag').text().split(': ')[1] || null;
+        const fromId = headerSearchInput.find('.from-tag').data('from-id') || null;
+        const channelId = headerSearchInput.find('.in-tag').data('channel-id') || null;
+        const beforeDate = headerSearchInput.find('.before-tag').text().trim().split(': ')[1];
+        const afterDate = headerSearchInput.find('.after-tag').text().trim().split(': ')[1];
         let containLink = null;
         let containImage = null;
         let containFile = null;
+
+        function formatDate(dateString) {
+            if (!dateString) return null;
+            const [month, day, year] = dateString.replace(/before|after/g, '').split('/');
+            return `${year}-${month}-${day}T00:00:00`;
+        }
+
+        // Wrap dates with single quotes
+        const formattedBeforeDate = beforeDate ? formatDate(beforeDate) : null;
+        const formattedAfterDate = afterDate ? formatDate(afterDate) : null;
 
         // Extract contain condition
         $('.contain-tag').each(function () {
@@ -333,6 +393,17 @@ function searchDropDown() {
             "search_keyword": searchKeyword,
             "from_id": fromId,
             "channel_id": channelId,
+            "before_date": formattedBeforeDate,
+            "after_date": formattedAfterDate,
+            "contain_link": containLink,
+            "contain_image": containImage,
+            "contain_file": containFile
+        };
+
+        const searchCondition = {
+            "search_keyword": searchKeyword,
+            "from_name": fromName, // Change from "from_id" to "from_name"
+            "channel_id": channelId,
             "before_date": beforeDate,
             "after_date": afterDate,
             "contain_link": containLink,
@@ -342,9 +413,10 @@ function searchDropDown() {
 
         // Save search data to session storage
         sessionStorage.setItem('searchBody', JSON.stringify(searchBody));
+        sessionStorage.setItem('searchCondition', JSON.stringify(searchCondition));
 
-        // Redirect to the search results page
-        window.location.href = `${window.location.href}/search`;
+        // Reload page
+        window.location.reload();
     });
 }
 
@@ -368,4 +440,33 @@ async function fetchChannelsByMemberId(member_id) {
     } else {
         console.error(responseData.message);
     }
+}
+
+function renderWorkspaceTab(workspace_id) {
+
+    const workspaces = JSON.parse(sessionStorage.getItem("user_workspace_members"));
+    console.log(workspaces);
+
+    for (let workspace of workspaces) {
+        // Create a button element for the workspace
+        const button = $('<button>')
+            .addClass('workspace-card')
+            .attr('data-workspace-id', workspace.workspace_id)
+            .attr('data-member-id', workspace.member_id)
+            .css('background-image', 'url(' + workspace.workspace_avatar + ')')
+            .on('click', function () {
+                window.location.href = '/workspace/' + workspace.workspace_id; // Redirect to workspace
+            });
+        // Check if the workspace_id matches the input workspace_id
+        if (workspace.workspace_id === workspace_id) {
+            button.addClass('active'); // Add 'active' class to the button
+        }
+        // Prepend the button to the workspaceTab
+        button.prependTo('#workspaces-tab');
+    }
+}
+
+function findPrivateChatPartner(channel) {
+    const member_id = getMemberId();
+    return channel.members.find(member => member.id !== member_id);
 }
