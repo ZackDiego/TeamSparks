@@ -51,7 +51,7 @@ function connectToSocketServer(roomName) {
         socket = io.connect("http://localhost:8001",
             {path: '/videoCallWebsocket', transports: ['websocket', 'xhr-polling', 'jsonp-polling']});
     } else {
-        socket = io.connect(`https://${hostName}`, {path: '/videoCallWebsocket'});
+        socket = io.connect(`https://${hostName}`);
     }
 
     // Error handling

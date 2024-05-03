@@ -1,7 +1,6 @@
 package org.example.teamspark.config;
 
 import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.Transport;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,9 +37,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 new com.corundumstudio.socketio.Configuration();
         config.setHostname(host);
         config.setPort(groupCallPort);
-        config.setTransports(Transport.POLLING, Transport.WEBSOCKET);
-        config.setOrigin("*");
-        config.setContext("/videoCallWebsocket");
+//        config.setTransports(Transport.POLLING, Transport.WEBSOCKET);
+//        config.setOrigin("*");
+//        config.setContext("/videoCallWebsocket");
 //        config.setOrigin("http://localhost:8080");
         return new SocketIOServer(config);
     }
