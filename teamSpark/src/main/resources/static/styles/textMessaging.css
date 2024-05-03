@@ -127,11 +127,23 @@
     background-image: url('/icons/businessmen.png');
 }
 
-.divider {
+.date-divider {
     width: 100%;
-    height: 1px; /* Adjust the height as needed */
-    background-color: #ccc; /* Adjust the color as needed */
-    margin: 10px 0; /* Adjust the margin as needed */
+    margin: 5px 0 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #959595;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+}
+
+.date-divider::before, .date-divider::after {
+    flex: 1;
+    content: '';
+    padding: 1px;
+    margin: 10px;
+    background-color: #ddd;
 }
 
 #list-container {
@@ -480,6 +492,10 @@
     border-radius: 8px;
 }
 
+.message-container:hover {
+    background-color: #e1e1e1;
+}
+
 .message-right {
     display: flex;
     flex-direction: column;
@@ -510,14 +526,6 @@
     font-size: 0.7em;
     color: #888;
     margin-bottom: 1px;
-}
-
-.message-content {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
 }
 
 
@@ -723,3 +731,15 @@ pre {
 }
 
 
+.message-container.flash-background {
+    animation: flash 1.5s infinite;
+}
+
+@keyframes flash {
+    0%, 49% {
+        background-color: #fcb365; /* Flashing color */
+    }
+    50%, 100% {
+        background-color: #f0f0f0; /* Original color */
+    }
+}

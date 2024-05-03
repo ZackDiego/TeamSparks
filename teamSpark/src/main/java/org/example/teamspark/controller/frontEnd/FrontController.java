@@ -39,7 +39,8 @@ public class FrontController {
     }
 
     @GetMapping("/workspace/{workspaceId}/search")
-    public String searchPage() {
+    public String searchPage(Model model) {
+        model.addAttribute("hostName", hostName);
         return "search";
     }
 }

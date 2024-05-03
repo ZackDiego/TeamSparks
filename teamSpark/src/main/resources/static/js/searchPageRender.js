@@ -15,6 +15,7 @@ $(document).ready(async function () {
     const keyword = renderSearchConditions();
     // render and highlight keyword
     renderSearchResult(searchResultMessages, keyword);
+    messageRedirect();
 
     // searchbar
     searchDropDown();
@@ -124,10 +125,10 @@ function renderSearchResult(messagesData, keyword) {
 
             let content;
             console.log(keyword);
-            if (keyword !== null) {
-                content = $('<div>').addClass('message-content').html(message.content.replace(new RegExp(keyword, 'gi'), match => `<em>${match}</em>`));
-            } else {
+            if (keyword === '' || keyword == null) {
                 content = $('<div>').addClass('message-content').html(message.content);
+            } else {
+                content = $('<div>').addClass('message-content').html(message.content.replace(new RegExp(keyword, 'gi'), match => `<em>${match}</em>`));
             }
 
             // Create message container
@@ -469,4 +470,24 @@ function renderWorkspaceTab(workspace_id) {
 function findPrivateChatPartner(channel) {
     const member_id = getMemberId();
     return channel.members.find(member => member.id !== member_id);
+}
+
+function messageRedirect() {
+    $('.message-wrapper').click(function () {
+        // Get channel ID and message ID
+        const channelId = $(this).find('.message-container').data('channel-id');
+        const messageId = $(this).find('.message-container').data('message-id');
+
+        // Create an object to store channel ID and message ID
+        const messageData = {
+            channelId: channelId,
+            messageId: messageId
+        };
+
+        // Store the object in sessionStorage
+        sessionStorage.setItem("messageData", JSON.stringify(messageData));
+
+        // Redirect to the workspace
+        window.location.href = `/workspace/${getWorkspaceIdInSearchUrl()}`;
+    });
 }

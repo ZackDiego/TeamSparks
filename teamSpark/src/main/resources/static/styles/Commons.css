@@ -73,3 +73,7 @@ body {
     border: none;
     background-image: url('/icons/bell.png');
 }
+
+.toast:hover {
+    cursor: pointer;
+}

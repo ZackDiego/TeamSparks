@@ -19,8 +19,6 @@ $(document).ready(async function () {
     // workspace Inf
     await fetchAndRenderWorkspaceInf(workspace_id);
 
-    scrollMessageContainerToBottom();
-
     const channelIds = channels.map(channel => channel.id);
     const stompClient = addMessagingStomp(channelIds);
     // Button setting
@@ -37,8 +35,22 @@ $(document).ready(async function () {
     $("details").attr("open", true);
 
     // click on the first channel
-    if ($('#channel-container .details-item').length) {
-        $('#channel-container .details-item:first').click();
+
+    const messageRedirect = JSON.parse(sessionStorage.getItem('messageData'));
+    if (messageRedirect) {
+
+        // Redirect to the specific message's channel
+        $('.details-item').each(function () {
+            if ($(this).data('channel-id') === messageRedirect.channelId) {
+                $(this).click(); // Trigger click event on the channel
+                return false;
+            }
+        });
+    } else {
+        // If messageRedirect doesn't exist, click on the first channel
+        if ($('#channel-container .details-item').length) {
+            $('#channel-container .details-item:first').click();
+        }
     }
 });
 
@@ -84,7 +96,6 @@ function renderChannelContent(channel, messageHistory) {
     textMessagingContent.attr('data-is-private', messageHistory.is_private);
 
     // --- Channel title
-    const channelTitleContainer = $('.content-header');
     const channelTitle = $('.channel-title.chat-partner-title');
 
     if (messageHistory.is_private) {
@@ -137,7 +148,7 @@ function renderChannelContent(channel, messageHistory) {
     const messagesContainer = $('.message-history-container');
 
     // Remove all message container
-    $('.message-container').remove();
+    messagesContainer.empty();
 
     // Sort messages by date
     const messages = messageHistory.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
@@ -157,25 +168,27 @@ function renderChannelContent(channel, messageHistory) {
 
         // Create message container
         return $('<div>').addClass('message-container')
+            .attr('data-channel-id', channel.id)
+            .attr('data-message-id', message.message_id.documentId)
             .append(avatar, $('<div>').addClass('message-right').append(messageHeader, content));
     }
 
-// Function to check if dates are different
+    // Function to check if dates are different
     function datesAreDifferent(date1, date2) {
         return new Date(date1).toDateString() !== new Date(date2).toDateString();
     }
 
-// Initialize previous date
+    // Initialize previous date
     let prevDate = null;
-
     $.each(messages, function (index, message) {
         const currentDate = new Date(message.created_at).toLocaleDateString();
 
         // Check if dates are different and insert date divider
-        if (prevDate && datesAreDifferent(currentDate, prevDate)) {
+        if (!prevDate || datesAreDifferent(currentDate, prevDate)) {
             // Create date divider with date text
-            const dateDivider = $('<div>').addClass('date-divider').attr('data-date', currentDate)
-                .append($('<hr>'), $('<div>').addClass('date-text').text(currentDate));
+            const dateDivider = $('<div>').addClass('date-divider')
+                .attr('data-date', currentDate)
+                .text(currentDate);
             messagesContainer.append(dateDivider);
         }
 
@@ -188,7 +201,32 @@ function renderChannelContent(channel, messageHistory) {
         // Update previous date
         prevDate = currentDate;
     });
-    scrollMessageContainerToBottom();
+
+    let messageRedirect = JSON.parse(sessionStorage.getItem('messageData'));
+    if (!messageRedirect) {
+        scrollMessageContainerToBottom();
+    } else {
+        console.log("redirect to following message")
+        $('.message-container').each(function () {
+            if ($(this).data('message-id') === messageRedirect.messageId) {
+                const $this = $(this);
+                // scroll to that message
+                $('.message-history-container').animate({
+                    scrollTop: $this.offset().top - $this.outerHeight() - 200
+                }, 500);
+
+                $this.addClass('flash-background');
+
+                setTimeout(function () {
+                    $this.removeClass('flash-background');
+                }.bind(this), 4000);
+
+                return false;
+            }
+        });
+        // remove the message for redirect
+        sessionStorage.removeItem('messageData');
+    }
 }
 
 
@@ -515,7 +553,6 @@ function searchDropDown() {
         });
 
         $searchDropdown.css('display', 'block');
-        console.log('load finish');
     }
 
     // Function to show suggestion list when input is focused
@@ -556,7 +593,7 @@ function searchDropDown() {
     });
 
     $searchInput.on('input', function () {
-        
+
         const searchKeyWord = $(this).clone().find('.condition-tag').remove().end().text().trim();
 
         conditions.forEach(condition => {

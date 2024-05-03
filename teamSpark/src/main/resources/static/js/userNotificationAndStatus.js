@@ -42,7 +42,6 @@
     }
 
     function renderNotification(data) {
-        console.log(data);
 
         // check if user is not the sender & user is not on the channel
         const currentChannelId = parseInt($('#text-messaging-content').attr('data-channel-id'));
@@ -78,12 +77,15 @@
                 <div class="toast-body">${messageText}</div>
             </div>`;
 
-            $('.toast-container').eq(0).append(toastHtml);
+            const toast = $(toastHtml);
+            $('.toast-container').eq(0).append(toast);
 
             // remove when close
             $('.toast .close').on('click', function () {
                 $(this).closest('.toast').remove();
             });
+
+            messageRedirect(toast);
 
             // Show the toast
             $(".toast").toast({
@@ -101,4 +103,34 @@
         disconnect();
     });
 })();
+
+function messageRedirect(toast) {
+    toast.click(function () {
+        // Get channel ID and message ID
+        const channelId = $(this).data('channel-id');
+        const messageId = $(this).data('message-id');
+
+        // Create an object to store channel ID and message ID
+        const messageData = {
+            channelId: channelId,
+            messageId: messageId
+        };
+
+
+        if (window.location.href.includes("/search")) {
+            sessionStorage.setItem("messageData", JSON.stringify(messageData));
+            window.location.href = `/workspace/${getWorkspaceIdInSearchUrl()}`;
+        } else {
+            sessionStorage.setItem("messageData", JSON.stringify(messageData));
+
+            // Redirect to the specific message's channel
+            $('.details-item').each(function () {
+                if ($(this).data('channel-id') === messageData.channelId) {
+                    $(this).click(); // Trigger click event on the channel
+                }
+            });
+        }
+
+    });
+}
 

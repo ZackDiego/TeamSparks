@@ -138,6 +138,28 @@ function subscribeChannel(stompClient, channelId) {
             }
 
             const messageElement = createMessageElement(data);
+
+            function datesAreDifferent(date1, date2) {
+                return new Date(date1).toDateString() !== new Date(date2).toDateString();
+            }
+
+            // check if the last message date is the same with added date
+            const lastMessage = messagesContainer.children('.message-container:last-child');
+
+            const lastMessageTimeStamp = lastMessage.length ?
+                lastMessage.find('.message-right .message-header .timestamp').text().split(' ')[0] : '';
+
+            const currentDate = new Date(data.created_at).toLocaleDateString();
+
+            // Check if dates are different and insert date divider
+            if (!lastMessage.length || datesAreDifferent(currentDate, lastMessageTimeStamp)) {
+                // Create date divider with date text
+                const dateDivider = $('<div>').addClass('date-divider')
+                    .attr('data-date', currentDate)
+                    .text(currentDate);
+                messagesContainer.append(dateDivider);
+            }
+
             // Append message container to the messages container
             messagesContainer.append(messageElement);
         } else {
