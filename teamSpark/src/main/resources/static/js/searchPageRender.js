@@ -124,7 +124,7 @@ function renderSearchResult(messagesData, keyword) {
             const messageHeader = $('<div>').addClass('message-header').append(fromName, timestamp);
 
             let content;
-            console.log(keyword);
+
             if (keyword === '' || keyword == null) {
                 content = $('<div>').addClass('message-content').html(message.content);
             } else {
