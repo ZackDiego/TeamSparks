@@ -12,8 +12,9 @@ $(document).ready(async function () {
 
     const searchResultMessages = await fetchSearchResult();
 
-    renderSearchResult(searchResultMessages);
-    renderSearchConditions();
+    const keyword = renderSearchConditions();
+    // render and highlight keyword
+    renderSearchResult(searchResultMessages, keyword);
 
     // searchbar
     searchDropDown();
@@ -82,7 +83,7 @@ async function fetchSearchResult() {
 }
 
 
-function renderSearchResult(messagesData) {
+function renderSearchResult(messagesData, keyword) {
     // --- Message history container
     const messagesContainer = $('.search-result');
     // Remove all message container
@@ -121,7 +122,13 @@ function renderSearchResult(messagesData) {
             const timestamp = $('<div>').addClass('timestamp').text(new Date(message.created_at).toLocaleString());
             const messageHeader = $('<div>').addClass('message-header').append(fromName, timestamp);
 
-            const content = $('<div>').addClass('message-content').html(message.content);
+            let content;
+            console.log(keyword);
+            if (keyword !== null) {
+                content = $('<div>').addClass('message-content').html(message.content.replace(new RegExp(keyword, 'gi'), match => `<em>${match}</em>`));
+            } else {
+                content = $('<div>').addClass('message-content').html(message.content);
+            }
 
             // Create message container
             return $('<div>').addClass('message-container')
@@ -163,11 +170,11 @@ function renderSearchConditions() {
         const $searchConditionsContainer = $('.search-conditions');
 
         // Clear existing content
-        $('.search-keyword').empty();
+        $('.search-keyword-placeholder').empty();
         $searchConditionsContainer.empty();
 
         // Fill in the search keyword
-        $('.search-keyword').text(condition.search_keyword);
+        $('.search-keyword-placeholder').text(condition.search_keyword);
 
         // Display other conditions if not null
         if (condition.from_name) $('<span>').addClass('condition-tag').text(`From: ${condition.from_name}`).appendTo($searchConditionsContainer);
@@ -180,6 +187,7 @@ function renderSearchConditions() {
     }
 
     displaySearchConditions(condition);
+    return condition.search_keyword;
 }
 
 
@@ -231,9 +239,20 @@ function searchDropDown() {
             const $avatar = $('<img>').addClass('avatar').attr('src', member.user.avatar);
             const $name = $('<span>').addClass('member-name').text(member.user.name);
             $item.append($avatar, $name).appendTo($searchDropdown);
+
+            // Event listener for clicking on workspace members
+            $item.on('click', function () {
+                console.log('pick member');
+                // Get the name of the clicked workspace member
+                const memberId = $(this).data('member-id');
+                const memberName = $(this).find('.member-name').text();
+                // Find the 'from' tag and insert the member name
+                $searchInput.find('.from-tag').text('#from: ' + memberName).data('from-id', memberId);
+            });
         });
 
         $searchDropdown.css('display', 'block');
+        console.log('load finish');
     }
 
     // Function to show suggestion list when input is focused
@@ -274,6 +293,7 @@ function searchDropDown() {
     });
 
     $searchInput.on('input', function () {
+
         const searchKeyWord = $(this).clone().find('.condition-tag').remove().end().text().trim();
 
         conditions.forEach(condition => {
@@ -300,22 +320,13 @@ function searchDropDown() {
         });
     });
 
-    $searchInput.add($searchDropdown).on('click', '.from-tag', function () {
+    $searchInput.on('click', '.from-tag', function () {
+        console.log('click on from tag');
         // Populate dropdown with workspace members
         populateWorkspaceMembers();
-        console.log('click on from tag')
+
     });
 
-    // Event listener for clicking on workspace members
-    $searchDropdown.on('click', '.workspace-member', function () {
-        // Get the name of the clicked workspace member
-
-        console.log('pick member');
-        const memberId = $(this).data('member-id');
-        const memberName = $(this).find('.member-name').text();
-        // Find the 'from' tag and insert the member name
-        $searchInput.find('.from-tag').text('#from: ' + memberName).data('from-id', memberId);
-    });
 
     $searchInput.on('click', '.before-tag, .after-tag', function () {
         const selectTag = $(this);
@@ -404,7 +415,7 @@ function searchDropDown() {
         sessionStorage.setItem('searchBody', JSON.stringify(searchBody));
         sessionStorage.setItem('searchCondition', JSON.stringify(searchCondition));
 
-        // Redirect to the search results page
+        // Reload page
         window.location.reload();
     });
 }

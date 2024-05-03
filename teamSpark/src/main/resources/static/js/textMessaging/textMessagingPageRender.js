@@ -135,14 +135,15 @@ function renderChannelContent(channel, messageHistory) {
 
     // --- Message history container
     const messagesContainer = $('.message-history-container');
-// Remove all message container
+
+    // Remove all message container
     $('.message-container').remove();
 
-// Sort messages by date
+    // Sort messages by date
     const messages = messageHistory.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     const membersData = JSON.parse(sessionStorage.getItem('workspaceMembers'));
 
-// Function to create message element
+    // Function to create message element
     function createMessageElement(message) {
         // Function to find the user object by ID
         const from_user = membersData.find(user => user.id === message.from_id)?.user;
@@ -501,6 +502,16 @@ function searchDropDown() {
             const $avatar = $('<img>').addClass('avatar').attr('src', member.user.avatar);
             const $name = $('<span>').addClass('member-name').text(member.user.name);
             $item.append($avatar, $name).appendTo($searchDropdown);
+
+            // Event listener for clicking on workspace members
+            $item.on('click', function () {
+                console.log('pick member');
+                // Get the name of the clicked workspace member
+                const memberId = $(this).data('member-id');
+                const memberName = $(this).find('.member-name').text();
+                // Find the 'from' tag and insert the member name
+                $searchInput.find('.from-tag').text('#from: ' + memberName).data('from-id', memberId);
+            });
         });
 
         $searchDropdown.css('display', 'block');
@@ -545,6 +556,7 @@ function searchDropDown() {
     });
 
     $searchInput.on('input', function () {
+        
         const searchKeyWord = $(this).clone().find('.condition-tag').remove().end().text().trim();
 
         conditions.forEach(condition => {
@@ -571,22 +583,13 @@ function searchDropDown() {
         });
     });
 
-    $searchInput.add($searchDropdown).on('click', '.from-tag', function () {
+    $searchInput.on('click', '.from-tag', function () {
         console.log('click on from tag');
         // Populate dropdown with workspace members
         populateWorkspaceMembers();
 
     });
 
-    // Event listener for clicking on workspace members
-    $searchDropdown.on('click', '.workspace-member', function () {
-        console.log('pick member');
-        // Get the name of the clicked workspace member
-        const memberId = $(this).data('member-id');
-        const memberName = $(this).find('.member-name').text();
-        // Find the 'from' tag and insert the member name
-        $searchInput.find('.from-tag').text('#from: ' + memberName).data('from-id', memberId);
-    });
 
     $searchInput.on('click', '.before-tag, .after-tag', function () {
         const selectTag = $(this);
