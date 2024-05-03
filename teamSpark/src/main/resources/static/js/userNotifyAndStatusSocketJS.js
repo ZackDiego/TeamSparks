@@ -1,45 +1,32 @@
 (function () {
-    let stompClient;
+    let socket;
     if (hostName === 'localhost') {
-        stompClient = new StompJs.Client({
-            brokerURL: 'ws://' + hostName + ':8080/notificationWebsocket'
-        });
+        // Connect to WebSocket server using StompJS
+        socket = new SockJS('http://' + hostName + ':8080/notificationWebsocket');
     } else {
-        stompClient = new StompJs.Client({
-            brokerURL: 'wss://' + hostName + '/notificationWebsocket'
-        });
+        // Connect to WebSocket server using secure WebSocket (wss://)
+        socket = new SockJS('https://' + hostName + '/notificationWebsocket');
     }
 
     const user = JSON.parse(localStorage.getItem('user'));
 
-    stompClient.onConnect = (frame) => {
-        console.log('Connected: ' + frame);
-        stompClient.subscribe('/userNotification/' + user.id, (result) => {
-            console.log("receive notification");
-            renderNotification(JSON.parse(result.body));
+    // Connect to StompJS over the WebSocket connection
+    const stompClient = Stomp.over(socket);
+
+    // Handle socket connection
+    stompClient.connect({}, function (frame) {
+        console.log('Connected to WebSocket server');
+
+        // Subscribe to user-specific notifications
+        stompClient.subscribe('/userNotification/' + user.id, function (notification) {
+            renderNotification(JSON.parse(notification.body));
         });
+    });
+
+    // Handle socket disconnection
+    socket.onclose = function () {
+        console.log('Disconnected from WebSocket server');
     };
-
-    stompClient.onWebSocketError = (error) => {
-        console.error('Error with websocket', error);
-    };
-
-    stompClient.onStompError = (frame) => {
-        console.error('Broker reported error: ' + frame.headers['message']);
-        console.error('Additional details: ' + frame.body);
-    };
-
-    function connect() {
-        stompClient.activate();
-    }
-
-    function disconnect() {
-        if (stompClient !== null) {
-            stompClient.deactivate();
-        }
-        // setConnected(false);
-        console.log("Disconnected");
-    }
 
     function renderNotification(data) {
 
@@ -95,12 +82,8 @@
         }
     }
 
-    $(function () {
-        connect();
-    });
-
     $(window).on('beforeunload', function () {
-        disconnect();
+        stompClient.disconnect();
     });
 
     function messageRedirect(toast) {

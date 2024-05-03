@@ -1,11 +1,11 @@
-function addMessagingStomp(channelIds) {
+addMessagingStomp = function (channelIds) {
     let socket;
     if (hostName === 'localhost') {
-        // Connect to WebSocket server using StompJS
-        socket = new SockJS('http://' + hostName + ':8080/textMessagingWebsocket');
+        // Connect to WebSocket server using SocketJS
+        socket = new SockJS('http://' + hostName + ':8080/notificationWebsocket');
     } else {
         // Connect to WebSocket server using secure WebSocket (wss://)
-        socket = new SockJS('https://' + hostName + '/textMessagingWebsocket');
+        socket = new SockJS('https://' + hostName + '/notificationWebsocket');
     }
 
     const user = JSON.parse(localStorage.getItem('user'));
@@ -37,11 +37,41 @@ function addMessagingStomp(channelIds) {
     }
 
     function sendMessage($messageEditor) {
-        // Your sendMessage function logic...
+
+        // Get the HTML content from the Summernote editor
+        const content = $messageEditor.summernote('code');
+        // Create a temporary div element using jQuery
+        const $tempDiv = $('<div>');
+        // Set the HTML content to the div
+        $tempDiv.html(content);
+        // Get the text content from the div, which will strip HTML tags but preserve line breaks
+        const plainTextContent = $tempDiv.text();
+
+        const containsLink = /(?:http|https):\/\/\S+/i.test(content);
+
+        const channelId = parseInt($('#text-messaging-content').attr('data-channel-id'));
+        console.log("send message to channel " + channelId);
+
+        const user = JSON.parse(localStorage.getItem('user'))
+        const messageJson = JSON.stringify({
+            channel_id: channelId,
+            message: {
+                from_id: getMemberId(),
+                from_name: user.name,
+                content: content,
+                plain_text_content: plainTextContent,
+                contain_link: containsLink,
+                file_url: null,
+                image_url: null
+            }
+        });
+        stompClient.send("/websocket/textMessagingEndpoint", {}, messageJson);
+
+        // clear the message editor
+        $messageEditor.summernote('code', '');
     }
 
     $('.btn-send').click(function () {
-        console.log("send message");
         const $messageEditor = $(this)
             .closest('.bottom-toolbar')
             .closest('.note-editor')
@@ -50,14 +80,14 @@ function addMessagingStomp(channelIds) {
     });
 
     $(window).on('beforeunload', function () {
-        stompClient.disconnect();
+        disconnect();
     });
 
     return stompClient;
 }
 
 function subscribeChannel(stompClient, channelId) {
-    stompClient.subscribe('/textMessagingChannel/' + channelId, function (result) {
+    stompClient.subscribe('/textMessagingChannel/' + channelId, (result) => {
         console.log("receive message from channel " + channelId);
         renderMessage(JSON.parse(result.body), channelId);
         scrollMessageContainerToBottom();
@@ -116,8 +146,6 @@ function subscribeChannel(stompClient, channelId) {
         } else {
             // if not add badge on corresponding channel sidebar avatar
             const channelReceive = $('.details-item').filter(function () {
-                console.log(parseInt($(this).attr('data-channel-id')));
-                console.log(channelId);
                 return parseInt($(this).attr('data-channel-id')) === channelId;
             });
 

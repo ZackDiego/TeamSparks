@@ -20,8 +20,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/textMessagingWebsocket");
-        registry.addEndpoint("/notificationWebsocket");
+//        registry.addEndpoint("/textMessagingWebsocket");
+//        registry.addEndpoint("/notificationWebsocket");
+        registry.addEndpoint("/textMessagingWebsocket").setAllowedOriginPatterns(new String[]{"*"}).withSockJS();
+        registry.addEndpoint("/notificationWebsocket").setAllowedOriginPatterns(new String[]{"*"}).withSockJS();
     }
 
     @Override

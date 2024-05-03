@@ -12,9 +12,16 @@
             crossorigin="anonymous"
             integrity="sha256-sw0iNNXmOJbQhYFuC9OF2kOlD5KQKe1y5lfBn4C9Sjg="
             src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
+    <!--    <script crossorigin="anonymous"-->
+    <!--            src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>-->
     <script crossorigin="anonymous"
-            src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
-    <!--    <link rel="stylesheet" th:href="@{/styles/Footer.css}" type="text/css"/>-->
+            integrity="sha512-iKDtgDyTHjAitUDdLljGhenhPwrbBfqTKWO1mkhSFH3A7blITC9MhYon6SjnMhp4o0rADGw9yAC6EW4t5a4K3g=="
+            referrerpolicy="no-referrer"
+            src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha512-1QvjE7BtotQjkq8PxLeF6P46gEpBRXuskzIVgjFpekzFVF4yjRgrQvTG1MTOJ3yQgvTteKAcO7DSZI92+u/yZw=="
+            referrerpolicy="no-referrer"
+            src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
     <!-- jquery -->
     <script crossorigin="anonymous"
             integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
@@ -359,11 +366,13 @@
     const hostName = '[[${hostName}]]';
 </script>
 <!--include tam-emoji js-->
-<script th:src="@{/js/textMessaging/textMessagingStomp.js}"></script>
+<!--<script th:src="@{/js/textMessaging/textMessagingStomp.js}"></script>-->
+<script th:src="@{/js/textMessaging/textMessageSocketJS.js}"></script>
 <!--<script th:src="@{/tam-emoji/js/config.js}"></script>-->
 <!--<script th:src="@{/tam-emoji/js/tam-emoji.min.js?v=1.1}"></script>-->
 <script th:src="@{/js/textMessaging/summernote-editor.js}"></script>
 <script th:src="@{/js/textMessaging/textMessagingPageRender.js}"></script>
-<script th:src="@{/js/userNotificationAndStatus.js}"></script>
+<!--<script th:src="@{/js/userNotificationAndStatus.js}"></script>-->
+<script th:src="@{/js/userNotifyAndStatusSocketJS.js}"></script>
 </body>
 </html>
