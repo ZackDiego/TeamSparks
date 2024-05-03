@@ -42,7 +42,6 @@
     }
 
     function renderNotification(data) {
-        console.log(data);
 
         // check if user is not the sender & user is not on the channel
         const currentChannelId = parseInt($('#text-messaging-content').attr('data-channel-id'));
