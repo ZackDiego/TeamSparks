@@ -1,11 +1,5 @@
 $(document).ready(async function () {
 
-    const channels = await fetchChannelsByMemberId(getMemberId());
-    sessionStorage.setItem("channels", JSON.stringify(channels));
-    addChannelsInSideBarAndModal(channels);
-
-    renderMessageEditor();
-
     // display user inf
     const user = JSON.parse(localStorage.getItem('user'));
     $('#welcome-message').text('Welcome, ' + user.name);
@@ -19,22 +13,29 @@ $(document).ready(async function () {
     // workspace Inf
     await fetchAndRenderWorkspaceInf(workspace_id);
 
+    // render channels
+    const channels = await fetchChannelsByMemberId(getMemberId());
+    sessionStorage.setItem("channels", JSON.stringify(channels));
+    addChannelsInSideBarAndModal(channels);
+
+    renderMessageEditor();
+
     const channelIds = channels.map(channel => channel.id);
     const stompClient = addMessagingStomp(channelIds);
     // Button setting
     toggleSideBarChannel();
     videoCallButton();
     toggleChannelMember();
+
     workspaceSetting();
     handleCreateChannel(stompClient);
+    handleAddChannelMember();
 
     // searchbar
     searchDropDown();
 
     // open the details when entering
     $("details").attr("open", true);
-
-    // click on the first channel
 
     const messageRedirect = JSON.parse(sessionStorage.getItem('messageData'));
     if (messageRedirect) {
@@ -116,30 +117,37 @@ function renderChannelContent(channel, messageHistory) {
         channelMembersList.empty(); // Clear existing members
 
         for (const member of channel.members) {
-            const listItem = $('<a class="list-group-item d-flex justify-content-between align-items-center"></a>');
-
-            const avatarImg = $('<img>').addClass('chat-partner-avatar').attr('src', member.user.avatar);
-            switch (member.user.status) {
-                case "ONLINE":
-                    avatarImg.addClass('online');
-                    break;
-                case "OFFLINE":
-                    avatarImg.addClass('offline');
-                    break;
-                case "DND":
-                    avatarImg.addClass('dnd');
-                    break;
-                case "INVISIBLE":
-                    avatarImg.addClass('invisible');
-                    break;
-                default:
-                    break;
-            }
-            const nameSpan = $('<span></span>').text(member.user.name);
-            const deleteBtn = $('<button class="btn btn-sm btn-danger">Delete</button>');
-
-            listItem.append($('<div>').append(avatarImg, nameSpan), deleteBtn).appendTo(channelMembersList);
+            addChannelMemberToList(member);
         }
+        if (!isUserCreator()) {
+            const button = $('#channelMembersList .list-group-item button');
+            button.prop('disabled', true);
+        }
+
+        // render workspaceMember that isn't in the channel
+        const $channelMemberSelection = $('#channel-member-selection');
+        $channelMemberSelection.empty();
+
+        const workspaceMembers = JSON.parse(sessionStorage.getItem('workspaceMembers')) || [];
+
+        const memberIds = channel.members.map(member => member.id);
+
+        workspaceMembers.forEach(function (member) {
+            // skip user own id, and skip existing channel member
+            if (member.id === getMemberId() || memberIds.includes(member.id)) {
+                return;
+            }
+
+            // append to channel member selection
+            const img = "<img src='" + member.user.avatar + "' class='chat-partner-avatar'>";
+            const option = $('<option>')
+                .attr('data-content', img + member.user.name)
+                .val(member.id);
+
+            $channelMemberSelection.append(option);
+        });
+        $channelMemberSelection.selectpicker('refresh');
+
     } else {
         $('.btn-channel-member').hide();
     }
@@ -334,7 +342,6 @@ async function fetchChannelsByMemberId(member_id) {
 }
 
 function addChannelsInSideBarAndModal(channels) {
-
     for (let channel of channels) {
         const channelModal = $('<div class="list-group-item d-flex justify-content-between align-items-center"></div>');
 
@@ -344,6 +351,7 @@ function addChannelsInSideBarAndModal(channels) {
 
         // Check if the channel is private
         if (channel.is_private) {
+
             const channelSideBar = $('<div class="chat-partner details-item"></div>');
 
             // Find the private chat partner
@@ -351,6 +359,7 @@ function addChannelsInSideBarAndModal(channels) {
 
             const avatarImg = $('<img>').addClass('chat-partner-avatar').attr('src', chat_partner.user.avatar);
             channelSideBar.attr('data-channel-id', channel.id)
+                .attr('data-chat-partner-id', chat_partner.id)
                 .append(avatarImg, chat_partner.user.name);
             $('#chat-container').append(channelSideBar);
 
@@ -365,10 +374,18 @@ function addChannelsInSideBarAndModal(channels) {
             channelSideBar.attr('data-channel-id', channel.id).append(hashSpan, channel.name);
             $('#channel-container').append(channelSideBar);
 
-
             channelModal.attr('data-channel-id', channel.id).append($('<div>').append(hashSpan.clone(), channel.name), modalEditBtn);
             $('#channel-modal-list').append(channelModal);
         }
+    }
+    // if not creator, disable the button
+    if (!isUserCreator()) {
+        const listItems = $('#channel-modal-list .list-group-item');
+        const button = $('#channel-modal-list .list-group-item button');
+
+        listItems.addClass('disabled');
+        button.prop('disabled', true);
+        $('#btn-create-channel').prop('disabled', true);
     }
 }
 
@@ -416,50 +433,83 @@ async function fetchAndRenderWorkspaceInf(workspaceId) {
     const workspace = await fetchWorkspace();
     sessionStorage.setItem('workspaceMembers', JSON.stringify(workspace.members));
 
-    // name
+    // workspace name
     $('#workspace-name').text(workspace.name).attr('data-workspace-id', workspace.id);
 
+    // add creator label
+    if (isUserCreator()) {
+        const span = $('<span>').text('Creator');
+        const icon = $("<img>").attr("src", "/icons/crown.png").addClass("creator-tag-icon");
+        $('.workspace-dropdown').after($('<div>').addClass('creator-tag').append(span, icon));
+    }
+
     // members
-    workspace.members.forEach(function (member) {
-        // Create list item
-        const listItem = $('<a>')
-            .addClass('list-group-item list-group-item-action d-flex align-items-center')
-            .attr({
-                'href': '#',
-                'data-member-id': member.id
-            });
-
-        // Create avatar image
-        const avatarImg = $('<img>').addClass('avatar mr-3')
-            .attr({
-                'src': member.user.avatar
-            });
-
-        // Create member details container
-        const memberDetails = $('<div>').addClass('member-details d-flex align-items-center justify-content-between');
-
-        // Create name span
-        const nameSpan = $('<span>').addClass('name')
-            .text(member.user.name);
-
-        // Append name span to member details container
-        memberDetails.append(nameSpan);
-
-        // Check if member is the creator and add label image
-        if (member.is_creator) {
-            const labelImg = $('<img>').addClass('creator-label')
+    function populateWorkspaceMembers(members) {
+        members.forEach(function (member) {
+            // Create list item
+            const listItem = $('<a>').addClass('list-group-item list-group-item-action d-flex align-items-center')
                 .attr({
-                    'src': '/icons/crown.png'
+                    'href': '#',
+                    'data-member-id': member.id
                 });
-            memberDetails.append(labelImg);
-        }
+            const avatarImg = $('<img>').addClass('avatar mr-3').attr({'src': member.user.avatar});
+            const memberDetails = $('<div>').addClass('member-details d-flex align-items-center justify-content-between');
+            const nameSpan = $('<span>').addClass('name').text(member.user.name);
 
-        // Append avatar image and member details container to list item
-        listItem.append(avatarImg, memberDetails);
+            // Append name span to member details container
+            memberDetails.append(nameSpan);
 
-        // Append list item to list group
-        $('.workspace-member-list').append(listItem);
-    });
+            // Check if member is the creator and add label image
+            if (member.is_creator) {
+                const labelImg = $('<img>').addClass('creator-label')
+                    .attr({
+                        'src': '/icons/crown.png'
+                    });
+                memberDetails.append(labelImg);
+            }
+
+            listItem.append(avatarImg, memberDetails);
+            // append to workspaceMember list
+            $('.workspace-member-list').append(listItem);
+        });
+
+        // Extracting existing chat partner IDs
+        const existingChatPartnerIds = [];
+        $('#chat-container .chat-partner.details-item').each(function () {
+            existingChatPartnerIds.push($(this).data('chat-partner-id'));
+        });
+
+
+        // Populate create private chat modal
+        members.forEach(function (member) {
+            // skip user his own id
+            if (member.id === getMemberId()) {
+                return;
+            }
+
+            // need to check if private chat already
+            const img = "<img src='" + member.user.avatar + "' class='chat-partner-avatar'>";
+
+            // Disable existing chat partner
+            let option;
+            if (existingChatPartnerIds.includes(member.id)) {
+                const disableText = "<small class='text-muted'>Chat already exists</small>";
+                option = $('<option>')
+                    .attr('data-content', img + member.user.name + disableText)
+                    .val(member.id)
+                    .prop('disabled', true);
+            } else {
+                option = $('<option>')
+                    .attr('data-content', img + member.user.name)
+                    .val(member.id);
+            }
+            $('#chat-partner-selection').append(option);
+        });
+        $('#chat-partner-selection').selectpicker('refresh');
+    }
+
+    populateWorkspaceMembers(workspace.members);
+
 
     $('[data-toggle="popover"]').popover({
         html: true,
@@ -851,108 +901,224 @@ function handleCreateChannel(stompClient) {
         // Prevent the default form submission
         event.preventDefault();
 
-        async function fetchCreateChannel(is_private) {
-            try {
-                // Get the form data
-                const formData = {
-                    workspace_id: getWorkspaceIdInUrl(),
-                    name: $('#channelName').val(),
-                    is_private: false
-                };
-
-                const accessToken = localStorage.getItem('access_token');
-
-                if (!accessToken) {
-                    console.error("Access token not found in local storage. Redirecting to login page.");
-                    // window.location.href = '/login'; // Redirect to profile page
-                    alert("please add access token!")
-                    return;
-                }
-
-                // Fetch options
-                let options = {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
-                    },
-                    body: JSON.stringify(formData)
-                };
-
-                // Send the fetch request to create the channel
-                const response = await fetch('/api/v1/channel', options);
-
-                if (!response.ok) {
-                    throw new Error('Create channel failed');
-                }
-
-                // Parse the response JSON data
-                const responseBody = await response.json();
-                return responseBody.data.id;
-            } catch (error) {
-                // Handle any errors
-                console.error('Error creating channel: ', error);
-                alert('Error creating channel: ' + error);
-            }
-        }
-
-        const create_channel_id = await fetchCreateChannel(false);
-
-        async function fetchAndRenderChannelById(id) {
-            try {
-                const accessToken = localStorage.getItem('access_token');
-
-                // Fetch the channel data by its ID
-                options = {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                };
-
-                const response = await fetch(`/api/v1/channel/${id}`, options);
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch channel data');
-                }
-
-                // Parse the channel data
-                const requestBody = await response.json();
-
-                const channelData = requestBody.data;
-
-                // Add the channel to the sidebar
-                let channelElement;
-                if (channelData.is_private) {
-                    channelElement = $('<div class="chat-partner details-item"></div>');
-                    const chat_partner = findPrivateChatPartner(channelData);
-                    const avatarImg = $('<img>').addClass('chat-partner-avatar').attr('src', chat_partner.user.avatar);
-                    channelElement.attr('data-channel-id', channelData.id)
-                        .append(avatarImg, chat_partner.user.name);
-                    $('#chat-container').append(channelElement);
-                } else {
-                    channelElement = $('<div class="channel-title details-item"></div>');
-                    channelElement.attr('data-channel-id', channelData.id);
-                    const hashSpan = $('<span class="channel-title-prefix">#</span>');
-                    channelElement.append(hashSpan);
-                    channelElement.append(channelData.name);
-
-                    $('#channel-container').append(channelElement);
-                }
-                toggleSideBarChannel();
-                channelElement.click();
-                subscribeChannel(stompClient, channelData.id);
-                // close the modal
-                $('#createChannelModal').modal('hide');
-            } catch (error) {
-                // Handle any errors
-                console.error('Error fetching channel by id: ', error);
-                alert('Error fetching channel by id: ' + error);
-            }
-        }
-
+        const create_channel_id = await fetchCreateChannel($('#channelName').val(), false);
         if (create_channel_id) {
-            await fetchAndRenderChannelById(create_channel_id);
+            await fetchAndRenderChannelById(create_channel_id, stompClient);
         }
     });
+
+    // create private form submit
+    $('#createPrivateForm').submit(async function (event) {
+        // Prevent the default form submission behavior
+        event.preventDefault();
+
+        const create_channel_id = await fetchCreateChannel("private", true);
+        console.log('Create channel: ' + create_channel_id);
+        const selectedMemberId = $('#chat-partner-selection').val();
+        console.log('Add selected chat partner: ', selectedMemberId);
+
+        await fetchAddMember(create_channel_id, selectedMemberId);
+
+        if (create_channel_id) {
+            await fetchAndRenderChannelById(create_channel_id, stompClient);
+            $('#createPrivateChatModel').modal('hide');
+        }
+    });
+}
+
+async function fetchAndRenderChannelById(id, stompClient) {
+    try {
+        const accessToken = localStorage.getItem('access_token');
+
+        // Fetch the channel data by its ID
+        options = {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        };
+
+        const response = await fetch(`/api/v1/channel/${id}`, options);
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch channel data');
+        }
+
+        // Parse the channel data
+        const requestBody = await response.json();
+
+        const channelData = requestBody.data;
+
+        // Add the channel to the sidebar
+        let channelElement;
+        if (channelData.is_private) {
+            channelElement = $('<div class="chat-partner details-item"></div>');
+            const chat_partner = findPrivateChatPartner(channelData);
+            const avatarImg = $('<img>').addClass('chat-partner-avatar').attr('src', chat_partner.user.avatar);
+            channelElement
+                .attr('data-chat-partner-id', chat_partner.id)
+                .attr('data-channel-id', channelData.id)
+                .append(avatarImg, chat_partner.user.name);
+            $('#chat-container').append(channelElement);
+        } else {
+            channelElement = $('<div class="channel-item details-item"></div>');
+            channelElement.attr('data-channel-id', channelData.id);
+            const hashSpan = $('<span class="channel-title-prefix">#</span>');
+            channelElement.append(hashSpan);
+            channelElement.append(channelData.name);
+
+            $('#channel-container').append(channelElement);
+        }
+        toggleSideBarChannel();
+        channelElement.click();
+        subscribeChannel(stompClient, channelData.id);
+        // close the modal
+        $('#createChannelModal').modal('hide');
+    } catch (error) {
+        // Handle any errors
+        console.error('Error fetching channel by id: ', error);
+        alert('Error fetching channel by id: ' + error);
+    }
+}
+
+async function fetchCreateChannel(channel_name, is_private) {
+    try {
+        // Get the form data
+        const formData = {
+            workspace_id: getWorkspaceIdInUrl(),
+            name: channel_name,
+            is_private: is_private
+        };
+
+        const accessToken = localStorage.getItem('access_token');
+
+        if (!accessToken) {
+            console.error("Access token not found in local storage. Redirecting to login page.");
+            // window.location.href = '/login'; // Redirect to profile page
+            alert("please add access token!")
+            return;
+        }
+
+        // Fetch options
+        let options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify(formData)
+        };
+
+        // Send the fetch request to create the channel
+        const response = await fetch('/api/v1/channel', options);
+
+        if (!response.ok) {
+            throw new Error('Create channel failed');
+        }
+
+        // Parse the response JSON data
+        const responseBody = await response.json();
+        return responseBody.data.id;
+    } catch (error) {
+        // Handle any errors
+        console.error('Error creating channel: ', error);
+        alert('Error creating channel: ' + error);
+    }
+}
+
+async function fetchAddMember(channelId, memberId) {
+    try {
+        // Get the form data
+        const accessToken = localStorage.getItem('access_token');
+
+        if (!accessToken) {
+            console.error("Access token not found in local storage. Redirecting to login page.");
+            // window.location.href = '/login'; // Redirect to profile page
+            alert("please add access token!")
+            return;
+        }
+
+        // Fetch options
+        let options = {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        };
+
+        // Send the fetch request to create the channel
+        const response = await fetch(`/api/v1/channel/${channelId}/member/${memberId}`, options);
+
+        if (!response.ok) {
+            throw new Error('Add member in private chat failed: ' + response);
+        }
+    } catch (error) {
+        // Handle any errors
+        console.error('Error adding member in private chat: ', error.message);
+        alert('Error adding member in private chat: ' + error.message);
+    }
+}
+
+function isUserCreator() {
+    const members = JSON.parse(sessionStorage.getItem('workspaceMembers'));
+    const userMember = members.find(member => member.id === getMemberId());
+    return userMember.is_creator;
+}
+
+function handleAddChannelMember() {
+    $('#btn-add-member').click(async function () {
+        const channelId = $('#text-messaging-content').data('channel-id');
+
+        const $channelMemberSelection = $('#channel-member-selection');
+        const selectedMemberId = $channelMemberSelection.val();
+
+        await fetchAddMember(channelId, selectedMemberId);
+
+        const members = JSON.parse(sessionStorage.getItem('workspaceMembers'));
+        const addedMember = members.find(member => member.id === parseInt(selectedMemberId, 10));
+
+        // add to channel member list
+        addChannelMemberToList(addedMember);
+
+        if (!isUserCreator()) {
+            const button = $('#channelMembersList .list-group-item button');
+            button.prop('disabled', true);
+        }
+
+        // remove from selection
+        $channelMemberSelection.find('option').filter(function () {
+            return $(this).val() === selectedMemberId;
+        }).remove();
+
+        $channelMemberSelection.selectpicker('refresh');
+
+        $('#channelMembersModal').modal('hide');
+    })
+}
+
+
+function addChannelMemberToList(member) {
+    const listItem = $('<a class="list-group-item d-flex justify-content-between align-items-center"></a>');
+
+    const avatarImg = $('<img>').addClass('chat-partner-avatar').attr('src', member.user.avatar);
+    switch (member.user.status) {
+        case "ONLINE":
+            avatarImg.addClass('online');
+            break;
+        case "OFFLINE":
+            avatarImg.addClass('offline');
+            break;
+        case "DND":
+            avatarImg.addClass('dnd');
+            break;
+        case "INVISIBLE":
+            avatarImg.addClass('invisible');
+            break;
+        default:
+            break;
+    }
+    const nameSpan = $('<span></span>').text(member.user.name);
+    const deleteBtn = $('<button class="btn btn-sm btn-danger">Delete</button>');
+
+    listItem.append($('<div>').append(avatarImg, nameSpan), deleteBtn).appendTo($('#channelMembersList'));
 }

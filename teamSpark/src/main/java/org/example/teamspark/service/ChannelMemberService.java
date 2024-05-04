@@ -28,15 +28,15 @@ public class ChannelMemberService {
                                  Long channelId,
                                  Long wsMemberId) throws ResourceAccessDeniedException {
 
-        WorkspaceMember creator = channelMemberRepository.findCreatorByChannelId(channelId);
-
         // Find the Channel by channelId
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new EntityNotFoundException("Channel not found with ID: " + channelId));
 
-        // Check if the member is the channel's creator
-        if (!creator.getUser().getId().equals(user.getId())) {
-            throw new ResourceAccessDeniedException("User is unauthorized to modify the workspace");
+        // Check if user belongs to the channel
+        Boolean isChannelMember = channelMemberRepository.checkUserChannelMember(user.getId(), channelId);
+
+        if (!isChannelMember) {
+            throw new ResourceAccessDeniedException("User is unauthorized to access channel " + channelId);
         }
 
         // Create new channelMember instance

@@ -49,6 +49,11 @@
     <!--    <link rel="stylesheet" th:href="@{/tam-emoji/css/emoji.css}">-->
     <!--include fontawesome-->
     <script src="https://use.fontawesome.com/52e183519a.js"></script>
+    <!--  bootstrap selection  -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css"
+          rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+
     <link rel="stylesheet" th:href="@{/styles/Commons.css}" type="text/css"/>
     <link rel="stylesheet" th:href="@{/styles/textMessaging.css}" type="text/css"/>
 </head>
@@ -99,7 +104,7 @@
                     </a>
                 </div>
             </div>
-            <div class="divider"></div>
+
             <div id="list-container">
                 <details class="details-container" id="channel-container" open="true">
                     <summary>Channels
@@ -262,7 +267,7 @@
                     <!-- Private Chat List -->
                     <h6 class="mt-4 d-flex justify-content-between align-items-center font-weight-bold">
                         Private Chats
-                        <button class="btn btn-success mr-2" data-target="#createChannelModal" data-toggle="modal"
+                        <button class="btn btn-success mr-2" data-target="#createPrivateChatModel" data-toggle="modal"
                                 id="btn-create-private-chat" type="button">Create
                         </button>
                     </h6>
@@ -290,7 +295,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createChannelModalLabel">Create Channel / Private Chat</h5>
+                    <h5 class="modal-title" id="createChannelModalLabel">Create Channel</h5>
                     <button aria-label="Close" class="close" data-dismiss="modal" type="button">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -317,22 +322,26 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createPrivateChatModelLabel">Create Channel / Private Chat</h5>
+                    <h5 class="modal-title" id="createPrivateChatModelLabel">Create Private Chat</h5>
                     <button aria-label="Close" class="close" data-dismiss="modal" type="button">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <form id="createPrivateForm">
-                        <!--                        <div class="form-group">-->
-                        <!--                            <label for="channelName">Name:</label>-->
-                        <!--                            <input class="form-control" id="channelName" name="channelName" required type="text">-->
-                        <!--                        </div>-->
+                        <div class="form-group private-form">
+                            <label for="chat-partner-selection">Chat with:</label>
+                            <select aria-label="chat-partner-selection" class="selectpicker"
+                                    data-live-search="true"
+                                    data-show-subtext="true" data-width="100%" id="chat-partner-selection"
+                                    title="Select chat partner">
+                            </select>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-dismiss="modal" type="button">Cancel</button>
-                    <button class="btn btn-primary" form="createChannelForm" type="submit" value="submit">Create
+                    <button class="btn btn-primary" form="createPrivateForm" type="submit" value="submit">Create
                     </button>
                 </div>
             </div>
@@ -350,6 +359,17 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="input-group" id="add-channel-member-input">
+                        <!--                        <label for="chat-partner-selection">Chat with:</label>-->
+                        <select aria-label="channel-member-selection" class="selectpicker"
+                                data-live-search="true"
+                                data-show-subtext="true" data-width="100%" id="channel-member-selection"
+                                title="Add channel member">
+                        </select>
+                        <div class="input-group-append">
+                            <button class="btn btn-success" id="btn-add-member" type="button">Add</button>
+                        </div>
+                    </div>
                     <!-- List group for displaying channel members -->
                     <div class="list-group" id="channelMembersList">
                         <!-- Member items will be populated here -->
