@@ -2,10 +2,10 @@ addMessagingStomp = function (channelIds) {
     let socket;
     if (hostName === 'localhost') {
         // Connect to WebSocket server using SocketJS
-        socket = new SockJS('http://' + hostName + ':8080/notificationWebsocket');
+        socket = new SockJS('http://' + hostName + ':8080/textMessagingWebsocket');
     } else {
         // Connect to WebSocket server using secure WebSocket (wss://)
-        socket = new SockJS('https://' + hostName + '/notificationWebsocket');
+        socket = new SockJS('https://' + hostName + '/textMessagingWebsocket');
     }
 
     // Connect to StompJS over the WebSocket connection
@@ -75,10 +75,6 @@ addMessagingStomp = function (channelIds) {
             .closest('.note-editor')
             .siblings('.message-editor');
         sendMessage($messageEditor);
-    });
-
-    $(window).on('beforeunload', function () {
-        disconnect();
     });
 
     return stompClient;

@@ -13,7 +13,7 @@ public class FrontController {
 
     @GetMapping("/")
     public String homePage() {
-        return "index";
+        return "redirect:/login";
     }
 
     @GetMapping("/login")
