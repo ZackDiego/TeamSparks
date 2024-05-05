@@ -77,3 +77,14 @@ body {
 .toast:hover {
     cursor: pointer;
 }
+
+.header-logo {
+    display: flex;
+    align-items: center;
+}
+
+#teamSparks-icon {
+    width: 35px;
+    margin-right: 10px;
+    margin-left: 5px;
+}
