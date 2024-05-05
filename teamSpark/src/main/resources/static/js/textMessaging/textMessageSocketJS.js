@@ -8,8 +8,6 @@ addMessagingStomp = function (channelIds) {
         socket = new SockJS('https://' + hostName + '/notificationWebsocket');
     }
 
-    const user = JSON.parse(localStorage.getItem('user'));
-
     // Connect to StompJS over the WebSocket connection
     const stompClient = Stomp.over(socket);
 

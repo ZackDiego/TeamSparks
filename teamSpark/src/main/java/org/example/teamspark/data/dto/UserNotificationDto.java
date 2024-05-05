@@ -20,9 +20,6 @@ public class UserNotificationDto {
     @JsonProperty("type")
     private NotificationType type;
 
-    @JsonProperty("channel_id")
-    private Long channelId;
-
     @JsonProperty("message")
     private MessageDto message;
 

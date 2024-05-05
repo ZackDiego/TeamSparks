@@ -21,9 +21,6 @@ public class UserNotification {
     @Column(name = "type")
     private NotificationType type;
 
-    @Column(name = "channel_id")
-    private Long channelId;
-
     @Column(name = "message_index_name")
     private String messageIndexName;
 

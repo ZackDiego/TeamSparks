@@ -33,9 +33,14 @@
         // check if user is not the sender & user is not on the channel
         const currentChannelId = parseInt($('#text-messaging-content').attr('data-channel-id'));
 
-        if (data.message.from_id !== getMemberId() && currentChannelId !== data.channel_id) {
+        console.log(data.message.message_id.indexName);
+
+        // Extract the channelId from the message_index_name string
+        const messageChannelId = parseInt(data.message.message_id.indexName.replace("channel-", ""), 10);
+        console.log(messageChannelId);
+        if (data.message.from_id !== getMemberId() && currentChannelId !== messageChannelId) {
             // Create a temporary element
-            var tempElement = document.createElement('div');
+            let tempElement = document.createElement('div');
 
             // Set the HTML content of the temporary element to the message
             tempElement.innerHTML = data.message.content;
@@ -52,7 +57,7 @@
             // Create the toast HTML
             var toastHtml = `
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" 
-            data-channel-id=${data.channel_id} data-message-id="${data.message.message_id.documentId}">
+            data-channel-id=${messageChannelId} data-message-id="${data.message.message_id.documentId}">
                 <div class="toast-header">
                     <img src=${from_user.avatar} class="avatar rounded mr-2" alt="...">
                     <strong class="mr-auto">${data.message.from_name}</strong> 

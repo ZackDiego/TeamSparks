@@ -45,7 +45,6 @@ public class NotificationService {
 
             notification.setUser(user);
             notification.setType(NotificationType.MESSAGE);
-            notification.setChannelId(channelId);
 
             MessageId messageId = messageDto.getMessageId();
             notification.setMessageIndexName(messageId.getIndexName());
@@ -60,7 +59,6 @@ public class NotificationService {
             dto.setId(notification.getId());
             dto.setUser(UserDto.from(notification.getUser()));
             dto.setType(notification.getType());
-            dto.setChannelId(notification.getChannelId());
             dto.setMessage(messageDto);
             dto.setIsSeen(notification.isSeen());
             return dto;
