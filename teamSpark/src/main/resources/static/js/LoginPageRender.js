@@ -4,7 +4,6 @@ $(document).ready(async function () {
     const accessToken = localStorage.getItem('access_token');
 
     // if (accessToken) {
-    //     // TODO: Redirect to Text messaging Page
     //
     // } else {
     //     // If no access token, redirect to login page

@@ -3,54 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <title>TeamSpark</title>
+    <script
+            crossorigin="anonymous"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" rel="stylesheet">
+    <script crossorigin="anonymous"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <link rel="stylesheet" th:href="@{/styles/Commons.css}" type="text/css"/>
     <link rel="stylesheet" th:href="@{/styles/loginPage.css}" type="text/css"/>
+    <link rel="icon" th:href="@{/icons/favicon.ico}" type="image/x-icon">
 </head>
 <body>
 <div class="header">
     <div class="header-logo">
         <img alt="teamSparksIcon" id="teamSparks-icon" src="/icons/teamSparksIcon.png">
-        <a href="http://localhost:8080/user">TeamSparks</a>
+        <a href="/login">TeamSparks</a>
     </div>
 </div>
 <main>
-    <div id="login" style="display: none">
-        <h2 class="sign-in">Welcome to TeamSpark, please log in.</h2>
-
-        <form class="sign-in" id="signInForm">
-            <h3>Sign In</h3>
-            <label for="email">Email:</label><br>
-            <input id="signInEmail" name="email" required type="email"><br>
-            <label for="password">Password:</label><br>
-            <input id="signInPassword" name="password" required type="password"><br>
-            <button style="margin-top: 10px" type="submit">Sign In</button>
-        </form>
-
-        <div>
-            <a class="sign-in" href="#" id="signUpLink">Sign Up</a>
+    <div class="introduction-container">
+        <img alt="teamsparks-into" id="introduction-img" src="/icons/teamSparksIntro.png">
+        <div class="introduction-text"><span class="font-weight-bold" style="color: #530079;">TeamSparks</span> is a
+            Place to <br>
+            <span class="font-weight-bold" style="color: #ff531f;">Maximize</span> Team's Potential
+        </div>
+    </div>
+    <div class="multi-form-container" id="login" style="display: none">
+        <!-- Sign-in form -->
+        <div class="form-container sign-in">
+            <div class="form-header">Welcome to TeamSparks <br> please sign in</div>
+            <form id="signInForm">
+                <label class="form-label" for="signInEmail">Email:</label>
+                <input class="form-input" id="signInEmail" name="email" required type="email">
+                <label class="form-label" for="signInPassword">Password:</label>
+                <input class="form-input" id="signInPassword" name="password" required type="password">
+                <button class="form-button" type="submit">Sign In</button>
+            </form>
+            <div class="direct-link">
+                <a class="sign-in" href="#" id="signUpLink">Sign Up</a>
+            </div>
         </div>
 
         <!-- Sign-up form -->
-        <h2 class="sign-up">Welcome to TeamSpark, please sign up.</h2>
-
-        <form class="sign-up" id="signUpForm">
-            <h3>Sign Up</h3>
-            <label for="name">Name:</label><br>
-            <input id="signUpName" name="name" required type="text"><br>
-            <label for="email">Email:</label><br>
-            <input id="signUpEmail" name="email" required type="email"><br>
-            <label for="password">Password:</label><br>
-            <input id="signUpPassword" name="password" required type="password"><br>
-            <button style="margin-top: 10px" type="submit">Sign Up</button>
-        </form>
-
-        <div>
-            <a class="sign-up" href="#" id="signInLink">Sign In</a>
+        <div class="form-container sign-up">
+            <div class="form-header">Welcome to TeamSparks <br> please sign up</div>
+            <form id="signUpForm">
+                <label class="form-label" for="signUpName">Name:</label>
+                <input class="form-input" id="signUpName" name="name" required type="text">
+                <label class="form-label" for="signUpEmail">Email:</label>
+                <input class="form-input" id="signUpEmail" name="email" required type="email">
+                <label class="form-label" for="signUpPassword">Password:</label>
+                <input class="form-input" id="signUpPassword" name="password" required type="password">
+                <button class="form-button" type="submit">Sign Up</button>
+            </form>
+            <div class="direct-link">
+                <a class="sign-up" href="#" id="signInLink">Sign In</a>
+            </div>
         </div>
     </div>
 </main>
-<footer></footer>
 <!--<script th:src="@{/js/headerFooterRender.js}"></script>-->
 <script th:src="@{/js/LoginPageRender.js}"></script>
 <script th:src="@{/js/signInSignUpForm.js}"></script>

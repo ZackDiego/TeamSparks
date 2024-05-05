@@ -1,12 +1,12 @@
 
 main {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     height: calc(100vh - 60px);
     width: 100%;
     padding: 20px;
+    background-color: #f2dfff;
 }
 
 @font-face {
@@ -49,3 +49,99 @@ html, body {
 .sign-up input {
     padding: 5px;
 }
+
+
+/* Style for the form container */
+.form-container {
+    background-color: #ffffff; /* Background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow */
+    padding: 25px;
+    margin-bottom: 20px; /* Margin bottom */
+}
+
+/* Style for the form inputs */
+.form-input {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding */
+    margin-bottom: 10px; /* Margin bottom */
+    border: 1px solid #ccc; /* Border */
+    border-radius: 4px; /* Rounded corners */
+    box-sizing: border-box; /* Box sizing */
+}
+
+/* Style for the form buttons */
+.form-button {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding */
+    background-color: #007bff; /* Background color */
+    color: #ffffff; /* Text color */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Cursor */
+    transition: background-color 0.3s; /* Transition */
+}
+
+/* Hover style for the form buttons */
+.form-button:hover {
+    background-color: #0056b3; /* Darker background color */
+}
+
+.direct-link {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.form-button {
+    margin-top: 20px;
+}
+
+.form-header {
+    margin: 15px 15px 35px 15px;
+    font-size: 20px;
+    text-align: center;
+    line-height: 35px;
+}
+
+#signInForm, #signUpForm {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-button {
+    width: 150px;
+    align-self: center;
+}
+
+#introduction-img {
+    height: 400px;
+}
+
+.introduction-container {
+    width: 500px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 100px;
+}
+
+.introduction-text {
+    font-size: 20px;
+    text-align: center;
+    line-height: 40px;
+    letter-spacing: 2px;
+}
+
+.multi-form-container, .introduction-container {
+    /*margin: 50px;*/
+    margin: 50px 50px 180px 50px;
+}
+
+.multi-form-container {
+    width: 400px;
+    min-width: 400px;
+}
+
