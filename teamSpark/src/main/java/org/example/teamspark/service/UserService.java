@@ -118,7 +118,7 @@ public class UserService {
     }
 
     @Transactional
-    public User setUserAvatar(User user, MultipartFile avatarImageFile) throws IOException {
+    public UserDto setUserAvatar(User user, MultipartFile avatarImageFile) throws IOException {
 
         String extension = "." + FileUploadService.getFileExtension(avatarImageFile.getOriginalFilename());
 
@@ -131,6 +131,7 @@ public class UserService {
 
         user.setAvatar(s3CdnPrefix + imageUploadPath);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return UserDto.from(savedUser);
     }
 }

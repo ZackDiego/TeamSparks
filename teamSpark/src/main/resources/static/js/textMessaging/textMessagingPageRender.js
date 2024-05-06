@@ -1098,7 +1098,8 @@ function handleAddChannelMember() {
 
 
 function addChannelMemberToList(member) {
-    const listItem = $('<a class="list-group-item d-flex justify-content-between align-items-center"></a>');
+    const listItem = $('<a class="list-group-item d-flex justify-content-between align-items-center"></a>')
+        .attr('data-member-id', member.id);
 
     const avatarImg = $('<img>').addClass('chat-partner-avatar').attr('src', member.user.avatar);
     switch (member.user.status) {

@@ -783,3 +783,8 @@ pre {
 #btn-add-member {
     width: 70px;
 }
+
+.workspace-member-list {
+    max-height: 400px; /* Adjust as needed */
+    overflow-y: scroll;
+}

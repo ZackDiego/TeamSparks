@@ -3,6 +3,7 @@ package org.example.teamspark.controller;
 import jakarta.validation.Valid;
 import org.example.teamspark.data.DataResponse;
 import org.example.teamspark.data.dto.SignInAndUpDto;
+import org.example.teamspark.data.dto.UserDto;
 import org.example.teamspark.data.dto.UserWorkspaceMemberDto;
 import org.example.teamspark.data.form.SignInForm;
 import org.example.teamspark.data.form.SignUpForm;
@@ -90,9 +91,9 @@ public class UserController {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        User savedUser = userService.setUserAvatar(user, avatarImageFile);
+        UserDto dto = userService.setUserAvatar(user, avatarImageFile);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new DataResponse<>(savedUser));
+                .body(new DataResponse<>(dto));
     }
 }
