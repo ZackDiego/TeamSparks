@@ -9,37 +9,6 @@ main {
     background-color: #f2dfff;
 }
 
-@font-face {
-    font-family: PingFangTC;
-    src: url('/styles/PingFang-TC-Regular-2.otf') format('opentype');
-    font-weight: normal;
-}
-
-@font-face {
-    font-family: PingFangTC;
-    src: url('/styles/PingFang-TC-Thin-2.otf') format('opentype');
-    font-weight: 100;
-}
-
-@font-face {
-    font-family: NotoSansTC;
-    src: url('/styles/NotoSansTC-Regular.otf') format('opentype');
-    font-weight: normal;
-}
-
-@font-face {
-    font-family: NotoSansTC;
-    src: url('/styles/NotoSansTC-Bold.otf') format('opentype');
-    font-weight: bold;
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    font-family: NotoSansTC;
-    min-height: 100vh; /* Ensure the body takes up at least the height of the viewport */
-}
-
 html, body {
     height: 100%;
     margin: 0;

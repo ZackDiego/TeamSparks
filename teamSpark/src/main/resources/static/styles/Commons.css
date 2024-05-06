@@ -1,26 +1,5 @@
-@font-face {
-    font-family: PingFangTC;
-    src: url('/styles/PingFang-TC-Regular-2.otf') format('opentype');
-    font-weight: normal;
-}
-
-@font-face {
-    font-family: PingFangTC;
-    src: url('/styles/PingFang-TC-Thin-2.otf') format('opentype');
-    font-weight: 100;
-}
-
-@font-face {
-    font-family: NotoSansTC;
-    src: url('/styles/NotoSansTC-Regular.otf') format('opentype');
-    font-weight: normal;
-}
-
-@font-face {
-    font-family: NotoSansTC;
-    src: url('/styles/NotoSansTC-Bold.otf') format('opentype');
-    font-weight: bold;
-}
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 html {
     height: 100vh;
@@ -29,7 +8,7 @@ html {
 body {
     margin: 0;
     padding: 0;
-    font-family: NotoSansTC;
+    font-family: "Open Sans", sans-serif;
     height: 100vh; /* Ensure the body takes up at least the height of the viewport */
 }
 
@@ -45,7 +24,7 @@ body {
     /*z-index: 99;*/
     background-color: #3F0E41;
     align-items: center;
-    font-family: PingFangTC;
+    font-family: "Poppins", sans-serif;
     justify-content: space-between;
 }
 
