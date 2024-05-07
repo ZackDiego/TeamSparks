@@ -32,6 +32,7 @@ public class GroupVideoCallSocketHandler {
     @OnConnect
     public void onConnect(SocketIOClient client) {
         log.info("Client connected: " + client.getSessionId());
+
     }
 
     @OnDisconnect
@@ -50,8 +51,9 @@ public class GroupVideoCallSocketHandler {
 
     @OnEvent("joinRoom")
     public void onJoinRoom(SocketIOClient client, Map<String, Object> payload) {
-        String room = (String) payload.get("room");
+        String room = (String) payload.get("roomName");
         String userName = (String) payload.get("userName");
+        String userId = client.getSessionId().toString();
 
         int connectedClients = server.getRoomOperations(room).getClients().size();
 
@@ -65,9 +67,9 @@ public class GroupVideoCallSocketHandler {
 
         client.joinRoom(room);
 
-
-        roomManager.addClientToRoom(client.getSessionId().toString(), room);
-        userRoomMap.put(client.getSessionId().toString(), room);
+        ClientIdentity clientIdentity = new ClientIdentity(userId, userName);
+        roomManager.addClientToRoom(clientIdentity, room);
+        userRoomMap.put(userId, room);
 
         printLog("onJoinRoom", client, room);
     }
@@ -88,10 +90,15 @@ public class GroupVideoCallSocketHandler {
         // parse payload
         String targetClientId = (String) payload.get("targetClientId");
         String room = (String) payload.get("room");
+        String userName = (String) payload.get("userName");
 
         SocketIOClient targetClient = server.getClient(UUID.fromString(targetClientId));
         Map<String, Object> offerPayload = new HashMap<>();
-        offerPayload.put("offerClientId", client.getSessionId().toString());
+
+
+        ClientIdentity clientIdentity = new ClientIdentity(client.getSessionId().toString(), userName);
+
+        offerPayload.put("offerClient", clientIdentity);
         offerPayload.put("sdp", payload.get("sdp"));
 
         log.info("send offer to " + targetClient);
