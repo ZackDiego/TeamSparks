@@ -85,7 +85,7 @@ function connectToSocketServer(roomName) {
             // {urls: 'stun:stun3.l.google.com:19302'},
             // {urls: 'stun:stun4.l.google.com:19302'},
             {
-                urls: `turn:13.230.221.152:3478`,
+                urls: `turn:176.34.63.18:3478`,
                 username: turnUserName,
                 credential: turnPassword
             }
