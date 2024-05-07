@@ -250,30 +250,30 @@ function connectToSocketServer(roomName) {
         const clientIdVideoElement = $(`#remoteVideo_${clientId}`)
 
         // make sure video doesn't add duplicate
-        // if (clientIdVideoElement.length === 0) {
-        const $videoPanel = $('.video-panel');
+        if (clientIdVideoElement.length === 0) {
+            const $videoPanel = $('.video-panel');
 
-        const $participantDiv = $('<div></div>')
-            .addClass("video-container")
-            .addClass("remoteStream")
-            .attr('id', `remoteVideo_${clientId}`);
+            const $participantDiv = $('<div></div>')
+                .addClass("video-container")
+                .addClass("remoteStream")
+                .attr('id', `remoteVideo_${clientId}`);
 
-        const $videoElement = $('<video autoplay muted></video>')
-            .addClass("remoteVideo")
-            .prop('srcObject', stream);
+            const $videoElement = $('<video autoplay muted></video>')
+                .addClass("remoteVideo")
+                .prop('srcObject', stream);
 
-        const $remoteParticipantHeader = $('<h3></h3>')
-            .addClass("text-center")
-            .addClass("streamer-name")
-            .text(`Participant: ${clientId}`);
+            const $remoteParticipantHeader = $('<h3></h3>')
+                .addClass("text-center")
+                .addClass("streamer-name")
+                .text(`Participant: ${clientId}`);
 
-        $participantDiv.append($remoteParticipantHeader);
-        $participantDiv.append($videoElement);
-        $videoPanel.append($participantDiv);
+            $participantDiv.append($remoteParticipantHeader);
+            $participantDiv.append($videoElement);
+            $videoPanel.append($participantDiv);
 
-        // adjust width if needed
-        adjustVideoContainerSize();
-        // }
+            // adjust width if needed
+            adjustVideoContainerSize();
+        }
     }
 
     return socket;
