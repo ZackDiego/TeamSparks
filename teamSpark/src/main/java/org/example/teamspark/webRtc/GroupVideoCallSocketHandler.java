@@ -32,8 +32,6 @@ public class GroupVideoCallSocketHandler {
     @OnConnect
     public void onConnect(SocketIOClient client) {
         log.info("Client connected: " + client.getSessionId());
-//        String clientId = client.getSessionId().toString();
-//        userRoomMap.put(clientId, null);
     }
 
     @OnDisconnect
@@ -51,7 +49,10 @@ public class GroupVideoCallSocketHandler {
     }
 
     @OnEvent("joinRoom")
-    public void onJoinRoom(SocketIOClient client, String room) {
+    public void onJoinRoom(SocketIOClient client, Map<String, Object> payload) {
+        String room = (String) payload.get("room");
+        String userName = (String) payload.get("userName");
+
         int connectedClients = server.getRoomOperations(room).getClients().size();
 
         if (connectedClients == 0) {
@@ -63,6 +64,8 @@ public class GroupVideoCallSocketHandler {
         }
 
         client.joinRoom(room);
+
+
         roomManager.addClientToRoom(client.getSessionId().toString(), room);
         userRoomMap.put(client.getSessionId().toString(), room);
 

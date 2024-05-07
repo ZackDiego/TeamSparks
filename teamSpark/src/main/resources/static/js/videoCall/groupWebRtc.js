@@ -43,6 +43,8 @@ function adjustVideoContainerSize() {
 // Function to establish connection to socket server
 function connectToSocketServer(roomName) {
 
+    const user = JSON.parse(localStorage.getItem('user'));
+
     const localVideo = $('.localVideo')[0];
 
     // Connect to video call socketIOServer
@@ -63,11 +65,11 @@ function connectToSocketServer(roomName) {
         console.log("Connected to Socket.IO server");
 
         // add name in local stream
-        $('.localStream > h3').text("user: " + socket.id);
+        $('.localStream > h3').text("user: " + user.name);
 
         // Join room when connect ready
         if (roomName != null) {
-            socket.emit("joinRoom", roomName);
+            socket.emit("joinRoom", {roomName: roomName, userName: userName});
         } else {
             alert('channel_id is not properly set!');
         }
@@ -198,6 +200,8 @@ function connectToSocketServer(roomName) {
                     console.log("add offerClientId: " + offerClientId + "sdp, and return answer");
                 })
                 .catch(error => console.log(error));
+        } else {
+            console.error('signal state unstable');
         }
         // save connection into map for management
         rtcPeerConnectionsMap.set(offerClientId, rtcPeerConnection);
