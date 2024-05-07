@@ -3,30 +3,24 @@ package org.example.teamspark.webRtc;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class RoomManager {
-    Map<String, Set<String>> roomClients = new HashMap<>();
-    Map<String, String> roomCaller = new HashMap<>();
+    Map<String, Set<ClientIdentity>> roomClients = new HashMap<>();
 
     // Add client to room
-    public void addClientToRoom(String clientId, String roomId) {
-        roomClients.computeIfAbsent(roomId, k -> new HashSet<>()).add(clientId);
-    }
-
-    public void setRoomCaller(String callerClientId, String roomId) {
-        roomCaller.put(roomId, callerClientId);
-    }
-
-    public String getRoomCaller(String roomId) {
-        return roomCaller.get(roomId);
+    public void addClientToRoom(ClientIdentity clientIdentity, String roomId) {
+        roomClients.computeIfAbsent(roomId, k -> new HashSet<>()).add(clientIdentity);
     }
 
     // Remove client from room
     public void removeClientFromRoom(String roomId, String clientId) {
-        Set<String> clients = roomClients.get(roomId);
+        Set<ClientIdentity> clients = roomClients.get(roomId);
         if (clients != null) {
-            clients.remove(clientId);
+            Set<ClientIdentity> updatedClients = clients.stream()
+                    .filter(client -> !client.getId().equals(clientId))
+                    .collect(Collectors.toSet());
             if (clients.isEmpty()) {
                 roomClients.remove(roomId);
             }
@@ -34,7 +28,7 @@ public class RoomManager {
     }
 
     // Get all clients in room
-    public Set<String> getClientsInRoom(String roomId) {
+    public Set<ClientIdentity> getClientsInRoom(String roomId) {
         return roomClients.getOrDefault(roomId, Collections.emptySet());
     }
 }

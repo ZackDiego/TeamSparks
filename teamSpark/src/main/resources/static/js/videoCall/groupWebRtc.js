@@ -43,6 +43,8 @@ function adjustVideoContainerSize() {
 // Function to establish connection to socket server
 function connectToSocketServer(roomName) {
 
+    const user = JSON.parse(localStorage.getItem('user'));
+
     const localVideo = $('.localVideo')[0];
 
     // Connect to video call socketIOServer
@@ -63,11 +65,11 @@ function connectToSocketServer(roomName) {
         console.log("Connected to Socket.IO server");
 
         // add name in local stream
-        $('.localStream > h3').text("user: " + socket.id);
+        $('.localStream > h3').text(user.name);
 
         // Join room when connect ready
         if (roomName != null) {
-            socket.emit("joinRoom", roomName);
+            socket.emit("joinRoom", {roomName: roomName, userName: user.name});
         } else {
             alert('channel_id is not properly set!');
         }
@@ -117,26 +119,27 @@ function connectToSocketServer(roomName) {
         console.log(socket.id);
         // loop through existing clients to send offer
         let rtcPeerConnection;
-        for (let existingClientId of e) {
-            if (existingClientId !== socket.id) {
+        for (let existingClient of e) {
+            if (existingClient.id !== socket.id) {
                 rtcPeerConnection = new RTCPeerConnection(iceServers);
-                rtcPeerConnection.onicecandidate = event => onIceCandidate(event, existingClientId);
-                rtcPeerConnection.ontrack = event => onAddStream(event, existingClientId);
+                rtcPeerConnection.onicecandidate = event => onIceCandidate(event, existingClient.id);
+                rtcPeerConnection.ontrack = event => onAddStream(event, existingClient);
                 rtcPeerConnection.addTrack(localStream.getTracks()[0], localStream);
                 rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
                 const sessionDescription = await rtcPeerConnection.createOffer();
                 await rtcPeerConnection.setLocalDescription(sessionDescription);
 
-                console.log("send offer to existing client: " + existingClientId)
+                console.log("send offer to existing client: " + existingClient.id)
 
                 // send offer event to new client through signal server
                 socket.emit("offer", {
                     type: "offer", sdp: sessionDescription, room: roomName,
-                    targetClientId: existingClientId,
+                    targetClientId: existingClient.id,
+                    userName: user.name
                 });
 
                 // save connection into map for management
-                rtcPeerConnectionsMap.set(existingClientId, rtcPeerConnection);
+                rtcPeerConnectionsMap.set(existingClient.id, rtcPeerConnection);
             }
         }
     });
@@ -173,17 +176,17 @@ function connectToSocketServer(roomName) {
     handleSocketEvent("offer", e => {
         console.log("receive offer event");
 
-        const {offerClientId, sdp} = e;
+        const {offerClient, sdp} = e;
 
         rtcPeerConnection = new RTCPeerConnection(iceServers);
-        rtcPeerConnection.onicecandidate = event => onIceCandidate(event, offerClientId);
-        rtcPeerConnection.ontrack = event => onAddStream(event, offerClientId);
+        rtcPeerConnection.onicecandidate = event => onIceCandidate(event, offerClient.id);
+        rtcPeerConnection.ontrack = event => onAddStream(event, offerClient);
         rtcPeerConnection.addTrack(localStream.getTracks()[0], localStream);
         rtcPeerConnection.addTrack(localStream.getTracks()[1], localStream);
 
         if (rtcPeerConnection.signalingState === "stable") {
             let remoteDescriptionPromise = rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
-            remoteDescriptionPromisesMap.set(offerClientId, remoteDescriptionPromise);
+            remoteDescriptionPromisesMap.set(offerClient.id, remoteDescriptionPromise);
 
             remoteDescriptionPromise
                 .then(() => {
@@ -192,15 +195,17 @@ function connectToSocketServer(roomName) {
                 .then(sessionDescription => {
                     rtcPeerConnection.setLocalDescription(sessionDescription);
                     socket.emit("answer", {
-                        type: "answer", sdp: sessionDescription, room: roomName, offerClientId: offerClientId
+                        type: "answer", sdp: sessionDescription, room: roomName, offerClientId: offerClient.id
                     });
 
-                    console.log("add offerClientId: " + offerClientId + "sdp, and return answer");
+                    console.log("add offerClientId: " + offerClient.id + "sdp, and return answer");
                 })
                 .catch(error => console.log(error));
+        } else {
+            console.error('signal state unstable');
         }
         // save connection into map for management
-        rtcPeerConnectionsMap.set(offerClientId, rtcPeerConnection);
+        rtcPeerConnectionsMap.set(offerClient.id, rtcPeerConnection);
         console.log(rtcPeerConnectionsMap);
     });
 
@@ -239,15 +244,15 @@ function connectToSocketServer(roomName) {
         }
     }
 
-    const onAddStream = (e, clientId) => {
+    const onAddStream = (e, client) => {
         console.log("Create new video screen");
-        createRemoteVideoScreen(e.streams[0], clientId);
-        remoteStreamsMap.set(clientId, e.stream);
+        createRemoteVideoScreen(e.streams[0], client);
+        remoteStreamsMap.set(client.id, e.stream);
     }
 
-    function createRemoteVideoScreen(stream, clientId) {
+    function createRemoteVideoScreen(stream, client) {
 
-        const clientIdVideoElement = $(`#remoteVideo_${clientId}`)
+        const clientIdVideoElement = $(`#remoteVideo_${client.id}`)
 
         // make sure video doesn't add duplicate
         if (clientIdVideoElement.length === 0) {
@@ -256,7 +261,7 @@ function connectToSocketServer(roomName) {
             const $participantDiv = $('<div></div>')
                 .addClass("video-container")
                 .addClass("remoteStream")
-                .attr('id', `remoteVideo_${clientId}`);
+                .attr('id', `remoteVideo_${client.id}`);
 
             const $videoElement = $('<video autoplay muted></video>')
                 .addClass("remoteVideo")
@@ -265,7 +270,7 @@ function connectToSocketServer(roomName) {
             const $remoteParticipantHeader = $('<h3></h3>')
                 .addClass("text-center")
                 .addClass("streamer-name")
-                .text(`Participant: ${clientId}`);
+                .text(client.name);
 
             $participantDiv.append($remoteParticipantHeader);
             $participantDiv.append($videoElement);
