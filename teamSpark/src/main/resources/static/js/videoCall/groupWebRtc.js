@@ -85,11 +85,9 @@ function connectToSocketServer(roomName) {
             // {urls: 'stun:stun2.l.google.com:19302'},
             // {urls: 'stun:stun3.l.google.com:19302'},
             // {urls: 'stun:stun4.l.google.com:19302'},
-            // {
-            //     urls: `turn:13.250.13.83:3478`,
-            //     username: "YzYNCouZM1mhqhmseWk6",
-            //     credential: "YzYNCouZM1mhqhmseWk6"
-            // }
+            {
+                urls: `turn:13.230.221.152:3478`
+            }
         ]
     };
 
