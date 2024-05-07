@@ -11,6 +11,12 @@ public class FrontController {
     @Value("${host.name}")
     private String hostName;
 
+    @Value("${turn.user.name}")
+    private String turnUserName;
+
+    @Value("${turn.password}")
+    private String turnPassword;
+
     @GetMapping("/")
     public String homePage() {
         return "redirect:/login";
@@ -35,6 +41,8 @@ public class FrontController {
     @GetMapping("/channel/{channelId}/videoCall")
     public String channelVideoCallPage(Model model) {
         model.addAttribute("hostName", hostName);
+        model.addAttribute("turnUserName", turnUserName);
+        model.addAttribute("turnPassword", turnPassword);
         return "videoCall";
     }
 

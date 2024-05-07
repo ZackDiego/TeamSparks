@@ -48,8 +48,7 @@ function connectToSocketServer(roomName) {
     // Connect to video call socketIOServer
     let socket;
     if (hostName === 'localhost') {
-        socket = io.connect("http://localhost:8001",
-            {path: '/videoCallWebsocket', transports: ['websocket', 'xhr-polling', 'jsonp-polling']});
+        socket = io.connect("http://localhost:8001");
     } else {
         socket = io.connect(`https://${hostName}`);
     }
@@ -86,7 +85,9 @@ function connectToSocketServer(roomName) {
             // {urls: 'stun:stun3.l.google.com:19302'},
             // {urls: 'stun:stun4.l.google.com:19302'},
             {
-                urls: `turn:13.230.221.152:3478`
+                urls: `turn:13.230.221.152:3478`,
+                username: turnUserName,
+                credential: turnPassword
             }
         ]
     };
@@ -249,30 +250,30 @@ function connectToSocketServer(roomName) {
         const clientIdVideoElement = $(`#remoteVideo_${clientId}`)
 
         // make sure video doesn't add duplicate
-        if (clientIdVideoElement.length === 0) {
-            const $videoPanel = $('.video-panel');
+        // if (clientIdVideoElement.length === 0) {
+        const $videoPanel = $('.video-panel');
 
-            const $participantDiv = $('<div></div>')
-                .addClass("video-container")
-                .addClass("remoteStream")
-                .attr('id', `remoteVideo_${clientId}`);
+        const $participantDiv = $('<div></div>')
+            .addClass("video-container")
+            .addClass("remoteStream")
+            .attr('id', `remoteVideo_${clientId}`);
 
-            const $videoElement = $('<video autoplay muted></video>')
-                .addClass("remoteVideo")
-                .prop('srcObject', stream);
+        const $videoElement = $('<video autoplay muted></video>')
+            .addClass("remoteVideo")
+            .prop('srcObject', stream);
 
-            const $remoteParticipantHeader = $('<h3></h3>')
-                .addClass("text-center")
-                .addClass("streamer-name")
-                .text(`Participant: ${clientId}`);
+        const $remoteParticipantHeader = $('<h3></h3>')
+            .addClass("text-center")
+            .addClass("streamer-name")
+            .text(`Participant: ${clientId}`);
 
-            $participantDiv.append($remoteParticipantHeader);
-            $participantDiv.append($videoElement);
-            $videoPanel.append($participantDiv);
+        $participantDiv.append($remoteParticipantHeader);
+        $participantDiv.append($videoElement);
+        $videoPanel.append($participantDiv);
 
-            // adjust width if needed
-            adjustVideoContainerSize();
-        }
+        // adjust width if needed
+        adjustVideoContainerSize();
+        // }
     }
 
     return socket;
