@@ -59,8 +59,9 @@
         <div class="search-dropdown"></div>
         <div id="datepicker" style="display: none;"></div>
     </div>
-    <div id="welcome-message"></div>
-    <button class="btn-notification position-relative" data-placement="bottom" data-toggle="popover">
+    <div id="welcome-message" style="display: none"></div>
+    <button class="btn-notification position-relative" data-placement="bottom" data-toggle="popover"
+            style="display: none">
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
             3
         </span>
@@ -78,16 +79,18 @@
         <button class="btn-add-workspace">+</button>
     </div>
     <div class="search-container">
-        <div class="search-condition-desc">
-            <div class="search-keyword-desc">Search Keyword: <span class="search-keyword-placeholder"></span></div>
-            <div class="search-condition-container">
-                <span class="font-weight-bold">Search conditions:</span>
-                <div class="search-conditions">
+        <div class="search-content">
+            <div class="search-condition-desc">
+                <div class="search-keyword-desc">Search Keyword: <span class="search-keyword-placeholder"></span></div>
+                <div class="search-condition-container">
+                    <span class="font-weight-bold">Search conditions:</span>
+                    <div class="search-conditions">
+                    </div>
                 </div>
             </div>
+            <div class="search-result-desc">Number of results: <span class="result-number"></span></div>
+            <div class="search-result"></div>
         </div>
-        <div class="search-result-desc">Number of results: <span class="result-number"></span></div>
-        <div class="search-result"></div>
     </div>
     <div class="toast-container"></div>
 </div>

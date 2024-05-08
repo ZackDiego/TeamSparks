@@ -215,23 +215,18 @@ function renderChannelContent(channel, messageHistory) {
         scrollMessageContainerToBottom();
     } else {
         console.log("redirect to following message")
-        $('.message-container').each(function () {
-            if ($(this).data('message-id') === messageRedirect.messageId) {
-                const $this = $(this);
-                // scroll to that message
-                $('.message-history-container').animate({
-                    scrollTop: $this.offset().top - $this.outerHeight() - 200
-                }, 500);
 
-                $this.addClass('flash-background');
+        const $messageContainer = $('.message-history-container').find('[data-message-id="' + messageRedirect.messageId + '"]');
 
-                setTimeout(function () {
-                    $this.removeClass('flash-background');
-                }.bind(this), 4000);
+        $('.message-history-container').animate({
+            scrollTop: $messageContainer[0].offsetTop
+        }, 500);
+        // flash for 4s
+        $messageContainer.addClass('flash-background');
+        setTimeout(function () {
+            $messageContainer.removeClass('flash-background');
+        }.bind(this), 4000);
 
-                return false;
-            }
-        });
         // remove the message for redirect
         sessionStorage.removeItem('messageData');
     }
@@ -703,9 +698,13 @@ function searchDropDown() {
 
     $('.header-search-button').click(() => {
         // Extract search keyword
-        const searchKeyword = $('.search-keyword').text().trim();
-
+        let searchKeyword = $('.search-keyword').text().trim();
         const headerSearchInput = $('.header-search-input');
+
+        if (searchKeyword === "" && headerSearchInput.find('span').length === 0) {
+            searchKeyword = $('.header-search-input').text().trim();
+        }
+
         // Extract other search criteria
         const fromName = headerSearchInput.find('.from-tag').text().split(': ')[1] || null;
         const fromId = headerSearchInput.find('.from-tag').data('from-id') || null;
