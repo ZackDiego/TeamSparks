@@ -38,7 +38,7 @@
     aspect-ratio: 13/9;
     position: relative;
     z-index: 0;
-    max-width: 530px;
+    max-width: 420px;
 }
 
 .video-container.big {
