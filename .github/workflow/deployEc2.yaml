@@ -5,6 +5,8 @@ on:
     branches:
       - dev
       - sprint3
+      - sprint4
+      - test/github-action
 
 jobs:
   deploy:
