@@ -34,10 +34,10 @@ jobs:
       - name: SSH into EC2 and deploy
         uses: easingthemes/ssh-deploy@main
         with:
-          remoteHost: ${{ secrets.EC2_HOST }}
-          remoteUser: ${{ secrets.EC2_USERNAME }}
-          sshPrivateKey: ${{ secrets.EC2_SSH_KEY }}
-          script: |
+          REMOTE_HOST: ${{ secrets.EC2_HOST }}
+          REMOTE_USER: ${{ secrets.EC2_USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          SCRIPT_AFTER: |
             cd /home/ubuntu/app
             sudo systemctl stop app
             mvn clean package -Dmaven.test.skip=true
