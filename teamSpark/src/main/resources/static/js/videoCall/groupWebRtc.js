@@ -263,7 +263,7 @@ function connectToSocketServer(roomName) {
                 .addClass("remoteStream")
                 .attr('id', `remoteVideo_${client.id}`);
 
-            const $videoElement = $('<video autoplay muted></video>')
+            const $videoElement = $('<video autoplay></video>')
                 .addClass("remoteVideo")
                 .prop('srcObject', stream);
 
