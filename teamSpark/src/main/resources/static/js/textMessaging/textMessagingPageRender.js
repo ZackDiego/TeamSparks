@@ -17,7 +17,7 @@ $(document).ready(async function () {
     const channels = await fetchChannelsByMemberId(getMemberId());
     sessionStorage.setItem("channels", JSON.stringify(channels));
     addChannelsInSideBarAndModal(channels);
-    
+
     const channelIds = channels.map(channel => channel.id);
     const stompClient = addMessagingStomp(channelIds);
 
@@ -43,11 +43,19 @@ $(document).ready(async function () {
     $("details").attr("open", true);
 
     const messageRedirect = JSON.parse(sessionStorage.getItem('messageData'));
+    const channelRedirect = JSON.parse(sessionStorage.getItem('channelRedirect'));
     if (messageRedirect) {
-
         // Redirect to the specific message's channel
         $('.details-item').each(function () {
             if ($(this).data('channel-id') === messageRedirect.channelId) {
+                $(this).click(); // Trigger click event on the channel
+                return false;
+            }
+        });
+    } else if (channelRedirect) {
+        // Redirect to the specific message's channel
+        $('.details-item').each(function () {
+            if ($(this).data('channel-id') === channelRedirect.channelId) {
                 $(this).click(); // Trigger click event on the channel
                 return false;
             }
@@ -269,6 +277,12 @@ function toggleSideBarChannel() {
         $('.details-item').removeClass('active');
         $(this).addClass('active');
 
+        // change channel direct
+        sessionStorage.setItem('channelRedirect', JSON.stringify({
+            workspaceId: getWorkspaceIdInUrl(),
+            channelId: channelId
+        }))
+
         // Remove the toasts of channelId
         $('.toast[data-channel-id="' + channelId + '"]').remove();
     });
@@ -277,6 +291,13 @@ function toggleSideBarChannel() {
 function videoCallButton() {
     $('.btn-video-call').click(function () {
         const channelId = $('#text-messaging-content').data('channel-id');
+
+        // save channel direct in sessionStorage
+        sessionStorage.setItem('channelRedirect', JSON.stringify({
+            workspaceId: getWorkspaceIdInUrl(),
+            channelId: channelId
+        }))
+
         window.location.replace("/channel/" + channelId + "/videoCall");
     });
 }

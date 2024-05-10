@@ -308,8 +308,9 @@ function disconnectAndRedirect(socket, roomName) {
     // remove all remoteStream videos
     $('.remoteStream').remove();
 
-    // Redirect to the workspace channel
-    window.location.href = "/user";
+    // Redirect to the original channel
+    const channelRedirect = JSON.parse(sessionStorage.getItem('channelRedirect'));
+    window.location.href = `/workspace/${channelRedirect.workspaceId}`;
 }
 
 // Page entry point

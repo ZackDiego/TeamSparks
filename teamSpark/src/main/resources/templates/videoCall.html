@@ -27,8 +27,9 @@
         <a href="/user">TeamSparks</a>
     </div>
     <div class="header-search-container">
+        <span class="placeholder" contenteditable="false"> Type # for search condition</span>
         <div class="header-search-input" contenteditable="true">
-            <div class="header-search-keyword" contenteditable="true"></div>
+            <div class="search-keyword" contenteditable="true"></div>
         </div>
         <button class="header-search-button"><img alt="Search" src="/icons/search.png"></button>
         <div class="search-dropdown"></div>
@@ -84,6 +85,7 @@
     const turnUserName = '[[${turnUserName}]]';
     const turnPassword = '[[${turnPassword}]]';
 </script>
+<script th:src="@{/js/searchBarDropDown.js}"></script>
 <script th:src="@{/js/videoCall/groupWebRtc.js}"></script>
 </body>
 </html>

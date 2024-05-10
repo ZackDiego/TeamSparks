@@ -253,7 +253,6 @@ function searchDropDown() {
         });
 
         $searchDropdown.css('display', 'block');
-        console.log('load finish');
     }
 
     // Function to show suggestion list when input is focused
@@ -354,9 +353,13 @@ function searchDropDown() {
 
     $('.header-search-button').click(() => {
         // Extract search keyword
-        const searchKeyword = $('.search-keyword').text().trim();
-
+        let searchKeyword = $('.search-keyword').text().trim();
         const headerSearchInput = $('.header-search-input');
+
+        if (searchKeyword === "" && headerSearchInput.find('span').length === 0) {
+            searchKeyword = $('.header-search-input').text().trim();
+        }
+
         // Extract other search criteria
         const fromName = headerSearchInput.find('.from-tag').text().split(': ')[1] || null;
         const fromId = headerSearchInput.find('.from-tag').data('from-id') || null;
