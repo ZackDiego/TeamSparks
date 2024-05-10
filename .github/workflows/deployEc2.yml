@@ -38,7 +38,7 @@ jobs:
           REMOTE_USER: ${{ secrets.EC2_USERNAME }}
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
           SCRIPT_AFTER: |
-            cd /home/ubuntu/app
+            cd /home/ubuntu/app/TeamSpark/teamSpark
             sudo systemctl stop app
             mvn clean package -Dmaven.test.skip=true
             sudo systemctl start app # Start the service
