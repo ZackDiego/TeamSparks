@@ -81,6 +81,10 @@
     border: none;
     box-shadow: none;
     outline: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
 }
 
 /* sidebar buttons */
@@ -658,11 +662,6 @@ pre {
     margin-bottom: 5px;
 }
 
-.dropdown-menu .dropdown-item {
-    border-bottom: 1px solid #ccc; /* Add a bottom border with a color */
-    padding: 8px 16px; /* Adjust padding as needed */
-}
-
 .dropdown-menu .dropdown-item:last-child {
     border-bottom: none; /* Remove bottom border from the last dropdown item */
 }
@@ -789,6 +788,10 @@ pre {
 .workspace-member-list {
     max-height: 400px; /* Adjust as needed */
     overflow-y: scroll;
+}
+
+.workspace-member-list a:hover {
+    cursor: default;
 }
 
 .message-content p {
