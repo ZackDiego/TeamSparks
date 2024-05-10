@@ -34,51 +34,51 @@ addMessagingStomp = function (channelIds) {
         $("#conversation").html("");
     }
 
-    function sendMessage($messageEditor) {
-
-        // Get the HTML content from the Summernote editor
-        const content = $messageEditor.summernote('code');
-        // Create a temporary div element using jQuery
-        const $tempDiv = $('<div>');
-        // Set the HTML content to the div
-        $tempDiv.html(content);
-        // Get the text content from the div, which will strip HTML tags but preserve line breaks
-        const plainTextContent = $tempDiv.text();
-
-        const containsLink = /(?:http|https):\/\/\S+/i.test(content);
-
-        const channelId = parseInt($('#text-messaging-content').attr('data-channel-id'));
-        console.log("send message to channel " + channelId);
-
-        const user = JSON.parse(localStorage.getItem('user'))
-        const messageJson = JSON.stringify({
-            channel_id: channelId,
-            message: {
-                from_id: getMemberId(),
-                from_name: user.name,
-                content: content,
-                plain_text_content: plainTextContent,
-                contain_link: containsLink,
-                file_url: null,
-                image_url: null
-            }
-        });
-        stompClient.send("/websocket/textMessagingEndpoint", {}, messageJson);
-
-        // clear the message editor
-        $messageEditor.summernote('code', '');
-    }
-
-    $('.btn-send').click(function () {
-        const $messageEditor = $(this)
-            .closest('.bottom-toolbar')
-            .closest('.note-editor')
-            .siblings('.message-editor');
-        sendMessage($messageEditor);
-    });
-
     return stompClient;
 }
+
+function sendMessageIfNotEmpty(stompClient, $messageEditor) {
+    // Get the HTML content from the Summernote editor
+    const content = $messageEditor.summernote('code');
+
+    // Check if the content is not empty
+    if (content.trim() === '') {
+        // Content is empty, do not send the message
+        console.log("emtpy message, can't send");
+        return;
+    }
+
+    // Create a temporary div element using jQuery
+    const $tempDiv = $('<div>');
+    // Set the HTML content to the div
+    $tempDiv.html(content);
+    // Get the text content from the div, which will strip HTML tags but preserve line breaks
+    const plainTextContent = $tempDiv.text();
+
+    const containsLink = /(?:http|https):\/\/\S+/i.test(content);
+
+    const channelId = parseInt($('#text-messaging-content').attr('data-channel-id'));
+    console.log("send message to channel " + channelId);
+
+    const user = JSON.parse(localStorage.getItem('user'))
+    const messageJson = JSON.stringify({
+        channel_id: channelId,
+        message: {
+            from_id: getMemberId(),
+            from_name: user.name,
+            content: content,
+            plain_text_content: plainTextContent,
+            contain_link: containsLink,
+            file_url: null,
+            image_url: null
+        }
+    });
+    stompClient.send("/websocket/textMessagingEndpoint", {}, messageJson);
+
+    // clear the message editor
+    $messageEditor.summernote('code', '');
+}
+
 
 function subscribeChannel(stompClient, channelId) {
     stompClient.subscribe('/textMessagingChannel/' + channelId, (result) => {

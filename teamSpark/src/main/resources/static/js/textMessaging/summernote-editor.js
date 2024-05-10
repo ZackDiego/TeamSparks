@@ -16,7 +16,7 @@ var BtnCodeBlock = function (context) {
     return button.render();   // return button as jquery object
 }
 
-renderMessageEditor = function () {
+renderMessageEditor = function (stompClient) {
     $('.message-editor').each(function () {
         var $messageEditor = $(this);
         $messageEditor.summernote({
@@ -54,6 +54,25 @@ renderMessageEditor = function () {
 
                     // Append the customToolbar after the original toolbar
                     $messageEditor.siblings('.note-editor').children('.note-editing-area').after(customToolbar);
+                },
+                onKeydown: function (e) {
+                    if (e.keyCode === 13 && !e.shiftKey) {
+                        e.preventDefault();
+                        console.log("Send with Enter key");
+                        // Get the message editor
+                        const $messageEditor = $(this);
+                        // Send the message if the content is not empty
+                        sendMessageIfNotEmpty(stompClient, $messageEditor);
+                    }
+                    // Check if Shift + Enter is pressed
+                    else if (e.keyCode === 13 && e.shiftKey) {
+                        // Change line with Shift + Enter
+                        console.log("Change line with Shift + Enter");
+                        // Prevent default behavior to avoid inserting a newline character
+                        e.preventDefault();
+                        // Insert a newline character
+                        $messageEditor.summernote("pasteHTML", "<br><br>");
+                    }
                 }
             },
         });

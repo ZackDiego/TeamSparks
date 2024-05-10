@@ -790,3 +790,7 @@ pre {
     max-height: 400px; /* Adjust as needed */
     overflow-y: scroll;
 }
+
+.message-content p {
+    margin-bottom: 0;
+}

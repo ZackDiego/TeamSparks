@@ -6,7 +6,7 @@ on:
       - dev
       - sprint3
       - sprint4
-      - test/github-action
+      - sprint5
 
 jobs:
   deploy:

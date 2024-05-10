@@ -17,15 +17,20 @@ $(document).ready(async function () {
     const channels = await fetchChannelsByMemberId(getMemberId());
     sessionStorage.setItem("channels", JSON.stringify(channels));
     addChannelsInSideBarAndModal(channels);
-
-    renderMessageEditor();
-
+    
     const channelIds = channels.map(channel => channel.id);
     const stompClient = addMessagingStomp(channelIds);
+
+    renderMessageEditor(stompClient);
     // Button setting
     toggleSideBarChannel();
     videoCallButton();
     toggleChannelMember();
+    $('.btn-send').click(function () {
+        const $messageEditor = $('.message-editor');
+
+        sendMessageIfNotEmpty(stompClient, $messageEditor);
+    });
 
     workspaceSetting();
     handleCreateChannel(stompClient);
