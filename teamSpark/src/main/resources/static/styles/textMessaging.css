@@ -307,8 +307,8 @@
 .search-dropdown {
     position: absolute;
     top: 100%;
-    left: 0;
-    width: 100%;
+    left: 3px;
+    width: calc(100% - 6px);
     background-color: white;
     border: 1px solid #ccc;
     border-top: none;
@@ -322,6 +322,13 @@
     cursor: pointer;
     width: 100%;
     border-bottom: 1px solid #b2b2b2;
+    display: flex;
+    align-items: center;
+}
+
+.channel-dropdown-item {
+    height: 50px;
+    padding-left: 10px;
 }
 
 .condition-tag {

@@ -67,6 +67,53 @@ function searchDropDown() {
         $searchDropdown.css('display', 'block');
     }
 
+    // Function to populate dropdown with channels
+    function populateChannels() {
+        // Retrieve channels from sessionStorage
+        const channels = JSON.parse(sessionStorage.getItem('channels')) || [];
+        channels.sort((a, b) => {
+            return a.is_private - b.is_private;
+        });
+        $searchDropdown.empty();
+
+        // Create dropdown items for each workspace member
+        channels.forEach(channel => {
+            const $item = $('<div>').addClass('search-dropdown-item').addClass('channel-dropdown-item').data('channel-id', channel.id);
+
+            if (channel.is_private) {
+                $item.data('is_private', true);
+                // Find the private chat partner
+                const chat_partner = findPrivateChatPartner(channel);
+                const avatarImg = $('<img>').addClass('chat-partner-avatar').attr('src', chat_partner.user.avatar);
+                const $name = $('<span>').addClass('channel-name').text("Chat with " + chat_partner.user.name);
+                $item.attr('data-channel-id', channel.id)
+                    .append(avatarImg, $name);
+
+            } else {
+                // If it's not private
+                $item.data('is_private', false);
+                const hashSpan = $('<span class="channel-title-prefix">#</span>');
+                const $name = $('<span>').addClass('channel-name').text(channel.name);
+                $item.attr('data-channel-id', channel.id).append(hashSpan, $name);
+            }
+
+            $item.appendTo($searchDropdown);
+
+            // Event listener for clicking on channels
+            $item.on('click', function () {
+                console.log('pick channel');
+                // Get the name of the clicked workspace member
+                const channelId = $(this).data('channel-id');
+                const channelName = $(this).find('.channel-name').text();
+
+                // Find the 'in' tag and insert the channel name
+                $searchInput.find('.in-tag').text('#in: ' + channelName).data('channel-id', channelId);
+            });
+        });
+
+        $searchDropdown.css('display', 'block');
+    }
+
     // Function to show suggestion list when input is focused
     $searchInput.on('keyup', function () {
         // Get the text content of the search input excluding the content within span elements
@@ -132,6 +179,8 @@ function searchDropDown() {
         });
     });
 
+    // ---  Conditions Tag Click Event
+    // from
     $searchInput.on('click', '.from-tag', function () {
         console.log('click on from tag');
         // Populate dropdown with workspace members
@@ -139,7 +188,14 @@ function searchDropDown() {
 
     });
 
+    // in
+    $searchInput.on('click', '.in-tag', function () {
+        console.log('click on in tag');
+        // Populate dropdown with workspace members
+        populateChannels();
+    });
 
+    // before, after
     $searchInput.on('click', '.before-tag, .after-tag', function () {
         const selectTag = $(this);
 
