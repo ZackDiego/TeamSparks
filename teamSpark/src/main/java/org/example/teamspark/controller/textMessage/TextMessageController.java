@@ -6,28 +6,23 @@ import org.example.teamspark.data.dto.message.InMessageDto;
 import org.example.teamspark.data.dto.message.MessageDto;
 import org.example.teamspark.data.dto.message.MessageId;
 import org.example.teamspark.exception.ElasticsearchFailedException;
+import org.example.teamspark.redis.RedisMessagePublisher;
 import org.example.teamspark.service.MessageHistoryService;
-import org.example.teamspark.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
 @CommonsLog
 public class TextMessageController {
-
-    private final SimpMessagingTemplate messageTemplate;
     private final MessageHistoryService messageHistoryService;
-    private final NotificationService notificationService;
+    private final RedisMessagePublisher redisMessagePublisher;
 
     @Autowired
-    public TextMessageController(SimpMessagingTemplate messageTemplate,
-                                 MessageHistoryService messageHistoryService,
-                                 NotificationService notificationService) {
-        this.messageTemplate = messageTemplate;
+    public TextMessageController(MessageHistoryService messageHistoryService,
+                                 RedisMessagePublisher redisMessagePublisher) {
         this.messageHistoryService = messageHistoryService;
-        this.notificationService = notificationService;
+        this.redisMessagePublisher = redisMessagePublisher;
     }
 
     @MessageMapping("/textMessagingEndpoint")
@@ -38,11 +33,9 @@ public class TextMessageController {
         // store message to elasticsearch
         MessageId messageId = messageHistoryService.addMessageHistoryByChannelId(inMessageDto.getChannelId(), messageDto);
         messageDto.setMessageId(messageId);
-        notificationService.handleChannelMessageNotifications(inMessageDto.getChannelId(), messageDto);
-
-        // Send to Message to channel
-        messageTemplate.convertAndSend(
-                "/textMessagingChannel/" + inMessageDto.getChannelId(),
-                messageDto);
+        // save message id
+        inMessageDto.setMessage(messageDto);
+        // Send the message to message broker
+        redisMessagePublisher.publish(inMessageDto);
     }
 }
