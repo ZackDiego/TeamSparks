@@ -5,6 +5,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 @Controller
 public class FrontController {
 
@@ -33,7 +36,10 @@ public class FrontController {
     }
 
     @GetMapping("/workspace/{workspaceId}")
-    public String workspacePage(Model model) {
+    public String workspacePage(Model model) throws UnknownHostException {
+        // Get the IP address of the current EC2 instance
+        String ipAddress = InetAddress.getLocalHost().getHostAddress();
+        model.addAttribute("ec2IpAddress", ipAddress);
         model.addAttribute("hostName", hostName);
         return "textMessaging";
     }
