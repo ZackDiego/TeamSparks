@@ -58,10 +58,6 @@ public class MessageHistoryService {
         return dto;
     }
 
-    public void createMessageHistoryByChannelId(User user, Long channelId) {
-
-    }
-
     public MessageId addMessageHistoryByChannelId(Long channelId, MessageDto message) throws JsonProcessingException, ElasticsearchFailedException {
 
         ObjectMapper objectMapper = new ObjectMapper();

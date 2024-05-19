@@ -8,6 +8,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.example.teamspark.data.dto.SearchCondition;
 import org.example.teamspark.data.dto.message.MessageDto;
 import org.example.teamspark.data.dto.message.MessageId;
+import org.example.teamspark.elasticsearch.query.*;
 import org.example.teamspark.exception.ElasticsearchFailedException;
 import org.example.teamspark.model.channel.Channel;
 import org.springframework.beans.factory.annotation.Value;
@@ -145,7 +146,7 @@ public class ElasticsearchService {
         return headers;
     }
 
-    public String searchMessageWithCondition(List<Channel> channels, SearchCondition condition) throws ElasticsearchFailedException {
+    public String searchMessageWithCondition(List<Channel> channels, SearchCondition condition) throws ElasticsearchFailedException, JsonProcessingException {
 
         if (condition.getChannelId() == null) {
             String indices = channels.stream()
@@ -175,60 +176,50 @@ public class ElasticsearchService {
         }
     }
 
-    private ResponseEntity<String> getElasticsearchSearchResult(SearchCondition condition, String searchUrl) throws ElasticsearchFailedException {
+    private ResponseEntity<String> getElasticsearchSearchResult(SearchCondition condition, String searchUrl) throws
+            ElasticsearchFailedException, JsonProcessingException {
+
         // Create HttpHeaders with authentication
         HttpHeaders headers = createHeaders(ESUserName, ESPassword);
 
-        String requestBody = """
-                {
-                    "query": {
-                        "bool": {
-                """;
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        if (condition.getSearchKeyword() != null && !condition.getSearchKeyword().isEmpty()) {
-            requestBody += "                    \"must\": {\n" +
-                    "                        \"match\": {\n" +
-                    "                            \"plain_text_content\": \"" + condition.getSearchKeyword() + "\"\n" +
-                    "                        }\n" +
-                    "                    },";
-        }
+        MatchQuery matchQuery = new MatchQuery(condition.getSearchKeyword());
+        MustQuery mustQuery = new MustQuery(matchQuery);
 
-        requestBody += """
-                            "filter": [
-                """;
-
-        // Build filter conditions
-        List<String> filterConditions = new ArrayList<>();
+        // Filter
+        List<JsonNode> filterQueries = new ArrayList<>();
         if (condition.getFromId() != null) {
-            filterConditions.add("{ \"term\": { \"from_id\": " + condition.getFromId() + " } }");
+            TermFilter termFilter = new TermFilter("from_id", condition.getFromId());
+            filterQueries.add(termFilter.toJsonNode());
         }
         if (condition.getBeforeDate() != null) {
-            filterConditions.add("{ \"range\": { \"created_at\": { \"lte\": " + condition.getBeforeDate().getTime() + " } } }");
+            RangeFilter rangeFilter = new RangeFilter("created_at", condition.getBeforeDate().getTime(), "lte");
+            filterQueries.add(rangeFilter.toJsonNode());
         }
         if (condition.getAfterDate() != null) {
-            filterConditions.add("{ \"range\": { \"created_at\": { \"gte\": " + condition.getAfterDate().getTime() + " } } }");
+            RangeFilter rangeFilter = new RangeFilter("created_at", condition.getAfterDate().getTime(), "gte");
+            filterQueries.add(rangeFilter.toJsonNode());
         }
         if (condition.getContainLink() != null) {
-            filterConditions.add("{ \"term\": { \"contain_link\": " + condition.getContainLink() + " } }");
+            TermFilter termFilter = new TermFilter("contain_link", condition.getContainLink());
+            filterQueries.add(termFilter.toJsonNode());
         }
         if (condition.getContainFile() != null && condition.getContainFile()) {
-            filterConditions.add("{ \"exists\": { \"field\": \"file_url\" } }");
+            ExistsFilter existsFilter = new ExistsFilter("file_url");
+            filterQueries.add(existsFilter.toJsonNode());
         }
         if (condition.getContainImage() != null) {
-            filterConditions.add("{ \"exists\": { \"field\": \"image_url\" } }");
+            ExistsFilter existsFilter = new ExistsFilter("image_url");
+            filterQueries.add(existsFilter.toJsonNode());
         }
 
-        // Concatenate filter conditions with commas
-        requestBody += String.join(",\n", filterConditions);
+        BoolQuery boolQuery = new BoolQuery(mustQuery, filterQueries);
+        Query query = new Query(boolQuery);
+        ElasticsearchRequestBody requestBody = new ElasticsearchRequestBody(query);
 
-        // Close the JSON structure
-        requestBody += """
-                            ]
-                        }
-                    }
-                }""";
-
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+        String requestBodyJson = objectMapper.writeValueAsString(requestBody);
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBodyJson, headers);
 
         try {
             return restTemplate.exchange(searchUrl, HttpMethod.POST, requestEntity, String.class);
