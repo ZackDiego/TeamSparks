@@ -12,11 +12,15 @@ import org.example.teamspark.model.user.User;
 import org.example.teamspark.model.workspace.WorkspaceMember;
 import org.example.teamspark.repository.ChannelMemberRepository;
 import org.example.teamspark.repository.ChannelRepository;
+import org.example.teamspark.repository.IChannelProjection;
 import org.example.teamspark.repository.WorkspaceMemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,46 +37,6 @@ public class ChannelService {
         this.channelMemberRepository = channelMemberRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
         this.elasticsearchService = elasticsearchService;
-    }
-
-    private static List<ChannelDto> mapResultSetToChannelDtos(List<Object[]> rs) {
-        // Map the result rows to DTO objects
-        Map<Long, ChannelDto> channelDtoMap = new HashMap<>();
-        for (Object[] row : rs) {
-            Long channelId = (Long) row[0];
-
-            // Create or retrieve the ChannelDto from the map
-            ChannelDto channelDto = channelDtoMap.computeIfAbsent(channelId, id -> {
-                ChannelDto newChannelDto = new ChannelDto();
-                newChannelDto.setId(channelId);
-                newChannelDto.setWorkspaceId((Long) row[1]);
-                newChannelDto.setName((String) row[2]);
-                newChannelDto.setCreatedAt((Date) row[3]);
-                newChannelDto.setPrivate((Boolean) row[4]);
-
-                newChannelDto.setMembers(new ArrayList<>());
-                return newChannelDto;
-            });
-
-            // Create a WorkspaceMemberDto for the member
-            WorkspaceMemberDto memberDto = new WorkspaceMemberDto();
-            memberDto.setId((Long) row[5]);
-
-            UserDto userDto = new UserDto();
-            userDto.setId((Long) row[6]);
-            userDto.setName((String) row[7]);
-            userDto.setAvatar((String) row[8]);
-            memberDto.setUserDto(userDto);
-
-            memberDto.setCreator((boolean) row[9]);
-            // Add the member to the channelDto
-            channelDto.getMembers().add(memberDto);
-
-            channelDtoMap.put(channelId, channelDto);
-        }
-
-        List<ChannelDto> channelDtos = new ArrayList<>(channelDtoMap.values());
-        return channelDtos;
     }
 
     @Transactional
@@ -118,9 +82,12 @@ public class ChannelService {
                 .map(Channel::getId)
                 .collect(Collectors.toList());
 
-        List<Object[]> rs = channelRepository.findChannelsWithMembersByChannelIds(channelIds);
+        List<IChannelProjection> channelProjections = channelRepository.findChannelsWithMembersByChannelIds(channelIds);
 
-        return mapResultSetToChannelDtos(rs);
+        if (channelProjections != null) {
+            return mapProjectionToDto(channelProjections);
+        }
+        return null;
     }
 
     public ChannelDto getChannelById(User user, Long channelId) throws ResourceAccessDeniedException {
@@ -132,9 +99,12 @@ public class ChannelService {
             throw new ResourceAccessDeniedException("User is unauthorized to access channel " + channelId);
         }
 
-        List<Object[]> rs = channelRepository.findChannelWithMembersByChannelId(channelId);
+        List<IChannelProjection> channelProjections = channelRepository.findChannelWithMembersByChannelId(channelId);
 
-        return mapResultSetToChannelDtos(rs).get(0);
+        if (channelProjections != null) {
+            return mapProjectionToDto(channelProjections).stream().findFirst().orElse(null);
+        }
+        return null;
     }
 
     public ChannelDto updateChannel(User user, Long channelId, ChannelDto channelDto) throws ResourceAccessDeniedException {
@@ -158,9 +128,12 @@ public class ChannelService {
         channelRepository.save(channel);
 
         // form the updatedChannelDto
-        List<Object[]> rs = channelRepository.findChannelWithMembersByChannelId(channelId);
+        List<IChannelProjection> channelProjections = channelRepository.findChannelWithMembersByChannelId(channelId);
 
-        return mapResultSetToChannelDtos(rs).get(0);
+        if (channelProjections != null) {
+            return mapProjectionToDto(channelProjections).stream().findFirst().orElse(null);
+        }
+        return null;
     }
 
     public void deleteChannel(User user, Long channelId) throws ResourceAccessDeniedException {
@@ -177,5 +150,43 @@ public class ChannelService {
         }
 
         channelRepository.delete(channel);
+    }
+
+    private List<ChannelDto> mapProjectionToDto(List<? extends IChannelProjection> projections) {
+        Map<Long, ChannelDto> map = new HashMap<>();
+        projections.forEach(mediatorChannel -> {
+
+            Long channelId = mediatorChannel.getChannelId();
+
+            // Create or retrieve the ChannelDto from the map
+            ChannelDto channelDto = map.computeIfAbsent(channelId, id -> {
+                ChannelDto newChannelDto = new ChannelDto();
+                newChannelDto.setId(channelId);
+                newChannelDto.setWorkspaceId(mediatorChannel.getWorkspaceId());
+                newChannelDto.setName(mediatorChannel.getChannelName());
+                newChannelDto.setCreatedAt(mediatorChannel.getCreatedAt());
+                newChannelDto.setPrivate(mediatorChannel.getIsPrivate());
+
+                newChannelDto.setMembers(new ArrayList<>());
+                return newChannelDto;
+            });
+
+            // Create a WorkspaceMemberDto for the member
+            WorkspaceMemberDto memberDto = new WorkspaceMemberDto();
+            memberDto.setId(mediatorChannel.getMemberId());
+
+            UserDto userDto = new UserDto();
+            userDto.setId(mediatorChannel.getMemberUserId());
+            userDto.setName(mediatorChannel.getMemberName());
+            userDto.setAvatar(mediatorChannel.getMemberAvatar());
+            memberDto.setUserDto(userDto);
+
+            memberDto.setCreator(mediatorChannel.getIsCreator());
+            // Add the member to the channelDto
+            channelDto.getMembers().add(memberDto);
+
+            map.put(channelId, channelDto);
+        });
+        return map.values().stream().toList();
     }
 }

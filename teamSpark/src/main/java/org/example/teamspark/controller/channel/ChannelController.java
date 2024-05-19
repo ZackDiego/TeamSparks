@@ -28,7 +28,7 @@ public class ChannelController {
 
     // get channel by workspace member id
     @GetMapping(value = "/member/{memberId}/channel")
-    public ResponseEntity<?> handleGetChannelsByMemberId(
+    public ResponseEntity<?> getChannelsByMemberId(
             @PathVariable Long memberId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -41,7 +41,7 @@ public class ChannelController {
 
     // get channel by id
     @GetMapping(value = "/channel/{channelId}")
-    public ResponseEntity<?> handleGetChannelById(
+    public ResponseEntity<?> getChannelById(
             @PathVariable Long channelId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -54,7 +54,7 @@ public class ChannelController {
 
     // create channel
     @PostMapping(value = "/channel", consumes = {"application/json"})
-    public ResponseEntity<?> handleCreateChannel(
+    public ResponseEntity<?> createChannel(
             @RequestBody ChannelDto channelDto) throws ResourceAccessDeniedException, JsonProcessingException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -67,7 +67,7 @@ public class ChannelController {
 
     // update channel
     @PutMapping(value = "/channel/{channelId}", consumes = {"application/json"})
-    public ResponseEntity<?> handleUpdateChannel(
+    public ResponseEntity<?> updateChannel(
             @PathVariable("channelId") Long channelId,
             @RequestBody ChannelDto channelDto) throws ResourceAccessDeniedException {
 
@@ -81,7 +81,7 @@ public class ChannelController {
 
     // delete channel
     @DeleteMapping("/channel/{channelId}")
-    public ResponseEntity<?> handleDeleteChannel(
+    public ResponseEntity<?> deleteChannel(
             @PathVariable("channelId") Long channelId) throws ResourceAccessDeniedException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

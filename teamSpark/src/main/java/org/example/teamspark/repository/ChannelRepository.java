@@ -35,48 +35,52 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
     @Query("SELECT cm.channel FROM ChannelMember cm WHERE cm.member.id = :memberId")
     List<Channel> findChannelsByMemberId(@Param("memberId") Long memberId);
 
-    @Query(value = "SELECT " +
-            "    c.id AS channelId, " +
-            "    c.workspace_id AS workspaceId, " +
-            "    c.name AS channelName, " +
-            "    c.created_at AS createdAt, " +
-            "    c.is_private AS channelIsPrivate, " +
-            "    wm.id AS memberId, " +
-            "    u.id AS memberUserId, " +
-            "    u.name AS memberName, " +
-            "    u.avatar AS memberAvatar, " +
-            "    wm.is_creator AS isCreator " +
-            "FROM " +
-            "    channel c " +
-            "    LEFT JOIN channel_member cm ON c.id = cm.channel_id " +
-            "    LEFT JOIN workspace_member wm ON cm.member_id = wm.id " +
-            "    LEFT JOIN user u ON wm.user_id = u.id " +
-            "WHERE " +
-            "    c.id = :channelId",
+    @Query(value = """
+            SELECT 
+                c.id AS channelId,
+                c.workspace_id AS workspaceId,
+                c.name AS channelName,
+                c.created_at AS createdAt,
+                c.is_private AS isPrivate,
+                wm.id AS memberId,
+                u.id AS memberUserId,
+                u.name AS memberName,
+                u.avatar AS memberAvatar,
+                wm.is_creator AS isCreator
+            FROM
+                channel c
+                LEFT JOIN channel_member cm ON c.id = cm.channel_id
+                LEFT JOIN workspace_member wm ON cm.member_id = wm.id
+                LEFT JOIN user u ON wm.user_id = u.id
+            WHERE
+                c.id = :channelId
+            """,
             nativeQuery = true)
-    List<Object[]> findChannelWithMembersByChannelId(@Param("channelId") Long channelId);
+    List<IChannelProjection> findChannelWithMembersByChannelId(@Param("channelId") Long channelId);
 
 
-    @Query(value = "SELECT " +
-            "    c.id AS channelId, " +
-            "    c.workspace_id AS workSpaceId, " +
-            "    c.name AS channelName, " +
-            "    c.created_at AS createdAt, " +
-            "    c.is_private AS channelIsPrivate, " +
-            "    wm.id AS memberId, " +
-            "    u.id AS userId, " +
-            "    u.name AS userName, " +
-            "    u.avatar AS userAvatar, " +
-            "    wm.is_creator AS memberIsCreator " +
-            "FROM " +
-            "    channel c " +
-            "    LEFT JOIN channel_member cm ON c.id = cm.channel_id " +
-            "    LEFT JOIN workspace_member wm ON cm.member_id = wm.id " +
-            "    LEFT JOIN user u ON wm.user_id = u.id " +
-            "WHERE " +
-            "    c.id IN :channelIds",
+    @Query(value = """
+            SELECT 
+                c.id AS channelId,
+                c.workspace_id AS workSpaceId,
+                c.name AS channelName,
+                c.created_at AS createdAt,
+                c.is_private AS isPrivate,
+                wm.id AS memberId,
+                u.id AS memberUserId,
+                u.name AS memberName,
+                u.avatar AS memberAvatar,
+                wm.is_creator AS isCreator
+            FROM
+                channel c
+                LEFT JOIN channel_member cm ON c.id = cm.channel_id
+                LEFT JOIN workspace_member wm ON cm.member_id = wm.id
+                LEFT JOIN user u ON wm.user_id = u.id
+            WHERE
+                c.id IN :channelIds
+            """,
             nativeQuery = true)
-    List<Object[]> findChannelsWithMembersByChannelIds(@Param("channelIds") List<Long> channelIds);
+    List<IChannelProjection> findChannelsWithMembersByChannelIds(@Param("channelIds") List<Long> channelIds);
 
 
     @Query(value = "SELECT c.* FROM channel c " +
