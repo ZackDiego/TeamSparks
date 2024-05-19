@@ -40,7 +40,7 @@ public class ElasticsearchService {
         this.restTemplate = new RestTemplate();
     }
 
-    public static List<MessageDto> mapSearchResultToMessageDocuments(String responseBody) throws JsonProcessingException {
+    public List<MessageDto> mapSearchResultToMessageDocuments(String responseBody) throws JsonProcessingException {
         // map response body to
         ObjectMapper objectMapper = new ObjectMapper();
 

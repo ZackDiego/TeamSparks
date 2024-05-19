@@ -39,6 +39,6 @@ public class SearchMessageService {
 
         String responseBody = elasticsearchService.searchMessageWithCondition(userChannels, searchCondition);
 
-        return ElasticsearchService.mapSearchResultToMessageDocuments(responseBody);
+        return elasticsearchService.mapSearchResultToMessageDocuments(responseBody);
     }
 }
