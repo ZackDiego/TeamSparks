@@ -24,7 +24,6 @@ public class ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelMemberRepository channelMemberRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
-
     private final ElasticsearchService elasticsearchService;
 
     public ChannelService(ChannelRepository channelRepository,
