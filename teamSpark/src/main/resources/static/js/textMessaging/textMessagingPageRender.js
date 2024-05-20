@@ -859,12 +859,14 @@ function workspaceSetting() {
     });
 
     // saveWorkspaceBtn
-    $('#saveWorkspaceBtn').click(async function () {
+    $('#addWorkspaceForm').submit(async function (event) {
+        event.preventDefault();
+
         const access_token = localStorage.getItem('access_token');
 
         // Create FormData
         const formData = new FormData();
-        formData.append('name', $('#workspaceName').val());
+        formData.append('name', $('#workspaceName').val().trim());
         formData.append('avatarImageFile', $('#workspaceAvatar')[0].files[0]);
 
         try {
@@ -1147,7 +1149,9 @@ function isUserCreator() {
 }
 
 function handleAddChannelMember() {
-    $('#btn-add-member').click(async function () {
+    $('#addMemberForm').submit(async function (event) {
+        event.preventDefault();
+
         const channelId = $('#text-messaging-content').data('channel-id');
 
         const $channelMemberSelection = $('#channel-member-selection');

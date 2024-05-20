@@ -225,19 +225,21 @@
                     <form id="addWorkspaceForm">
                         <div class="form-group">
                             <label for="workspaceName">Workspace Name:</label>
-                            <input class="form-control" id="workspaceName" name="workspaceName" required type="text">
+                            <input class="form-control" id="workspaceName" name="workspaceName" required type="text"/>
                         </div>
                         <div class="form-group">
                             <label for="workspaceAvatar">Workspace Avatar:</label>
                             <input class="form-control-file" id="workspaceAvatar" name="workspaceAvatar"
                                    placeholder="Choose file"
-                                   type="file">
+                                   required type="file"/>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
-                    <button class="btn btn-primary" id="saveWorkspaceBtn" type="button">Save Workspace</button>
+                    <button class="btn btn-success" form="addWorkspaceForm" id="saveWorkspaceBtn" type="submit">
+                        Add Workspace
+                    </button>
                 </div>
             </div>
         </div>
@@ -343,7 +345,7 @@
                             <select aria-label="chat-partner-selection" class="selectpicker"
                                     data-live-search="true"
                                     data-show-subtext="true" data-width="100%" id="chat-partner-selection"
-                                    title="Select chat partner">
+                                    required title="Select chat partner">
                             </select>
                         </div>
                     </form>
@@ -368,17 +370,18 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="input-group" id="add-channel-member-input">
-                        <!--                        <label for="chat-partner-selection">Chat with:</label>-->
-                        <select aria-label="channel-member-selection" class="selectpicker"
-                                data-live-search="true"
-                                data-show-subtext="true" data-width="100%" id="channel-member-selection"
-                                title="Add channel member">
-                        </select>
-                        <div class="input-group-append">
-                            <button class="btn btn-success" id="btn-add-member" type="button">Add</button>
+                    <form id="addMemberForm">
+                        <div class="input-group" id="add-channel-member-input">
+                            <select aria-label="channel-member-selection" class="selectpicker"
+                                    data-live-search="true"
+                                    data-show-subtext="true" data-width="100%" id="channel-member-selection"
+                                    required title="Add channel member">
+                            </select>
+                            <div class="input-group-append">
+                                <button class="btn btn-success" id="btn-add-member" type="submit">Add</button>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                     <!-- List group for displaying channel members -->
                     <div class="list-group" id="channelMembersList">
                         <!-- Member items will be populated here -->
