@@ -6,9 +6,7 @@ import org.example.teamspark.model.channel.Channel;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,17 +20,6 @@ public class ElasticsearchServiceTest {
 
     @Autowired
     ElasticsearchService elasticsearchService;
-
-    RestTemplate restTemplate;
-
-    @Value("${elasticsearch.username}")
-    private String ESUserName;
-
-    @Value("${elasticsearch.password}")
-    private String ESPassword;
-
-    @Value("${elasticsearch.url}")
-    private String ESUrl;
 
     @Test
     public void searchMessageWithCondition_with_fromId() throws Exception {
