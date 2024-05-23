@@ -1,23 +1,22 @@
 
 <div align="center">
   <div style="display: flex; align-items: center;">
-      <img src="https://github.com/ZackDiego/TeamSparks/assets/96913989/05a3b779-6afb-49fc-9ae9-38352e9cec12" alt="teamSparksIcon" width="50" height="50">
+      <img src="https://github.com/ZackDiego/TeamSparks/assets/96913989/05a3b779-6afb-49fc-9ae9-38352e9cec12" alt="teamSparksIcon" width="80" height="80">
       <h1 style="margin-left: 10px;">TeamSparks</h1>
   </div>
-  <p align="center">
-    <a href="https://github.com/ZackDiego/TeamSparks#about">About</a>
-    |
-    <a href="https://github.com/ZackDiego/TeamSparks#about">Features</a>
-    |
-    <a href="https://github.com/ZackDiego/TeamSparks#contact">Demo</a>
-    |
-    <a href="https://github.com/ZackDiego/TeamSparks#contact">Contact</a>
-  </p>
+
+  ![Java](https://img.shields.io/badge/Java-17-orange)
+  ![Elasticsearch](https://img.shields.io/badge/Elasticsearch-7.10.1-blue)
+  ![Socket.IO](https://img.shields.io/badge/Socket.IO-2.2.0-brightgreen)
 </div>
 
-## About
+## About 
 TeamSparks enables seamless collaboration similar to Discord and Slack, offering effortless workspace
 creation, channel management, and member connectivity through messages and video.   
+
+## Tech Stack
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=java&logoColor=white) ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white) ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white) ![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white) ![ElasticSearch](https://img.shields.io/badge/-ElasticSearch-005571?style=for-the-badge&logo=elasticsearch) ![Socket.io](https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101) ![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white) 
+
 
 ## Test Accounts
 | User | Email               | Password |
@@ -43,7 +42,8 @@ creation, channel management, and member connectivity through messages and video
 - Automated deployment with **GitHub Actions**.
 
 ## Database Schema
-![圖片](https://github.com/ZackDiego/TeamSparks/assets/96913989/94d4434d-dda6-4a62-826c-d7b657777705)
+
+![image-2](https://github.com/ZackDiego/TeamSparks/assets/96913989/df15f3c8-b163-42c8-a649-08bfa75d1516)
 
 
 ## Architecture
@@ -59,15 +59,6 @@ creation, channel management, and member connectivity through messages and video
 ## Maintenance
 Unit tests and Integration tests
 Implemented unit and integration tests to validate code accuracy after refactor, and use GitHub Actions for continuous deployment, reducing the potential for human errors and time consumption.
-
-
-## Tools
-- Cloud Service AWS: EC2, ElastiCache, RDS, S3, CloudFront, ALB
-- Programming Language: Java, JavaScript, Html, Css  
-- Databases: MySQL, ElasticSearch  
-- Real-time Communication: Socket.IO   
-- Others: GitHub Actions for Auto Deployment, Redis as Message broker, Docker
-
 
 ## Contact
 **Email:** mrzackchiang@gmail.com   
