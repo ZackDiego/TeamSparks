@@ -2,7 +2,7 @@
 <div align="center">
   <div style="display: flex; align-items: center;">
       <img src="https://github.com/ZackDiego/TeamSparks/assets/96913989/05a3b779-6afb-49fc-9ae9-38352e9cec12" alt="teamSparksIcon" width="80" height="80">
-      <h1 style="margin-left: 10px;">TeamSparks</h1>
+      <h1>TeamSparks</h1>
   </div>
 
   ![Java](https://img.shields.io/badge/Java-17-orange)
@@ -31,6 +31,30 @@ creation, channel management, and member connectivity through messages and video
 - **Message Search**: Search messages with multiple conditions to quickly find the matching message.
 - **Video Call Meetings**: Host private or group video call meetings to express your thoughts without distance.
 
+
+## Demo
+### Message Notification
+<p align="center">
+  <img src="https://github.com/ZackDiego/TeamSparks/assets/96913989/ea34faea-957a-433b-aebb-7984e50a5d2d" alt="notification" width="100%"/>
+</p>
+
+### Message search
+<p align="center">
+  <img src="https://github.com/ZackDiego/TeamSparks/assets/96913989/e7709699-5b15-4471-ae79-abb11099c3bf" alt="search" width="100%"/>
+</p>
+
+### Video Call
+<p align="center">
+  <img src="https://github.com/ZackDiego/TeamSparks/assets/96913989/7c6776b7-862e-402b-bca1-f378bdb5f9dc" alt="videoCall" width="100%"/>
+</p>
+
+## Architecture
+![圖片](https://github.com/ZackDiego/TeamSparks/assets/96913989/ed69cbe5-2c8e-4c81-aa7f-124f43ac7352)
+
+## Database Schema
+
+![image-2](https://github.com/ZackDiego/TeamSparks/assets/96913989/df15f3c8-b163-42c8-a649-08bfa75d1516)
+
 ## Applied Technologies
 - Used **Java Spring Boot** framework with Maven for the back-end, and HTML, CSS, JavaScript, jQuery, and Bootstrap for the front-end.
 - Implemented **WebRTC**-based video and audio streaming, establishing WebRTC peer connections in **mesh** architecture to facilitate group video calls.
@@ -41,24 +65,6 @@ creation, channel management, and member connectivity through messages and video
 - Implemented **RBAC** and **JWT** for managing user permissions.
 - Automated deployment with **GitHub Actions**.
 
-## Database Schema
-
-![image-2](https://github.com/ZackDiego/TeamSparks/assets/96913989/df15f3c8-b163-42c8-a649-08bfa75d1516)
-
-
-## Architecture
-![圖片](https://github.com/ZackDiego/TeamSparks/assets/96913989/ed69cbe5-2c8e-4c81-aa7f-124f43ac7352)
-
-
-
-## Demo
-### Workspace Page
-![圖片](https://github.com/ZackDiego/TeamSparks/assets/96913989/6bf78687-fabb-4e95-abb2-6029ec729744)
-
-
-## Maintenance
-Unit tests and Integration tests
-Implemented unit and integration tests to validate code accuracy after refactor, and use GitHub Actions for continuous deployment, reducing the potential for human errors and time consumption.
 
 ## Contact
 **Email:** mrzackchiang@gmail.com   
