@@ -1,5 +1,21 @@
-# TeamSparks 
-## Introduction
+
+<div align="center">
+  <div style="display: flex; align-items: center;">
+      <img src="https://github.com/ZackDiego/TeamSparks/assets/96913989/05a3b779-6afb-49fc-9ae9-38352e9cec12" alt="teamSparksIcon" width="50" height="50">
+      <h1 style="margin-left: 10px;">TeamSparks</h1>
+  </div>
+  <p align="center">
+    <a href="https://github.com/ZackDiego/TeamSparks#about">About</a>
+    |
+    <a href="https://github.com/ZackDiego/TeamSparks#about">Features</a>
+    |
+    <a href="https://github.com/ZackDiego/TeamSparks#contact">Demo</a>
+    |
+    <a href="https://github.com/ZackDiego/TeamSparks#contact">Contact</a>
+  </p>
+</div>
+
+## About
 TeamSparks enables seamless collaboration similar to Discord and Slack, offering effortless workspace
 creation, channel management, and member connectivity through messages and video.   
 
@@ -30,12 +46,12 @@ creation, channel management, and member connectivity through messages and video
 ![圖片](https://github.com/ZackDiego/TeamSparks/assets/96913989/94d4434d-dda6-4a62-826c-d7b657777705)
 
 
-## Architecture Diagram
+## Architecture
 ![圖片](https://github.com/ZackDiego/TeamSparks/assets/96913989/ed69cbe5-2c8e-4c81-aa7f-124f43ac7352)
 
 
 
-## ScreenShots
+## Demo
 ### Workspace Page
 ![圖片](https://github.com/ZackDiego/TeamSparks/assets/96913989/6bf78687-fabb-4e95-abb2-6029ec729744)
 
