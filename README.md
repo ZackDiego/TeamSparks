@@ -22,7 +22,7 @@ creation, channel management, and member connectivity through messages and video
 | User | Email               | Password |
 |----------|-------------------------|--------------|
 | Alice    | alice12345@gmail.com    | alice12345   |
-| Zack      | zack12345@gmail.com      | zack12345     |
+| Zack      | zack@gmail.com      | zack12345     |
 
 ## Features
 - **Workspace Management**:  
