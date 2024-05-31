@@ -58,7 +58,8 @@ creation, channel management, and member connectivity through messages and video
 
 ## Database Schema
 
-![image-2](https://github.com/ZackDiego/TeamSparks/assets/96913989/df15f3c8-b163-42c8-a649-08bfa75d1516)
+![截圖 2024-05-31 上午11 05 05](https://github.com/ZackDiego/TeamSparks/assets/96913989/433350a1-1554-49ed-ac8e-64da29acc52c)
+
 
 ## Applied Technologies
 - Used **Java Spring Boot** framework with Maven for the back-end, and HTML, CSS, JavaScript, jQuery, and Bootstrap for the front-end.
