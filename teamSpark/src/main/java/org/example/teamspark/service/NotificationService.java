@@ -50,7 +50,9 @@ public class NotificationService {
             notification.setMessageIndexName(messageId.getIndexName());
             notification.setMessageDocumentId(messageId.getDocumentId());
 
-            return userNotificationRepository.save(notification);
+            // TODO: save when user offline
+//            return userNotificationRepository.save(notification);
+            return notification;
         }).toList();
 
         // Transform userNotification to userNotificationDto
