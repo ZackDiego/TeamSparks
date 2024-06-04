@@ -26,7 +26,7 @@ creation, channel management, and member connectivity through messages and video
 
 ## Features
 - **Workspace Management**:  
-  Easily create and manage workspaces with RBAC to guarantee creator authorities.
+  Easily create and manage workspaces to guarantee creator authorities.
 - **Channel and Private Chats**:  
   Group members by channels or have private chats with individual members.
 - **User Notifications**:  
