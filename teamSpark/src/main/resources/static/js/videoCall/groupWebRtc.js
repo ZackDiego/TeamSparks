@@ -27,7 +27,6 @@ function toggleTrack(trackType) {
 function adjustVideoContainerSize() {
     const videoContainers = $('.video-container');
     const numContainers = videoContainers.length;
-    console.log(numContainers);
 
     // Remove existing size classes
     videoContainers.removeClass('big small');
@@ -155,7 +154,7 @@ function connectToSocketServer(roomName) {
             });
 
             rtcPeerConnection.onicecandidateerror = (error) => {
-                // console.error("Error adding ICE candidate: ", error);
+                console.error("On ICE candidate error: ", error);
             };
 
             let remoteDescriptionPromise = remoteDescriptionPromisesMap.get(e.candidateClientId);
@@ -167,8 +166,7 @@ function connectToSocketServer(roomName) {
                         }
                     })
                     .catch(error =>
-                            console.log()
-                        // console.log("Error adding ICE candidate after remote description: ", error)
+                        console.log("Error adding ICE candidate after remote description: ", error)
                     );
             }
         }
