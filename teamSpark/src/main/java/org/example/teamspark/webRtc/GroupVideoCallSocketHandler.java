@@ -79,10 +79,14 @@ public class GroupVideoCallSocketHandler {
         String room = (String) payload.get("room");
         String targetClientId = (String) payload.get("targetClientId");
 
-        SocketIOClient targetClient = server.getClient(UUID.fromString(targetClientId));
-        payload.put("candidateClientId", client.getSessionId().toString());
-        targetClient.sendEvent("candidate", payload);
-        printLog("onCandidate", client, room);
+        if (targetClientId != null) {
+            SocketIOClient targetClient = server.getClient(UUID.fromString(targetClientId));
+            payload.put("candidateClientId", client.getSessionId().toString());
+            targetClient.sendEvent("candidate", payload);
+            printLog("onCandidate", client, room);
+        } else {
+            log.warn("Receiving null targetClientId");
+        }
     }
 
     @OnEvent("offer")
