@@ -75,7 +75,7 @@ public class GroupVideoCallSocketHandler {
     }
 
     @OnEvent("candidate")
-    public void onCandidate(SocketIOClient client, Map<String, Object> payload) {
+    public synchronized void onCandidate(SocketIOClient client, Map<String, Object> payload) {
         String room = (String) payload.get("room");
         String targetClientId = (String) payload.get("targetClientId");
 
@@ -86,7 +86,7 @@ public class GroupVideoCallSocketHandler {
     }
 
     @OnEvent("offer")
-    public void onOffer(SocketIOClient client, Map<String, Object> payload) {
+    public synchronized void onOffer(SocketIOClient client, Map<String, Object> payload) {
         // parse payload
         String targetClientId = (String) payload.get("targetClientId");
         String room = (String) payload.get("room");
@@ -109,7 +109,7 @@ public class GroupVideoCallSocketHandler {
     }
 
     @OnEvent("answer")
-    public void onAnswer(SocketIOClient client, Map<String, Object> payload) {
+    public synchronized void onAnswer(SocketIOClient client, Map<String, Object> payload) {
         String room = (String) payload.get("room");
         String offerClientId = (String) payload.get("offerClientId");
         SocketIOClient targetClient = server.getClient(UUID.fromString(offerClientId));

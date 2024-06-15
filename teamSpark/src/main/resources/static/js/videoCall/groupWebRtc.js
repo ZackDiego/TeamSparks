@@ -117,10 +117,11 @@ function connectToSocketServer(roomName) {
         localVideo.srcObject = stream;
 
         console.log(socket.id);
+        console.log(e);
         // loop through existing clients to send offer
         let rtcPeerConnection;
         for (let existingClient of e) {
-            if (existingClient.id !== socket.id) {
+            if (existingClient !== undefined && existingClient.id !== socket.id) {
                 rtcPeerConnection = new RTCPeerConnection(iceServers);
                 rtcPeerConnection.onicecandidate = event => onIceCandidate(event, existingClient.id);
                 rtcPeerConnection.ontrack = event => onAddStream(event, existingClient);
@@ -230,7 +231,7 @@ function connectToSocketServer(roomName) {
     });
 
     const onIceCandidate = (e, clientId) => {
-        console.log("onIceCandidate " + clientId)
+        console.log("onIceCandidate " + clientId);
         if (e.candidate) {
             console.log("sending ice candidate");
             socket.emit("candidate", {
