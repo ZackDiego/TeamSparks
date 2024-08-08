@@ -23,6 +23,8 @@ public class RoomManager {
                     .collect(Collectors.toSet());
             if (clients.isEmpty()) {
                 roomClients.remove(roomId);
+            } else {
+                roomClients.put(roomId, updatedClients); // Update with filtered clients
             }
         }
     }
