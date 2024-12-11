@@ -21,8 +21,13 @@ public class FrontController {
     private String turnPassword;
 
     @GetMapping("/")
-    public String homePage() {
+    public String root() {
         return "redirect:/login";
+    }
+
+    @GetMapping("/homePage")
+    public String homePage() {
+        return "index";
     }
 
     @GetMapping("/login")

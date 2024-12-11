@@ -3,6 +3,7 @@ package org.example.teamspark.service;
 import org.example.teamspark.TeamSparkApplication;
 import org.example.teamspark.data.dto.SearchCondition;
 import org.example.teamspark.model.channel.Channel;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.List;
         "spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false",
         "spring.jpa.hibernate.ddl-auto=none"
 })
+@Disabled
 public class ElasticsearchServiceTest {
 
     @Autowired

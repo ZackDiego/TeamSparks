@@ -47,8 +47,8 @@ public class NotificationService {
             notification.setType(NotificationType.MESSAGE);
 
             MessageId messageId = messageDto.getMessageId();
-            notification.setMessageIndexName(messageId.getIndexName());
-            notification.setMessageDocumentId(messageId.getDocumentId());
+            notification.setMessageIndexName("channel-" + messageId.getChannelId());
+            notification.setMessageDocumentId(messageId.getMessageObjectId());
 
             // TODO: save when user offline
 //            return userNotificationRepository.save(notification);

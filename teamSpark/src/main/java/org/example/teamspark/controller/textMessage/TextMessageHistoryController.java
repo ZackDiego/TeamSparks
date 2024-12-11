@@ -2,11 +2,11 @@ package org.example.teamspark.controller.textMessage;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.example.teamspark.data.DataResponse;
-import org.example.teamspark.data.dto.message.MessageHistoryDto;
+import org.example.teamspark.data.dto.message.ChannelMessageHistoryDto;
 import org.example.teamspark.exception.ElasticsearchFailedException;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
 import org.example.teamspark.model.user.User;
-import org.example.teamspark.service.MessageHistoryService;
+import org.example.teamspark.service.MessageHistoryServiceV2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("api/v1/channelId/{channelId}/message")
 public class TextMessageHistoryController {
 
-    private final MessageHistoryService messageHistoryService;
+    private final MessageHistoryServiceV2 messageHistoryService;
 
     @Autowired
-    public TextMessageHistoryController(MessageHistoryService messageHistoryService) {
+    public TextMessageHistoryController(MessageHistoryServiceV2 messageHistoryService) {
         this.messageHistoryService = messageHistoryService;
     }
 
@@ -33,10 +33,10 @@ public class TextMessageHistoryController {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        MessageHistoryDto messageHistoryDto = messageHistoryService.getMessagesByChannelId(channelId, user);
+        ChannelMessageHistoryDto channelMessageHistoryDto = messageHistoryService.getMessagesByChannelId(channelId, user);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new DataResponse<>(messageHistoryDto));
+                .body(new DataResponse<>(channelMessageHistoryDto));
     }
 
 //    // update message by id

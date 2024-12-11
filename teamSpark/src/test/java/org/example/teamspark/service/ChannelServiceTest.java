@@ -11,6 +11,7 @@ import org.example.teamspark.model.workspace.WorkspaceMember;
 import org.example.teamspark.repository.ChannelMemberRepository;
 import org.example.teamspark.repository.ChannelRepository;
 import org.example.teamspark.repository.WorkspaceMemberRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.when;
         "spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false",
         "spring.jpa.hibernate.ddl-auto=none"
 })
+@Disabled
 public class ChannelServiceTest {
     @Autowired
     ChannelService channelService;

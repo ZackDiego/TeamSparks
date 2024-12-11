@@ -2,10 +2,80 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>HomePage</title>
+    <title>TeamSpark</title>
+    <script
+            crossorigin="anonymous"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" rel="stylesheet">
+    <script crossorigin="anonymous"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/styles/Commons.css}" type="text/css"/>
+    <!--    <link rel="stylesheet" th:href="@{/styles/homePage.css}" type="text/css"/>-->
+    <link rel="icon" th:href="@{/icons/favicon.ico}" type="image/x-icon">
 </head>
 <body>
-<h2>Hello User</h2>
-<h3>This is TeamSpark Home Page</h3>
+<div class="header">
+    <div class="header-logo">
+        <img alt="teamSparksIcon" id="teamSparks-icon" src="/icons/teamSparksIcon.png">
+        <a href="/homePage">TeamSparks</a>
+    </div>
+    <div>
+        <button class="header-button" id="get-started" type="button"><a href="/login">Get Started</a></button>
+        <button class="header-button" id="contact" type="button"><a href="#homePage-footer">Contact</a></button>
+    </div>
+</div>
+<main>
+    <div class="banner">
+        <img alt="teamsparks-into" id="introduction-img" src="/icons/teamSparksIntro.png">
+        <div class="introduction-text"><span class="font-weight-bold" style="color: #530079;">TeamSparks</span> is a
+            Place to <br>
+            <span class="font-weight-bold" style="color: #ff531f;">Maximize</span> Team's Potential
+        </div>
+    </div>
+    <div class="features-container" id="login" style="display: none">
+        <div class="feature">
+            <img alt="teamsparks-feature1" src="/icons/teamSparksIntro.png">
+            <div class="feature-description">
+                Effortlessly create and manage workspaces. <br>
+                Assemble and organize your team with ease.
+            </div>
+        </div>
+        <div class="feature">
+            <img alt="teamsparks-feature2" src="/icons/teamSparksIntro.png">
+            <div class="feature-description">
+                Real-time communication including group messaging, <br>
+                and video conferencing, all in one place.
+            </div>
+        </div>
+        <div class="feature">
+            <img alt="teamsparks-feature3" src="/icons/teamSparksIntro.png">
+            <div class="feature-description">
+                Lost in a sea of messages? <br>
+                TeamSparks message search helps locate messages by keyword.
+            </div>
+        </div>
+    </div>
+</main>
+<footer id="homePage-footer">
+    <p>Copyright &copy; 2024 Zack Chiang. All rights reserved.</p>
+    <div> Contact author:
+        <p>
+            <a href="https://github.com/ZackDiego" target="_blank">
+                <i class="fab fa-github"></i>
+            </a>
+            |
+            <a href="https://linkedin.com/in/zackchiang" target="_blank">
+                <i class="fab fa-linkedin"></i>
+            </a>
+            |
+            <i class="far fa-envelope"></i> <a href="mailto:zackykjdev@gmail.com">zackykjdev@gmail.com</a>
+        </p>
+    </div>
+</footer>
+<!--<script th:src="@{/js/HomePage.js}"></script>-->
 </body>
 </html>
