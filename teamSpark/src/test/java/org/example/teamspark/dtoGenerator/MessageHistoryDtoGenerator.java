@@ -2,7 +2,7 @@ package org.example.teamspark.dtoGenerator;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.teamspark.data.dto.message.MessageHistoryDto;
+import org.example.teamspark.data.dto.message.ChannelMessageHistoryDto;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -215,7 +215,7 @@ public class MessageHistoryDtoGenerator {
             }
             """;
 
-    public static MessageHistoryDto getMockMessageHistory() throws IOException {
+    public static ChannelMessageHistoryDto getMockMessageHistory() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(new ClassPathResource("./test/messages.json").getFile(), new TypeReference<>() {
         });

@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MessageId {
-    private String indexName;
-    private String documentId;
+    private Long channelId;
+    private String messageObjectId;
 }

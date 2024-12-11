@@ -28,15 +28,15 @@ public class ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelMemberRepository channelMemberRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
-    private final ElasticsearchService elasticsearchService;
+    private final MessageHistoryServiceV2 messageHistoryService;
 
     public ChannelService(ChannelRepository channelRepository,
                           ChannelMemberRepository channelMemberRepository,
-                          WorkspaceMemberRepository workspaceMemberRepository, ElasticsearchService elasticsearchService) {
+                          WorkspaceMemberRepository workspaceMemberRepository, MessageHistoryServiceV2 messageHistoryService) {
         this.channelRepository = channelRepository;
         this.channelMemberRepository = channelMemberRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
-        this.elasticsearchService = elasticsearchService;
+        this.messageHistoryService = messageHistoryService;
     }
 
     @Transactional
@@ -60,7 +60,7 @@ public class ChannelService {
         channelMemberRepository.save(newMember);
 
         // create message history
-        elasticsearchService.createIndex("channel-" + createdChannel.getId());
+        messageHistoryService.createNewMessageHistory(createdChannel.getId());
 
         // form the savedChannelDto
         return createdChannel.getId();
