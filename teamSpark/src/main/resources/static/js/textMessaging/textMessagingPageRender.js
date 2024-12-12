@@ -190,7 +190,7 @@ function renderChannelContent(channel, messageHistory) {
         // Create message container
         return $('<div>').addClass('message-container')
             .attr('data-channel-id', channel.id)
-            .attr('data-message-id', message.message_id.documentId)
+            .attr('data-message-id', message.message_id.messageObjectId)
             .append(avatar, $('<div>').addClass('message-right').append(messageHeader, content));
     }
 
