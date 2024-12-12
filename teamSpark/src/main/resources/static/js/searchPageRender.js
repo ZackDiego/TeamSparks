@@ -98,8 +98,7 @@ function renderSearchResult(messagesData, keyword) {
     $('.result-number').text(messages.length);
 
     $.each(messages, function (index, message) {
-        const channelIdString = message.message_id.indexName.replace('channel-', ''); // Remove 'channel-' prefix
-        const channelId = parseInt(channelIdString, 10);
+        const channelId = message.message_id.channelId;
 
         // message channel tag
         const channel = getChannelById(channelId);
@@ -134,7 +133,7 @@ function renderSearchResult(messagesData, keyword) {
             // Create message container
             return $('<div>').addClass('message-container')
                 .attr('data-channel-id', channelId)
-                .attr('data-message-id', message.message_id.documentId)
+                .attr('data-message-id', message.message_id.messageObjectId)
                 .append(avatar, $('<div>').addClass('message-right').append(messageHeader, content));
         }
 
