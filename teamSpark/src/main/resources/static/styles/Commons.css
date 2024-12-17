@@ -68,3 +68,19 @@ body {
     margin-right: 10px;
     margin-left: 5px;
 }
+
+footer {
+    margin-top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #3F0E41; /* Background color */
+    color: white; /* Text color */
+    text-align: center; /* Center-align content inside the footer */
+    padding: 10px; /* Padding inside the footer */
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 30px;
+    height: 7vh;
+}

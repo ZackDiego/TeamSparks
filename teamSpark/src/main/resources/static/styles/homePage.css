@@ -1,0 +1,128 @@
+.header {
+    position: absolute; /* Makes it overlay on the banner */
+    top: 0;
+    left: 0;
+    width: 100%; /* Full width */
+    background-color: transparent;
+    z-index: 10;
+}
+
+.header-logo > a {
+    color: #28032a;
+}
+
+.banner {
+    width: 100%;
+    height: 55vh;
+    position: relative;
+    margin-bottom: 6vh;
+}
+
+#banner-text {
+    position: absolute;
+    top: 65%; /* Vertically center the text */
+    left: 8vw; /* Adjust this as needed */
+    transform: translateY(-50%); /* Center vertically */
+    text-align: center; /* Align the text to the left */
+    z-index: 2; /* Ensure text stays above the image */
+    font-size: 2.8em;
+    font-weight: bold;
+    line-height: 1.5;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    color: #000000;
+    font-family: 'Lato', sans-serif;
+    word-spacing: 2px;
+}
+
+.banner span {
+    background: linear-gradient(to bottom right, #f83506, #fdc22b); /* Gradient from top-left to bottom-right */
+    -webkit-background-clip: text; /* Clip the background to the text */
+    -webkit-text-fill-color: transparent; /* Make the text fill transparent to show the background */
+    text-shadow: none;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+    font-size: 1.8em;
+}
+
+#banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensure the image covers the entire container */
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.5; /* Optional: adjust image transparency */
+}
+
+
+.banner button {
+    position: absolute;
+    top: 65%; /* Vertically center the text */
+    right: 24vw; /* Adjust this as needed */
+    transform: translateY(-10%); /* Center vertically */
+    border-radius: 5px;
+    background-color: #d145d7;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    width: 180px;
+    z-index: 10;
+    box-shadow: rgb(122, 35, 126) 5px 5px 0;
+}
+
+.banner button a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.4em;
+    word-spacing: 2px;
+}
+
+.features-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 40vh;
+    width: 100%;
+    margin-bottom: 3vh;
+}
+
+.feature {
+    max-width: 18vw;
+    margin: 0 30px;
+    display: flex;
+    flex-direction: column; /* Stacks the image and description vertically */
+    align-items: center; /* Centers the content horizontally */
+    justify-content: center; /* Centers the content vertically */
+    padding: 10px;
+    height: auto;
+    font-size: 1.1em;
+    text-align: center;
+}
+
+
+.feature img {
+    width: 42%;
+    height: 42%;
+    margin-bottom: 20px;
+}
+
+.feature-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+
+.fab {
+    font-size: x-large;
+}
+
+#contact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+

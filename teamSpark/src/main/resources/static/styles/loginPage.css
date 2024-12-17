@@ -5,8 +5,9 @@ main {
     align-items: center;
     height: calc(100vh - 60px);
     width: 100%;
-    padding: 20px;
-    background-color: #f2dfff;
+    background-color: rgba(242, 223, 255, 0.9);
+    gap: 8vw;
+    padding: 20px 20px 18vh 20px;
 }
 
 html, body {
@@ -26,7 +27,6 @@ html, body {
     border-radius: 8px; /* Rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow */
     padding: 25px;
-    margin-bottom: 20px; /* Margin bottom */
 }
 
 /* Style for the form inputs */
@@ -94,11 +94,11 @@ html, body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: 100px;
 }
 
 .introduction-text {
-    font-size: 20px;
+    font-family: 'Georgia', serif;
+    font-size: 25px;
     text-align: center;
     line-height: 40px;
     letter-spacing: 2px;
@@ -106,7 +106,6 @@ html, body {
 
 .multi-form-container, .introduction-container {
     /*margin: 50px;*/
-    margin: 50px 50px 180px 50px;
 }
 
 .multi-form-container {
