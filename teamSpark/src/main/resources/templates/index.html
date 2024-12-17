@@ -13,8 +13,10 @@
             integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
             src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/styles/Commons.css}" type="text/css"/>
-    <!--    <link rel="stylesheet" th:href="@{/styles/homePage.css}" type="text/css"/>-->
+    <link rel="stylesheet" th:href="@{/styles/homePage.css}" type="text/css"/>
     <link rel="icon" th:href="@{/icons/favicon.ico}" type="image/x-icon">
 </head>
 <body>
@@ -23,57 +25,56 @@
         <img alt="teamSparksIcon" id="teamSparks-icon" src="/icons/teamSparksIcon.png">
         <a href="/homePage">TeamSparks</a>
     </div>
-    <div>
-        <button class="header-button" id="get-started" type="button"><a href="/login">Get Started</a></button>
-        <button class="header-button" id="contact" type="button"><a href="#homePage-footer">Contact</a></button>
-    </div>
 </div>
 <main>
     <div class="banner">
-        <img alt="teamsparks-into" id="introduction-img" src="/icons/teamSparksIntro.png">
-        <div class="introduction-text"><span class="font-weight-bold" style="color: #530079;">TeamSparks</span> is a
-            Place to <br>
-            <span class="font-weight-bold" style="color: #ff531f;">Maximize</span> Team's Potential
+        <img alt="teamsparks-into" id="banner-img" src="/img/banner.jpg">
+        <div id="banner-text"><span>TeamSparks</span>&nbsp; is a Place <br>
+            to Maximize Team's Potential
         </div>
+        <button class="header-button" id="get-started" type="button"><a href="/login">Get Started</a></button>
     </div>
-    <div class="features-container" id="login" style="display: none">
-        <div class="feature">
-            <img alt="teamsparks-feature1" src="/icons/teamSparksIntro.png">
-            <div class="feature-description">
-                Effortlessly create and manage workspaces. <br>
-                Assemble and organize your team with ease.
+    <div class="features-section">
+        <div class="features-container">
+            <div class="feature">
+                <img alt="teamsparks-feature1" src="/img/workspace.png">
+                <div class="feature-title">Team Management</div>
+                <div class="feature-description">
+                    Effortlessly create and manage workspaces. <br>
+                    Assemble and organize your team with ease.
+                </div>
             </div>
-        </div>
-        <div class="feature">
-            <img alt="teamsparks-feature2" src="/icons/teamSparksIntro.png">
-            <div class="feature-description">
-                Real-time communication including group messaging, <br>
-                and video conferencing, all in one place.
+            <div class="feature">
+                <img alt="teamsparks-feature2" src="/img/online-training.png">
+                <div class="feature-title">Live Collaboration</div>
+                <div class="feature-description">
+                    Real-time communication including group messaging <br>
+                    and video conferencing, all in one place.
+                </div>
             </div>
-        </div>
-        <div class="feature">
-            <img alt="teamsparks-feature3" src="/icons/teamSparksIntro.png">
-            <div class="feature-description">
-                Lost in a sea of messages? <br>
-                TeamSparks message search helps locate messages by keyword.
+            <div class="feature">
+                <img alt="teamsparks-feature3" id="img-adjust" src="/img/search.png">
+                <div class="feature-title">Message Search</div>
+                <div class="feature-description">
+                    Lost in a sea of messages? <br>
+                    TeamSparks message search helps locate messages by keyword.
+                </div>
             </div>
         </div>
     </div>
 </main>
 <footer id="homePage-footer">
-    <p>Copyright &copy; 2024 Zack Chiang. All rights reserved.</p>
-    <div> Contact author:
-        <p>
-            <a href="https://github.com/ZackDiego" target="_blank">
-                <i class="fab fa-github"></i>
-            </a>
-            |
-            <a href="https://linkedin.com/in/zackchiang" target="_blank">
-                <i class="fab fa-linkedin"></i>
-            </a>
-            |
-            <i class="far fa-envelope"></i> <a href="mailto:zackykjdev@gmail.com">zackykjdev@gmail.com</a>
-        </p>
+    <div>Copyright &copy; 2024 Zack Chiang. All rights reserved.</div>
+    <div id="contact"> Contact author:&nbsp;&nbsp;
+        <a href="https://github.com/ZackDiego" target="_blank">
+            <i class="fab fa-github"></i>
+        </a>
+        |
+        <a href="https://linkedin.com/in/zackchiang" target="_blank">
+            <i class="fab fa-linkedin"></i>
+        </a>
+        |
+        <i class="far fa-envelope"></i> <a href="mailto:zackykjdev@gmail.com">zackykjdev@gmail.com</a>
     </div>
 </footer>
 <!--<script th:src="@{/js/HomePage.js}"></script>-->
