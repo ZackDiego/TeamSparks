@@ -22,7 +22,7 @@ public class FrontController {
 
     @GetMapping("/")
     public String root() {
-        return "redirect:/login";
+        return "redirect:/homePage";
     }
 
     @GetMapping("/homePage")
