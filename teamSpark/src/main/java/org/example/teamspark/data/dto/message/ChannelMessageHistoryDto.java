@@ -23,7 +23,9 @@ public class ChannelMessageHistoryDto {
     @Indexed(unique = true)
     private Long channelId;
 
-    @JsonProperty("messages")
+    @JsonProperty("is_private")
+    private boolean isPrivate;
+
     private List<MessageDto> messages;
 
 }

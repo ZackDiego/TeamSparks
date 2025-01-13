@@ -9,6 +9,7 @@ import org.example.teamspark.data.dto.message.MessageDto;
 import org.example.teamspark.data.dto.message.MessageId;
 import org.example.teamspark.exception.ElasticsearchFailedException;
 import org.example.teamspark.exception.ResourceAccessDeniedException;
+import org.example.teamspark.model.channel.Channel;
 import org.example.teamspark.model.channel.ChannelMember;
 import org.example.teamspark.model.user.User;
 import org.example.teamspark.repository.ChannelMemberRepository;
@@ -50,10 +51,13 @@ public class MessageHistoryServiceV2 {
         }
 
         // Validate if the channel exists
-        channelRepository.findById(channelId)
+        Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new EntityNotFoundException("Channel not found with ID: " + channelId));
 
-        return messageHistoryRepository.findOneByChannelId(channelId);
+        ChannelMessageHistoryDto channelMessageHistoryDto = messageHistoryRepository.findOneByChannelId(channelId);
+
+        channelMessageHistoryDto.setPrivate(channel.getIsPrivate());
+        return channelMessageHistoryDto;
     }
 
     public MessageId addMessageToChannelMessageHistory(Long channelId, MessageDto message) {
