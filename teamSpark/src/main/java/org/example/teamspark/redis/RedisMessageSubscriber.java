@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.apachecommons.CommonsLog;
 import org.example.teamspark.data.dto.message.InMessageDto;
 import org.example.teamspark.data.dto.message.MessageDto;
-import org.example.teamspark.service.NotificationService;
+import org.example.teamspark.service.MessageNotificationService;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -16,12 +16,12 @@ import org.springframework.stereotype.Service;
 public class RedisMessageSubscriber implements MessageListener {
 
     private final SimpMessagingTemplate messageTemplate;
-    private final NotificationService notificationService;
+    private final MessageNotificationService messageNotificationService;
     ObjectMapper objectMapper = new ObjectMapper();
 
-    public RedisMessageSubscriber(SimpMessagingTemplate messageTemplate, NotificationService notificationService) {
+    public RedisMessageSubscriber(SimpMessagingTemplate messageTemplate, MessageNotificationService messageNotificationService) {
         this.messageTemplate = messageTemplate;
-        this.notificationService = notificationService;
+        this.messageNotificationService = messageNotificationService;
     }
 
     public void onMessage(final Message message, final byte[] pattern) {
@@ -31,7 +31,7 @@ public class RedisMessageSubscriber implements MessageListener {
             MessageDto messageDto = inMessageDto.getMessage();
 
             // Send notification
-            notificationService.handleChannelMessageNotifications(inMessageDto.getChannelId(), messageDto);
+            messageNotificationService.handleChannelMessageNotifications(inMessageDto.getChannelId(), messageDto);
 
             // Send to Message to channel
             messageTemplate.convertAndSend(
