@@ -86,7 +86,7 @@ public class UserController {
                 .body(new DataResponse<>(dtos));
     }
 
-    @PutMapping(value = "/avatar")
+    @PostMapping(value = "/avatar")
     public ResponseEntity<Object> uploadUserAvatar(MultipartFile avatarImageFile) throws IOException {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
