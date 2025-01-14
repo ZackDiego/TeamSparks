@@ -7,7 +7,7 @@ on:
       - sprint3
       - sprint4
       - sprint5
-      - clousureSprint
+      - closureSprint
 
 jobs:
   deploy:
