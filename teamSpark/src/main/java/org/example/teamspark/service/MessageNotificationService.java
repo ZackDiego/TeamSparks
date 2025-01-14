@@ -18,15 +18,15 @@ import java.util.List;
 
 @Service
 @CommonsLog
-public class NotificationService {
+public class MessageNotificationService {
 
     private final UserNotificationRepository userNotificationRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messageTemplate;
 
-    public NotificationService(UserNotificationRepository userNotificationRepository,
-                               UserRepository userRepository,
-                               SimpMessagingTemplate messageTemplate) {
+    public MessageNotificationService(UserNotificationRepository userNotificationRepository,
+                                      UserRepository userRepository,
+                                      SimpMessagingTemplate messageTemplate) {
         this.userNotificationRepository = userNotificationRepository;
         this.userRepository = userRepository;
         this.messageTemplate = messageTemplate;
