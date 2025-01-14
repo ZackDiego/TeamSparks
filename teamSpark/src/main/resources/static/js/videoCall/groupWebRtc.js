@@ -95,7 +95,6 @@ function connectToSocketServer(roomName) {
 
     const streamConstraints = {audio: true, video: true};
 
-
     // Handle Event
     const handleSocketEvent = (eventName, callback) => socket.on(eventName,
         callback);
