@@ -25,7 +25,7 @@ TeamSparks has migrated from Elasticsearch to MongoDB in its latest version, due
 ## Test Accounts
 | User | Email               | Password |
 |----------|-------------------------|--------------|
-| Alice    | alice12345@gmail.com    | alice12345   |
+| Alice    | alice@gmail.com    | alice12345   |
 | Zack      | zack@gmail.com      | zack12345     |
 
 ## Features
