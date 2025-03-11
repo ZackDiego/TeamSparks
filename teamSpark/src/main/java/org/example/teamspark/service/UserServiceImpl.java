@@ -39,6 +39,8 @@ public class UserServiceImpl implements UserService {
     @Value("${s3.cdn.prefix}")
     private String s3CdnPrefix;
 
+    private String userAvatarPrefix = "img/avatar/";
+
     public UserServiceImpl(UserRepository userRepository, JwtService jwtService, WorkspaceMemberRepository workspaceMemberRepository, FileUploadService fileUploadService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
@@ -132,7 +134,8 @@ public class UserServiceImpl implements UserService {
         // save image
         fileUploadService.saveMultipartFile(avatarImageFile, imageUploadPath);
 
-        user.setAvatar(s3CdnPrefix + imageUploadPath);
+//        user.setAvatar(s3CdnPrefix + imageUploadPath);
+        user.setAvatar(userAvatarPrefix + imageUploadPath);
 
         User savedUser = userRepository.save(user);
         return UserDto.from(savedUser);

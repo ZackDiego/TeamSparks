@@ -34,6 +34,8 @@ public class WorkspaceService {
     @Value("${s3.cdn.prefix}")
     private String s3CdnPrefix;
 
+    private String workspacePrefix = "img/workspace_icon/";
+
     @Autowired
     public WorkspaceService(WorkspaceRepository workspaceRepository,
                             UserRepository userRepository,
@@ -102,7 +104,8 @@ public class WorkspaceService {
             // save image
             fileUploadService.saveMultipartFile(avatarImageFile, imageUploadPath);
 
-            workspace.setAvatar(s3CdnPrefix + imageUploadPath);
+//            workspace.setAvatar(s3CdnPrefix + imageUploadPath);
+            workspace.setAvatar(workspacePrefix + imageUploadPath);
         }
 
         Workspace savedWorkspace = workspaceRepository.save(workspace);

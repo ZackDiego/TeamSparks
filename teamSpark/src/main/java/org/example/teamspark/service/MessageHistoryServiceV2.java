@@ -56,6 +56,12 @@ public class MessageHistoryServiceV2 {
 
         ChannelMessageHistoryDto channelMessageHistoryDto = messageHistoryRepository.findOneByChannelId(channelId);
 
+        if (channelMessageHistoryDto == null) {
+            ChannelMessageHistoryDto dto = new ChannelMessageHistoryDto();
+            dto.setChannelId(channelId);
+            dto.setPrivate(channel.getIsPrivate());
+            return dto;
+        }
         channelMessageHistoryDto.setPrivate(channel.getIsPrivate());
         return channelMessageHistoryDto;
     }
