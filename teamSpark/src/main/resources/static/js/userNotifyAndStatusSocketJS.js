@@ -36,7 +36,7 @@
         console.log(data.message.message_id.indexName);
 
         // Extract the channelId from the message_index_name string
-        const messageChannelId = parseInt(data.message.message_id.indexName.replace("channel-", ""), 10);
+        const messageChannelId = data.message.message_id.channelId;
         console.log(messageChannelId);
         if (data.message.from_id !== getMemberId() && currentChannelId !== messageChannelId) {
             // Create a temporary element
