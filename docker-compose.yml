@@ -11,6 +11,7 @@ services:
       - mongodb
     ports:
       - "8080:8080"
+      - "8001:8001"  # video call port
     environment:
       - MONGODB_HOST=mongodb
       - MONGODB_USERNAME=root
