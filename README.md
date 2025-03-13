@@ -28,6 +28,27 @@ TeamSparks has migrated from Elasticsearch to MongoDB in its latest version, due
 | Alice    | alice@gmail.com    | alice12345   |
 | Zack      | zack@gmail.com      | zack12345     |
 
+
+## Running the App
+
+TeamSparks has two versions available for deployment:
+
+1. **AWS Cloud Deployment (`release/aws-cloud`)**  
+   This branch configures TeamSparks to run on AWS services like EC2, RDS, ElastiCache, S3, and CloudFront.
+   Before running, ensure you update the [`application.properties`](teamSpark/src/main/resources/application.properties) to match your AWS setup.
+   **Upcoming Feature:** Terraform support will be provided in a future update.
+   
+   ```
+   git checkout release/aws-cloud
+   ```
+2. **Local Deployment with Docker Compose (`release/local-docker-compose`)**
+   This branch sets up all required services locally using [`Docker Compose`](docker-compose.yml). Image files will be saved under the static img folder.
+    ```
+    git checkout release/local-docker-compose
+    
+    docker-compose up -d
+    ```
+
 ## Features
 - **Workspace Management**:  
   Easily create and manage workspaces to guarantee creator authorities.
@@ -77,5 +98,5 @@ TeamSparks has migrated from Elasticsearch to MongoDB in its latest version, due
 
 
 ## Contact
-**Email:** mrzackchiang@gmail.com   
+**Email:** zackykjdev@gmail.com   
 **LinkedIn:** https://www.linkedin.com/in/zackchiang/
