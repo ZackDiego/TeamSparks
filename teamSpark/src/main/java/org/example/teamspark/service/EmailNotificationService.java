@@ -75,26 +75,8 @@ public class EmailNotificationService {
         try {
             log.info("Sending workspace invite email to " + recipient);
 
-            send(sesClient, "your-email@example.com", recipient, subject, body);
-
-            sesClient.sendEmail(SendEmailRequest.builder()
-                    .destination(Destination.builder()
-                            .toAddresses(recipient)
-                            .build())
-                    .message(Message.builder()
-                            .subject(Content.builder()
-                                    .data(subject)
-                                    .charset("UTF-8")
-                                    .build())
-                            .body(Body.builder()
-                                    .html(Content.builder()
-                                            .data(body)
-                                            .charset("UTF-8")
-                                            .build())
-                                    .build())
-                            .build())
-                    .source("your-email@example.com") // Replace with a verified SES email address
-                    .build());
+            // In sandbox mode, only the verified email address can send or receive emails
+            // send(sesClient, "mrzackchiang@gmail.com", recipient, subject, body);
 
             log.info("Workspace invite email sent successfully to " + recipient);
 

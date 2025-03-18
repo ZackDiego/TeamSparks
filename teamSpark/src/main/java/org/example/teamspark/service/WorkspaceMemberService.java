@@ -51,7 +51,6 @@ public class WorkspaceMemberService {
         workspaceMember.setUser(addUser);
         WorkspaceMember savedWorkspaceMember = workspaceMemberRepository.save(workspaceMember);
 
-        // To do: Send email notification
         emailNotificationService.sendWorkspaceMemberInviteEmail(addUser, workspace);
 
         return savedWorkspaceMember.getId();
