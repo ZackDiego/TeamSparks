@@ -15,15 +15,14 @@ public class WorkspaceMemberService {
     private final WorkspaceRepository workspaceRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final UserRepository userRepository;
-    private final EmailNotificationService emailNotificationService;
+//    private final EmailNotificationService emailNotificationService;
 
     public WorkspaceMemberService(WorkspaceRepository workspaceRepository,
                                   WorkspaceMemberRepository workspaceMemberRepository,
-                                  UserRepository userRepository, EmailNotificationService emailNotificationService) {
+                                  UserRepository userRepository) {
         this.workspaceRepository = workspaceRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
         this.userRepository = userRepository;
-        this.emailNotificationService = emailNotificationService;
     }
 
     public Long addWorkspaceMember(User user,
@@ -52,7 +51,7 @@ public class WorkspaceMemberService {
         WorkspaceMember savedWorkspaceMember = workspaceMemberRepository.save(workspaceMember);
 
         // To do: Send email notification
-        emailNotificationService.sendWorkspaceMemberInviteEmail(addUser, workspace);
+//        emailNotificationService.sendWorkspaceMemberInviteEmail(addUser, workspace);
 
         return savedWorkspaceMember.getId();
     }
