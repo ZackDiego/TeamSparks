@@ -80,7 +80,6 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=mongodb_pass
     volumes:
       - ./docker/mongodb/teamSparks:/docker-entrypoint-initdb.d
-      - ./docker/mongodb/init_db.sh:/docker-entrypoint-initdb.d/init.sh
     networks:
       - teamSparks-network
 
