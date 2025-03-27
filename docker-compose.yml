@@ -1,0 +1,89 @@
+services:
+  web-server:
+    image: teamsparks
+    container_name: teamsparks
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    depends_on:
+      - mysql
+      - redis
+      - mongodb
+    ports:
+      - "8080:8080"
+      - "8001:8001"  # video call port
+    environment:
+      - MONGODB_HOST=mongodb
+      - MONGODB_USERNAME=root
+      - MONGODB_PASSWORD=mongodb_pass
+      - MYSQL_HOST=mysql
+      - MYSQL_USERNAME=root   
+      - MYSQL_PASSWORD=mysql_pass    
+      - JWT_SECRET=your_jwt_secret
+      - JWT_EXPIRE_TIME=3600 # in seconds
+      - TURN_USERNAME=kurento
+      - TURN_PASSWORD=kurento
+      - TURN_SERVER_HOST=turn-server
+      - REDIS_SERVER_HOST=redis
+      - REDIS_PASSWORD=redis_pass
+    networks:
+      - teamSparks-network
+
+  turn-server:
+    image: coturn/coturn
+    container_name: turn-server
+    ports:
+      - "3478:3478/udp"
+      - "3478:3478/tcp"
+      - "5349:5349/tcp"
+    environment:
+      - TURN_PORT=3478
+      - TURNS_PORT=5349
+    volumes:
+    - ./docker/turnserver.conf:/etc/turnserver.conf
+    networks:
+      - teamSparks-network
+
+  mysql:
+    image: mysql:9.2
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql_pass
+      MYSQL_DATABASE: teamSparks
+    volumes:
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - teamSparks-network
+
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: always
+    environment:
+      - REDIS_PASSWORD=redis_pass
+    ports:
+      - "6379:6379"
+    networks:
+      - teamSparks-network
+
+  mongodb:
+    image: mongo:8.0.5
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=mongodb_pass
+    volumes:
+      - ./docker/mongodb/teamSparks:/docker-entrypoint-initdb.d
+      - ./docker/mongodb/init_db.sh:/docker-entrypoint-initdb.d/init.sh
+    networks:
+      - teamSparks-network
+
+networks:
+  teamSparks-network:
+    driver: bridge

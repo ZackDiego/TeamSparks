@@ -34,9 +34,9 @@ public class FileUploadService {
 
     public void saveMultipartFile(MultipartFile file, String filePath) throws IOException {
         File convertedFile = convertMultipartToFile(file);
-        s3Uploader.uploadFile(filePath, convertedFile);
-
-        convertedFile.delete();
+//        s3Uploader.uploadFile(filePath, convertedFile);
+//
+//        convertedFile.delete();
         log.info("Delete temp file");
     }
 }
