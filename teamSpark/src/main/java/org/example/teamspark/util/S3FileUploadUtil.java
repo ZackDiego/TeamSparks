@@ -1,4 +1,4 @@
-package org.example.teamspark.service;
+package org.example.teamspark.util;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.regions.Regions;
@@ -9,16 +9,21 @@ import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @CommonsLog
 @Component
-public class S3Uploader {
+@Profile("aws")
+public class S3FileUploadUtil implements FileUploadUtil {
 
     @Value("${s3.bucket.name}")
     private String bucketName;
@@ -31,7 +36,23 @@ public class S3Uploader {
                 .build();
     }
 
-    public void uploadFile(String saveKeyName, File file) {
+    private static File convertMultipartToFile(MultipartFile multipartFile) throws IOException {
+        File file = new File(multipartFile.getOriginalFilename());
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(multipartFile.getBytes());
+        fos.close();
+        return file;
+    }
+
+    public void uploadFile(MultipartFile file, String fileName) throws IOException {
+        File convertedFile = convertMultipartToFile(file);
+        uploadToS3(fileName, convertedFile);
+
+        convertedFile.delete();
+        log.info("Delete temp file");
+    }
+
+    private void uploadToS3(String saveKeyName, File file) {
         AmazonS3 s3 = getS3Client();
         log.info("Get s3 permission");
         try {

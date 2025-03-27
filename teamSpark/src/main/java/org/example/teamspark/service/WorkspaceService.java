@@ -13,6 +13,7 @@ import org.example.teamspark.model.workspace.WorkspaceMember;
 import org.example.teamspark.repository.UserRepository;
 import org.example.teamspark.repository.WorkspaceMemberRepository;
 import org.example.teamspark.repository.WorkspaceRepository;
+import org.example.teamspark.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,22 +30,20 @@ public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final UserRepository userRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
-    private final FileUploadService fileUploadService;
+    private final FileUploadUtil fileUploadUtil;
 
-    @Value("${s3.cdn.prefix}")
-    private String s3CdnPrefix;
-
-    private String workspacePrefix = "img/workspace_icon/";
+    @Value("${file.upload.prefix}")
+    private String fileUploadPrefix;
 
     @Autowired
     public WorkspaceService(WorkspaceRepository workspaceRepository,
                             UserRepository userRepository,
                             WorkspaceMemberRepository workspaceMemberRepository,
-                            FileUploadService fileUploadService) {
+                            FileUploadUtil fileUploadUtil) {
         this.workspaceRepository = workspaceRepository;
         this.userRepository = userRepository;
         this.workspaceMemberRepository = workspaceMemberRepository;
-        this.fileUploadService = fileUploadService;
+        this.fileUploadUtil = fileUploadUtil;
     }
 
     private static List<WorkspaceDto> mapResultSetToWorkspaceDtos(List<Object[]> rs) {
@@ -95,17 +94,16 @@ public class WorkspaceService {
         MultipartFile avatarImageFile = form.getAvatarImageFile();
         if (!avatarImageFile.isEmpty()) {
             // save avatar image
-            String extension = "." + FileUploadService.getFileExtension(avatarImageFile.getOriginalFilename());
+            String extension = "." + fileUploadUtil.getFileExtension(avatarImageFile.getOriginalFilename());
 
             // random Id
             long randomId = Math.abs(UUID.randomUUID().getLeastSignificantBits());
 
-            String imageUploadPath = "workspaceAvatar-" + randomId + extension;
+            String fileName = "workspaceAvatar-" + randomId + extension;
             // save image
-            fileUploadService.saveMultipartFile(avatarImageFile, imageUploadPath);
+            fileUploadUtil.uploadFile(avatarImageFile, fileName);
 
-//            workspace.setAvatar(s3CdnPrefix + imageUploadPath);
-            workspace.setAvatar(workspacePrefix + imageUploadPath);
+            workspace.setAvatar(fileUploadPrefix + fileName);
         }
 
         Workspace savedWorkspace = workspaceRepository.save(workspace);

@@ -12,6 +12,7 @@ import org.example.teamspark.model.user.User;
 import org.example.teamspark.model.workspace.WorkspaceMember;
 import org.example.teamspark.repository.UserRepository;
 import org.example.teamspark.repository.WorkspaceMemberRepository;
+import org.example.teamspark.util.FileUploadUtil;
 import org.example.teamspark.util.JwtService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -31,21 +32,21 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final WorkspaceMemberRepository workspaceMemberRepository;
-    private final FileUploadService fileUploadService;
+    private final FileUploadUtil fileUploadUtil;
 
     @Value("${jwt.expireTimeAsSec}")
     private long jwtExpireTimeAsSec;
 
-    @Value("${s3.cdn.prefix}")
-    private String s3CdnPrefix;
+    @Value("${file.upload.prefix}")
+    private String fileUploadPrefix;
 
-    private String userAvatarPrefix = "img/avatar/";
-
-    public UserServiceImpl(UserRepository userRepository, JwtService jwtService, WorkspaceMemberRepository workspaceMemberRepository, FileUploadService fileUploadService) {
+    public UserServiceImpl(UserRepository userRepository, JwtService jwtService,
+                           WorkspaceMemberRepository workspaceMemberRepository,
+                           FileUploadUtil fileUploadUtil) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.workspaceMemberRepository = workspaceMemberRepository;
-        this.fileUploadService = fileUploadService;
+        this.fileUploadUtil = fileUploadUtil;
     }
 
     @Override
@@ -125,17 +126,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto setUserAvatar(User user, MultipartFile avatarImageFile) throws IOException {
 
-        String extension = "." + FileUploadService.getFileExtension(avatarImageFile.getOriginalFilename());
+        String extension = "." + fileUploadUtil.getFileExtension(avatarImageFile.getOriginalFilename());
 
         // random Id
         long randomId = Math.abs(UUID.randomUUID().getLeastSignificantBits());
         String imageUploadPath = "userAvatar-" + randomId + extension;
 
         // save image
-        fileUploadService.saveMultipartFile(avatarImageFile, imageUploadPath);
+        fileUploadUtil.uploadFile(avatarImageFile, imageUploadPath);
 
-//        user.setAvatar(s3CdnPrefix + imageUploadPath);
-        user.setAvatar(userAvatarPrefix + imageUploadPath);
+        user.setAvatar(fileUploadPrefix + imageUploadPath);
 
         User savedUser = userRepository.save(user);
         return UserDto.from(savedUser);
