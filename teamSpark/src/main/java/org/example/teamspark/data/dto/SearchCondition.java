@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -35,4 +36,6 @@ public class SearchCondition {
 
     @JsonProperty("contain_file")
     private Boolean containFile;
+
+    private List<Long> accessibleChannelIds;
 }

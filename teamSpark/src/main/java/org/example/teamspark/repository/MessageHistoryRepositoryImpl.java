@@ -24,29 +24,38 @@ public class MessageHistoryRepositoryImpl implements CustomMessageHistoryReposit
     @Override
     public List<MessageDto> findMessagesWithSearchCondition(SearchCondition condition) {
 
-        Criteria criteria = new Criteria();
+        // Build criteria for document-level filtering
+        Criteria docCriteria = new Criteria();
+        if (condition.getAccessibleChannelIds() != null) {
+            docCriteria.and("channelId").in(condition.getAccessibleChannelIds());
+        }
+
+        // Build message-level criteria
+        Criteria msgCriteria = new Criteria();
         if (condition.getSearchKeyword() != null && !condition.getSearchKeyword().isEmpty()) {
             String keywordRegex = ".*" + condition.getSearchKeyword() + ".*";
-            criteria.and("messages.content").regex(keywordRegex, "i");
+            msgCriteria.and("messages.content").regex(keywordRegex, "i");
         }
         if (condition.getFromId() != null) {
-            criteria.and("messages.fromId").is(condition.getFromId());
+            msgCriteria.and("messages.fromId").is(condition.getFromId());
         }
         if (condition.getBeforeDate() != null) {
-            criteria.and("messages.createdAt").lte(condition.getBeforeDate());
+            msgCriteria.and("messages.createdAt").lte(condition.getBeforeDate());
         }
         if (condition.getAfterDate() != null) {
-            criteria.and("messages.createdAt").gte(condition.getAfterDate());
+            msgCriteria.and("messages.createdAt").gte(condition.getAfterDate());
         }
 
+        // Aggregation pipeline
         Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(criteria),
-                Aggregation.unwind("messages"), // Unwind the array to process each element individually
-                Aggregation.match(criteria),   // Re-apply the condition to filter the specific messages
-                Aggregation.replaceRoot("messages") // Return only the matching messages
+                Aggregation.match(docCriteria), // Narrow to accessible channels
+                Aggregation.unwind("messages"), // Unwind the messages array
+                Aggregation.match(msgCriteria), // Filter messages
+                Aggregation.replaceRoot("messages") // Return only the messages
         );
 
-        AggregationResults<MessageDto> result = mongoTemplate.aggregate(aggregation, "channel_message_histories", MessageDto.class);
+        AggregationResults<MessageDto> result = mongoTemplate.aggregate(aggregation,
+                "channel_message_histories", MessageDto.class);
         return result.getMappedResults();
     }
 }
